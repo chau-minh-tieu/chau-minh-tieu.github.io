@@ -214,14 +214,14 @@ Connectors use `#8A857B`; external systems use a dashed slate border on the page
 
 ### 5.3 Pages and final copy
 
-**Global:** nav with the oxblood CT monogram, "Chau Tieu", links Writing · Projects · About, theme toggle (44 px target). Footer: "© {year} Chau Tieu · No trackers, no cookies." with RSS, GitHub, Colophon links.
+**Global:** nav with the oxblood CT monogram, "Chau Tieu", links Writing · Projects · About, theme toggle (44 px target). Footer: ~~"© {year} Chau Tieu · No trackers, no cookies."~~ *Owner decision, 2026-10-25 (F8): "© {year} Chau Tieu · Building software since 2010, still learning it one note at a time."* with RSS, GitHub, Colophon links.
 
 **Home** (`/`):
 - Eyebrow: "Engineering · AI · Leadership" (each word in its tag colour).
 - H1: **"Notes on software, data & AI, and engineering leadership."**
 - Lede: "I'm Chau Tieu, an engineering manager. I've been building software since 2010, and this is where I write down what I learn."
 - Writing: tag chips (All, Engineering, AI, Leadership → `/tags/<tag>/`), then posts newest first: date (tabular), tag label with reading time, title, description. Must look right with a single post.
-- Selected projects: two entries, link to `/projects/`.
+- Selected projects: two entries, link to `/projects/`. *Owner decision, 2026-10-25 (F8): Reign Edge and delivery-metrics, in that order.*
 
 **Post** (`/posts/<slug>/`): tag · date · reading time; title; description as dek; byline "Chau Tieu · Drafted with AI, edited by me"; "On this page" contents in the margin; numbered section headings; sidenotes; code blocks; tables with optional Verdict row; figures with numbered captions ("Fig. N", "Table N"); notes as GitHub-style alerts; a pull quote. Footer: AI disclosure line ("Drafted with AI from my notes and the project's code. Reviewed and edited by me." — wording configurable per post), numbered sources, "Discuss on GitHub →", next/previous post.
 
@@ -242,7 +242,7 @@ Connectors use `#8A857B`; external systems use a dashed slate border on the page
 >
 > This site is where I write down what I learn, so I understand it properly.
 
-Then: "What I write about" (Engineering: backend systems, system design, data, and the occasional deep dive into a tool I had to understand; AI: agents, LLM tooling, and building software with a model in the loop, including where it goes wrong; Leadership: hiring, growing engineers, and making technical decisions as a team — lessons, never stories about people). "Now" (updated month, three placeholder items for the owner). "How posts are written" (brief written by the owner, AI drafts, every line reviewed in a PR, sources checked; mistakes are the owner's, not the model's). Sidebar: Elsewhere (GitHub, LinkedIn, RSS — **no email**) and Colophon ("Built with Astro and hosted on GitHub Pages. Set in Inter and JetBrains Mono. No analytics, no cookies, no third-party scripts.").
+Then: "What I write about" (Engineering: backend systems, system design, data, and the occasional deep dive into a tool I had to understand; AI: agents, LLM tooling, and building software with a model in the loop, including where it goes wrong; Leadership: hiring, growing engineers, and making technical decisions as a team — lessons, never stories about people). "Now" (updated month, three placeholder items for the owner; *F8: hidden until the owner sends three items*). "How posts are written" (brief written by the owner, AI drafts, every line reviewed in a PR, sources checked; mistakes are the owner's, not the model's). Sidebar: Elsewhere (GitHub, LinkedIn, RSS — **no email**) and Colophon (~~"Built with Astro and hosted on GitHub Pages. Set in Inter and JetBrains Mono. No analytics, no cookies, no third-party scripts."~~ *owner decision, 2026-10-25 (F8): "I built this site the way I like to learn: slowly, in public, one reviewed pull request at a time. Astro writes every page once, GitHub Pages serves it, and it is set in Inter and JetBrains Mono. Nothing here watches you read: no analytics, no cookies, no third-party scripts."*).
 
 **Tags** (`/tags/<tag>/`), **404**, **RSS** (`/rss.xml`, published posts only).
 
@@ -328,7 +328,7 @@ One feature = one brief, one branch, one PR, one debrief. Timeboxes are the owne
 | F5 | **Pages and brand.** Home, Projects, About, 404 with final copy; monogram favicon and nav mark; Open Graph defaults | [Astro] layouts and components | 25′ | All pages match section 5.3 and the mockup |
 | F6 | **Content workflow.** Brief issue form, labels, `lock-briefs.yml`, `STYLE.md`, post PR template, scope and link checks | [GitHub] issue forms; Actions for content gates | 40′ | A test brief locks itself; a test post PR runs all gates |
 | F7 | **First post end to end.** delivery-metrics: the owner writes the brief and insight; outline; draft PR; review; `unlisted` check; publish; `docs/runbook.md` | The full publishing loop | 60–90′ | The post is live and listed |
-| F8 | **Stretch, in order:** Vale rules in CI; generated Open Graph images; Claude Code GitHub Action (`@claude` on briefs; requires an exception to the GitHub-created-actions rule, ask first); search | | Remaining time | The owner calls it done |
+| F8 | ~~**Stretch, in order:** Vale rules in CI; generated Open Graph images; Claude Code GitHub Action (`@claude` on briefs; requires an exception to the GitHub-created-actions rule, ask first); search~~ *Owner decision, 2026-10-25: **site polish and documentation**, starting with a README for the repository. The four stretch items are deferred, not deleted.* | [GitHub] READMEs, licences; [CSS] font features, line breaking | Remaining time | The owner calls it done |
 
 **Setup Guide A (F0):** confirm the empty public repo exists; git uses the no-reply email and "Block command line pushes that expose my email" is on; Actions limited to GitHub-created actions, default token read-only, approval required for fork workflows; secret scanning and push protection on; Pages source = GitHub Actions; Issues → creation restricted to collaborators; Discussions on, with a "Posts" category; `.privacy-terms` created locally and `PRIVACY_TERMS` set via `gh secret set PRIVACY_TERMS < .privacy-terms`.
 

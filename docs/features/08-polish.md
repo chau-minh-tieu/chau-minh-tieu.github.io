@@ -42,6 +42,12 @@
 3. **Revert rehearsal. Default: a dry run.** You run `gh pr revert 13 --draft`; I check the branch name, that `verify` and `privacy` pass, that `content` is skipped and that the PR is mergeable; you close it unmerged and delete its branch. Reason: it proves every claim the runbook makes about the revert PR without adding two commits to `main`. Alternative: merge it, then revert the revert (two deploys, about 6 minutes).
 4. **Old stretch items. Default: deferred and listed in HANDOFF.md 8** (Vale, per-post Open Graph images, the Claude Code GitHub Action, search). Reason: they stay visible as candidates. Alternative: delete them.
 
+**Your answers** (2026-10-25): all four defaults. No Now items were sent, so the section is hidden until you send them. Three changes on top, which count as owner decisions and are recorded in HANDOFF.md 5.3:
+
+11. **"Selected projects" on Home: Reign Edge and delivery-metrics**, in that order, chosen by name in `src/lib/projects.ts` instead of "the first two". Projects keeps the HANDOFF.md 5.3 order. Reign Edge has no stack line, so its card shows its status instead.
+12. **A more personal footer and colophon**, written from HANDOFF.md 3.1 facts only (2010, writing to understand, the travel sentence, building in public) and adding no new personal information. The colophon keeps the promise the footer used to make: no analytics, no cookies, no third-party scripts. The PR gives one alternative for each.
+13. **The README shows the site off:** the monogram and links at the top; screenshots of Home and a post that follow GitHub's light or dark mode (`<picture>` with `prefers-color-scheme`); the 375 px view; the numbers (Lighthouse, scripts shipped, third-party requests, tests); and Mermaid diagrams of the publishing loop, the CI/CD pipeline and the Markdown pipeline. The images live in `docs/readme/`, are taken from this branch's build and carry no metadata.
+
 **Acceptance criteria**
 
 - README, licence, `docs/deep-dives.md`, the scope change, the runbook fixes and F7's time are on the branch; `pnpm privacy` is clean, and the only personal information is from HANDOFF.md 3.1.
