@@ -121,6 +121,18 @@ Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-t
 
 **Guide D verified at 00:03 on 2026-10-26, read-only.** You ran the `gh repo edit` command. `GET /repos/…`: `homepage` `https://chau-minh-tieu.github.io`, `topics` `astro`, `blog`, `github-pages`, `typescript`, `has_wiki: false`, `has_projects: false`; the description is unchanged.
 
+**Verified after the merge, 00:13 to 00:16 on 2026-10-26, read-only.** You merged PR #14 as `7f4b9f6`.
+
+| Check | Result |
+|---|---|
+| Local `main` | Equal to `origin/main` at `7f4b9f6`; clean working tree. `feat/08-polish` deleted on GitHub by the merge, and locally by you (its tree was identical to `main`) |
+| `main` ruleset | Active, no bypass; `deletion`, `non_fast_forward`, `pull_request`, `required_status_checks` (`verify`, `privacy`, `content`, integration 15368) |
+| Deploy run 40215377160 | `build`, `deploy` and `smoke` green |
+| `pnpm smoke --version 7f4b9f6…` | All 11 checks passed against the live site, the `http://` and trailing-slash redirects included |
+| Lighthouse 13.5.0, desktop, live | Home and the post: performance 100, accessibility 100, CLS 0, TBT 0 ms |
+| Live pages | The new footer; Reign Edge then delivery-metrics on Home; no "Now" on About |
+| Repository page | The README renders: logo, badge and four screenshots load, three Mermaid diagrams draw; `GET /repos/…/license` reports MIT from `LICENSE`; no Wiki or Projects tab |
+
 ### 2. File tour
 
 | File | Single responsibility | Depends on |
@@ -213,7 +225,7 @@ Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-t
 - **Screenshots are palette PNGs**, re-encoded with `sharp` (about 70% smaller, 672 KB for 14 files); `pnpm privacy` found no metadata in them.
 - **The mockup keeps the old footer and colophon.** HANDOFF.md wins on conflict, and it now records the new copy.
 - **PR #2's body was edited** (one line): its two screenshots now point at `e85d96d`, the F1 squash commit, which holds the same files.
-- **Lighthouse ran locally** on this branch (Home and post: 100 and 100, CLS 0). The live run follows the merge; the README quotes the live F7 figures until then.
+- **Lighthouse ran locally** on the branch (Home and post: 100 and 100, CLS 0), and again on the live site after the merge, with the same scores; the README's figures hold.
 - **The kitchen sink needed no change:** its tables gain `num` cells and its wide diagrams the hint, and the build-output tests still pass on it.
 
 ### 7. Time used
@@ -226,6 +238,11 @@ Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-t
 | F8 so far | about 35 minutes of work, before your checks, the revert dry run, Guide D, review and merge |
 | Cumulative | about 8 h 14 min of active time (about 10 h 16 min by the clock) of the planned 4–6 hours |
 | Revert dry run | 23:58 to 00:01: the first "done" reached no command (as in F7); then I ran it on your request and checked #15 |
+| Checks, Guide D, footer change, review and merge | 00:01 to 00:13: #15 closed, Guide D verified, the footer chosen from five options, your four checks recorded, PR #14 merged |
+| Post-merge verification | 00:13 to 00:16 |
+| Close-out PR | 00:18 to 00:21: this record |
+| F8 total | 23:20 to 00:21 by the clock, about 1 h 01 min; about 57 minutes active, leaving out the wait for your answers (23:30 to 23:34) |
+| Cumulative after F8 | about 8 h 36 min of active time (about 10 h 42 min by the clock), against the planned 4–6 hours, which you agreed could run over |
 
 ### 8. Q&A log
 
@@ -233,4 +250,4 @@ Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-t
 
 ### 9. Next
 
-Within F8: your review. After the merge I verify `main`, the Deploy run, `pnpm smoke --version <squash sha>`, Lighthouse on the live Home and post, the README on the repository page and the detected licence. F8 ends when you call it done. Deferred, not deleted (HANDOFF.md 8): Vale rules in CI, per-post Open Graph images, the Claude Code GitHub Action, search.
+Nothing within F8: merged as `7f4b9f6` and verified live (part 1). This close-out PR records the final time; F8 ends when you call it done. Deferred, not deleted (HANDOFF.md 8): Vale rules in CI, per-post Open Graph images, the Claude Code GitHub Action, search.
