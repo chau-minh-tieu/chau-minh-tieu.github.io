@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://chau-minh-tieu.github.io"><img src="public/brand/monogram-oxblood.svg" width="88" height="88" alt="The CT monogram"></a>
+  <a href="https://chau-minh-tieu.github.io"><img src="https://chau-minh-tieu.github.io/favicon.svg" width="88" height="88" alt="The CT monogram"></a>
 </p>
 
 <h1 align="center">chau-minh-tieu.github.io</h1>
@@ -45,12 +45,19 @@ Every state of a post lives in exactly one place: an issue, a pull request, or o
 
 ```mermaid
 flowchart LR
-  B["Brief issue<br/>written by me, locked"]:::slate --> O["Outline<br/>AI proposes, I approve"]:::violet
-  O --> D["Draft PR on post/slug<br/>AI writes, status unlisted"]:::violet
-  D --> G{"CI gates<br/>verify · privacy · content"}:::amber
-  G -->|"I review every line, merge"| U["Live but unlisted<br/>noindex, linked nowhere"]:::teal
-  U --> P["Publish PR<br/>status: published"]:::blue
-  P -->|merge| L["Listed<br/>home · tags · RSS · sitemap"]:::green
+  subgraph S1["1 · Brief"]
+    direction TB
+    B["Brief issue<br/>written by me, locked"]:::slate --> O["Outline<br/>AI proposes, I approve"]:::violet
+  end
+  subgraph S2["2 · Draft"]
+    direction TB
+    D["Draft PR on post/slug<br/>AI writes, status unlisted"]:::violet --> G{"CI gates<br/>verify · privacy · content"}:::amber
+  end
+  subgraph S3["3 · Review and publish"]
+    direction TB
+    U["Live but unlisted<br/>I review every line"]:::teal --> P["Publish PR<br/>status: published"]:::blue --> L["Listed<br/>home · tags · RSS · sitemap"]:::green
+  end
+  S1 --> S2 --> S3
   classDef slate fill:#ECE9E2,stroke:#6B665D,color:#2E2B26
   classDef violet fill:#ECE4F3,stroke:#6E54A0,color:#45326B
   classDef amber fill:#F6EAD2,stroke:#A87A22,color:#5E430D
