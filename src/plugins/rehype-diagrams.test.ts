@@ -95,8 +95,10 @@ describe('diagrams', () => {
   it('sizes figures: wide past the column, a scroll floor, nothing for small ones', async () => {
     const wide = await render(fence('flowchart LR', '  accDescr: Long.', '  A[One] --> B[Two] --> C[Three] --> D[Four] --> E[Five] --> F[Six] --> G[Seven]'));
     expect(wide).toMatch(/^<figure class="figure figure-diagram figure-wide diagram-min-\d+"><div class="diagram-scroll" tabindex="0">/);
+    expect(wide).toContain('</svg></div><p class="scroll-hint" aria-hidden="true">Scroll sideways to see the whole figure.</p>');
     const small = await render(fence('flowchart TB', '  accDescr: Short.', '  A --> B'));
     expect(small).toMatch(/^<figure class="figure figure-diagram"><div class="diagram-scroll"><svg/);
+    expect(small).not.toContain('scroll-hint');
 
     // The floor keeps at least 75% of the natural width, and never more than all of it.
     const medium = await render(fence('flowchart LR', '  accDescr: Medium.', '  A[One] --> B[Two] --> C[Three]'));
@@ -106,10 +108,11 @@ describe('diagrams', () => {
     expect(floor).toBeLessThanOrEqual(width);
   });
 
-  it('has a CSS rule for every floor step', () => {
+  it('has a CSS rule for every floor step, and a scroll hint that shows below it', () => {
     const css = readFileSync(new URL('../styles/figures.css', import.meta.url), 'utf8');
     for (let step = 280; step <= 920; step += 40) {
       expect(css).toContain(`.diagram-min-${step} .diagram { min-width: ${step}px; }`);
+      expect(css).toContain(`@container (width < ${step}px) { .diagram-min-${step} .scroll-hint { display: block; } }`);
     }
   });
 

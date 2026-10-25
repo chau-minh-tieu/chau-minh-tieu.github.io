@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { PROJECTS, SELECTED, linksOf, type Project } from './projects.ts';
+import { PROJECTS, SELECTED, linksOf, selectedProjects, type Project } from './projects.ts';
 import type { PostLike } from './posts.ts';
 
 /** The external links HANDOFF.md 3.1 allows, as URL prefixes; GitHub covers the owner's repositories. */
@@ -18,9 +18,10 @@ describe('projects', () => {
     }
   });
 
-  it('has unique names and enough projects for the home page', () => {
+  it('has unique names, and the home page selects two of them by name', () => {
     expect(new Set(PROJECTS.map((p) => p.name)).size).toBe(PROJECTS.length);
-    expect(PROJECTS.length).toBeGreaterThanOrEqual(SELECTED);
+    expect(selectedProjects().map((p) => p.name)).toEqual(['Reign Edge', 'delivery-metrics']);
+    expect(new Set(SELECTED).size).toBe(SELECTED.length);
   });
 
   it('adds the write-up link only when its post is published', () => {

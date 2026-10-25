@@ -1,7 +1,7 @@
 /**
- * The projects on /projects/ and, the first two, under "Selected projects" on
- * the home page. Copy from HANDOFF.md 5.3 only, nothing beyond it.
- * src/lib/projects.test.ts checks the links.
+ * The projects on /projects/, in HANDOFF.md 5.3's order, and the two that
+ * "Selected projects" shows on the home page. Copy from HANDOFF.md 5.3 only,
+ * nothing beyond it. src/lib/projects.test.ts checks the links.
  */
 import { REPOSITORY, postPath, type PostLike } from './posts.ts';
 
@@ -61,8 +61,17 @@ export const PROJECTS: readonly Project[] = [
   },
 ];
 
-/** How many projects the home page shows. */
-export const SELECTED = 2;
+/** The projects the home page shows, by name and in this order (owner decision, F8). */
+export const SELECTED: readonly string[] = ['Reign Edge', 'delivery-metrics'];
+
+/** The selected projects; a name that matches no project fails the build. */
+export function selectedProjects(): Project[] {
+  return SELECTED.map((name) => {
+    const project = PROJECTS.find((p) => p.name === name);
+    if (!project) throw new Error(`Selected project "${name}" is not in PROJECTS`);
+    return project;
+  });
+}
 
 /**
  * A project's links, with "Write-up" added after them when its post is

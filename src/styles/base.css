@@ -30,16 +30,32 @@ main {
   flex: 1;
 }
 
+/*
+ * Line breaking. Headings, titles and ledes balance their lines, so a title
+ * never ends on one word; paragraphs avoid a single word on the last line.
+ * Browsers without text-wrap ignore it and wrap as before.
+ */
 h1,
 h2,
 h3,
 h4 {
   margin: 0;
   font-weight: 600;
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
 }
 
 p {
   margin: 0;
+}
+
+.lede,
+blockquote p {
+  text-wrap: balance;
 }
 
 img,

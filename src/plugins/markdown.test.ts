@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { CODE_TOKENS } from './code-theme.ts';
 import { markdownOptions } from './markdown.ts';
+import { isNumeric } from './rehype-tables.ts';
 
 const processor = await createMarkdownProcessor({ syntaxHighlight: false, ...markdownOptions });
 const render = async (markdown: string) => (await processor.render(markdown)).code;
@@ -155,6 +156,14 @@ describe('tables', () => {
     expect(html).toContain('<td>a</td>');
     expect(html).not.toContain('<caption>');
   });
+
+  it('marks cells that hold a number, for tabular figures, and leaves text alone', async () => {
+    const html = await render(md('| Metric | Value |', '| --- | ---: |', '| read-only role | 99% |', '| Median | **2.1 h** |'));
+    expect(html).toContain('<td>read-only role</td><td align="right" class="num">99%</td>');
+    expect(html).toContain('<td align="right" class="num"><strong>2.1 h</strong></td>');
+    for (const value of ['133', '99%', '$1.08', '2.1 h', '1–63 ms', '≈730', '-0.5', '2026-10-25', '1,234']) expect(isNumeric(value), value).toBe(true);
+    for (const value of ['read-only', '≈730 tests', 'Exact', 'v1.2', '53-question graded eval', '', 'N/A']) expect(isNumeric(value), value).toBe(false);
+  });
 });
 
 describe('code blocks', () => {
@@ -173,6 +182,11 @@ describe('code blocks', () => {
     expect(html).toContain('<button type="button" class="code-copy" data-copy="" hidden>');
     expect(html.match(/<span class="line[^"]*"/g)).toEqual(['<span class="line"', '<span class="line highlighted"']);
     expect(html).toContain('<pre class="code-body" tabindex="0"><code>');
+  });
+
+  it('lets a long file name wrap after each slash, never inside a folder name', async () => {
+    const html = await render(md('```py title="migrations/versions/0003_roles.py"', 'pass', '```'));
+    expect(html).toContain('<span class="code-file">migrations/<wbr>versions/<wbr>0003_roles.py</span>');
   });
 
   it('names languages by their display name and accepts plain text', async () => {

@@ -173,6 +173,8 @@ Screenshots of the live site in [`img/`](img/): `07-post-light.png`, `07-post-da
 | Live checks, Lighthouse, screenshots, debrief | 23:06 to 23:11 |
 | F7 so far | about 2 h 00 min by the clock, about 1 h 34 min active (including your 35 minutes on the brief) against the 60–90-minute timebox, before this PR's review and merge |
 | Cumulative | about 7 h 35 min of active time (about 9 h 37 min by the clock) of the planned 4–6 hours |
+| F7 total (recorded in F8) | 21:11 to 23:15 by the clock, about 2 h 04 min; about 1 h 38 min active, including your 35 minutes on the brief and leaving out the interrupted turn (22:40 to 23:06) |
+| Cumulative after F7 | about 7 h 39 min of active time (about 9 h 41 min by the clock) |
 
 ### 8. Q&A log
 

@@ -60,15 +60,19 @@ const elsewhere = [
           }
         </section>
 
-        <section class="now" aria-labelledby="now-title">
-          <div class="now-head">
-            <h2 id="now-title">Now</h2>
-            <p class="updated">Updated {formatMonth(now.updated)}</p>
-          </div>
-          <ul>
-            {now.items.map((item) => <li>{item}</li>)}
-          </ul>
-        </section>
+        {
+          now.items.length > 0 && (
+            <section class="now" aria-labelledby="now-title">
+              <div class="now-head">
+                <h2 id="now-title">Now</h2>
+                <p class="updated">Updated {formatMonth(now.updated)}</p>
+              </div>
+              <ul>
+                {now.items.map((item) => <li>{item}</li>)}
+              </ul>
+            </section>
+          )
+        }
 
         <section class="process" aria-labelledby="process-title">
           <h2 id="process-title">How posts are written</h2>
@@ -99,8 +103,9 @@ const elsewhere = [
         <section id="colophon" aria-labelledby="colophon-title">
           <h2 class="label side-title" id="colophon-title">Colophon</h2>
           <p class="colophon">
-            Built with Astro and hosted on GitHub Pages. Set in Inter and JetBrains Mono. No analytics, no
-            cookies, no third-party scripts.
+            I built this site the way I like to learn: slowly, in public, one reviewed pull request at a time.
+            Astro writes every page once, GitHub Pages serves it, and it is set in Inter and JetBrains Mono.
+            Nothing here watches you read: no analytics, no cookies, no third-party scripts.
           </p>
         </section>
       </aside>

@@ -66,7 +66,9 @@ export type PostData = z.output<typeof postSchema>;
  */
 export const nowSchema = z.strictObject({
   updated: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'updated must be a month as YYYY-MM, quoted'),
-  items: z.array(z.string().trim().min(1)).length(3),
+  items: z
+    .array(z.string().trim().min(1))
+    .refine((items) => items.length === 0 || items.length === 3, 'items must be exactly three lines, or none to hide the section'),
 });
 
 export type NowData = z.output<typeof nowSchema>;

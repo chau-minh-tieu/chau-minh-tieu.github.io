@@ -13,7 +13,7 @@
  * Runs after rehype-sanitize: the classes and the button it adds are ours.
  */
 import { transformerMetaHighlight } from '@shikijs/transformers';
-import type { Element, Root } from 'hast';
+import type { Element, ElementContent, Root } from 'hast';
 import { toString } from 'hast-util-to-string';
 import { bundledLanguagesInfo, createHighlighter, type Highlighter, type ShikiTransformer } from 'shiki';
 import type { Plugin } from 'unified';
@@ -84,10 +84,16 @@ const copyIcon = el(
   ],
 );
 
+/** A file path with a line-break opportunity after each slash, so it wraps between folders. */
+export function fileName(title: string): ElementContent[] {
+  const parts = title.split('/');
+  return parts.flatMap((part, i) => (i < parts.length - 1 ? [text(`${part}/`), el('wbr')] : [text(part)]));
+}
+
 function codeBlock(pre: Element, label: string, title: string | undefined): Element {
   const head = el('div', { className: ['code-head'] }, [
     el('div', { className: ['code-meta'] }, [
-      ...(title ? [el('span', { className: ['code-file'] }, [text(title)])] : []),
+      ...(title ? [el('span', { className: ['code-file'] }, fileName(title))] : []),
       el('span', { className: ['code-lang'] }, [text(label)]),
     ]),
     // Hidden until src/scripts/copy-code.ts finds a working clipboard.
