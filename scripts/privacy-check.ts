@@ -12,7 +12,9 @@
  * from .privacy-terms at the repository root: one term per line, # comments.
  * Matching ignores case and diacritics and needs whole words or phrases.
  * Files are scanned for terms and email addresses; commit messages for terms
- * only, because commit trailers carry addresses by design.
+ * only, because commit trailers carry addresses by design. Raster images are
+ * checked for metadata (EXIF with GPS, XMP, IPTC, C2PA): the repository is
+ * public, so stripping images only in the built site would not be enough.
  *
  * Without a term list the term scan is skipped with a notice (fork PRs get no
  * secrets); PRIVACY_REQUIRE_TERMS=1 turns that into an error.
@@ -21,9 +23,16 @@
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { extname, join } from 'node:path';
 import { parseArgs } from 'node:util';
+import { findImageMetadata, IMAGE_EXTENSIONS } from './lib/image-metadata.ts';
 import { findEmails, findTerms, parseTerms, type Term } from './lib/privacy.ts';
+
+/**
+ * Images that carry fake metadata on purpose: the build-output test proves
+ * the image pipeline strips it. Nothing else may carry metadata.
+ */
+const METADATA_FIXTURES = new Set(['src/content/posts/kitchen-sink/screenshot-fixture.jpg']);
 
 interface Finding {
   file?: string;
@@ -98,9 +107,18 @@ function main(): number {
 
   const findings: Finding[] = [];
   let files = 0;
+  let images = 0;
   let messages = 0;
 
   const scanFile = (file: string, content: Buffer) => {
+    if (IMAGE_EXTENSIONS.has(extname(file).toLowerCase())) {
+      images++;
+      const kinds = findImageMetadata(content);
+      if (kinds.length > 0 && !METADATA_FIXTURES.has(file)) {
+        findings.push({ file, location: file, line: 1, message: `image metadata (${kinds.join(', ')})` });
+      }
+      return;
+    }
     if (isBinary(content)) return;
     files++;
     const text = content.toString('utf8');
@@ -162,7 +180,7 @@ function main(): number {
     }
   }
 
-  const scanned = `${files} file(s), ${messages} commit message(s), ${terms.length} term(s)`;
+  const scanned = `${files} file(s), ${images} image(s), ${messages} commit message(s), ${terms.length} term(s)`;
   if (findings.length > 0) {
     console.log(`privacy: ${findings.length} finding(s) in ${scanned}`);
     return 1;

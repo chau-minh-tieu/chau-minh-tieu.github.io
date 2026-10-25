@@ -1,0 +1,166 @@
+/*
+ * Code blocks rendered by src/plugins/rehype-code.ts: header (file name,
+ * language chip, copy button), line numbers, highlighted lines, token colours.
+ * One dark theme in both page themes (HANDOFF.md 5.1).
+ */
+
+.code {
+  margin: 0 0 36px;
+  overflow: hidden;
+  border: 1px solid var(--code-border);
+  border-radius: 10px;
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: var(--font-mono);
+}
+
+.code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 47px;
+  padding: 8px 10px 8px 16px;
+  border-bottom: 1px solid var(--code-border);
+  background: var(--code-head);
+}
+
+.code-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.25rem;
+}
+
+.code-file {
+  overflow-wrap: anywhere;
+}
+
+.code-lang {
+  flex: none;
+  padding: 2px 6px;
+  border: 1px solid var(--code-chip-border);
+  border-radius: 4px;
+  color: var(--code-function);
+  font-size: 0.6875rem; /* 11px */
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.code-copy {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--code-chip-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--code-punctuation);
+  font: inherit;
+  font-size: var(--text-label);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* display: inline-flex above would otherwise override the hidden attribute. */
+.code-copy[hidden] {
+  display: none;
+}
+
+.code-copy:hover {
+  border-color: var(--code-line-number);
+  color: var(--code-text);
+}
+
+.code-copy:focus-visible,
+.code-body:focus-visible {
+  outline-color: var(--code-text);
+}
+
+.code-copy svg {
+  display: inline;
+}
+
+.code-body {
+  margin: 0;
+  padding: 14px 0;
+  overflow-x: auto;
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4375rem; /* 23px */
+}
+
+.code-body:focus-visible {
+  outline-offset: -2px;
+}
+
+/*
+ * Each line is a grid row, so a highlighted line's background runs the full
+ * scroll width (min-width: max-content). The newlines between lines stay in
+ * the HTML for copying; whitespace-only text in a grid is not rendered.
+ */
+.code-body code {
+  display: grid;
+  min-width: max-content;
+  font-size: inherit;
+  counter-reset: line;
+}
+
+.code-body .line {
+  padding-right: 24px;
+  white-space: pre;
+}
+
+/* Line numbers are generated content: not selectable, not copied. */
+.code-body .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 44px;
+  padding-right: 18px;
+  text-align: right;
+  color: var(--code-line-number);
+  font-variant-numeric: tabular-nums;
+}
+
+.code-body .highlighted {
+  background: var(--code-highlight);
+}
+
+.tok-keyword {
+  color: var(--code-keyword);
+}
+
+.tok-string {
+  color: var(--code-string);
+}
+
+.tok-number {
+  color: var(--code-number);
+}
+
+.tok-function {
+  color: var(--code-function);
+}
+
+.tok-type {
+  color: var(--code-type);
+}
+
+.tok-builtin {
+  color: var(--code-builtin);
+}
+
+.tok-comment {
+  color: var(--code-comment);
+  font-style: italic;
+}
+
+.tok-punctuation {
+  color: var(--code-punctuation);
+}

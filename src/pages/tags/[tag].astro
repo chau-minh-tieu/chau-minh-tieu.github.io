@@ -1,0 +1,68 @@
+---
+// /tags/<tag>/ for every tag, built even without posts so the chips on the
+// home page never lead to a 404. Lists published posts only.
+import PostList from '../../components/PostList.astro';
+import TopicChips from '../../components/TopicChips.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { listedPosts } from '../../lib/collection.ts';
+import { TAG_DESCRIPTIONS, TAG_LABELS } from '../../lib/posts.ts';
+import { TAGS, type Tag } from '../../lib/schema.ts';
+
+export function getStaticPaths() {
+  return TAGS.map((tag) => ({ params: { tag } }));
+}
+
+const tag = Astro.params.tag as Tag;
+const posts = (await listedPosts()).filter((post) => post.data.tags.includes(tag));
+---
+
+<BaseLayout title={TAG_LABELS[tag]} description={TAG_DESCRIPTIONS[tag]}>
+  <div class="wrap">
+    <header class="head" data-tag={tag}>
+      <p class="label topic">Topic</p>
+      <h1>{TAG_LABELS[tag]}</h1>
+      <p class="lede">{TAG_DESCRIPTIONS[tag]}</p>
+    </header>
+    <section class="list" aria-label={`${TAG_LABELS[tag]} posts`}>
+      <div class="chips">
+        <TopicChips current={tag} />
+      </div>
+      <PostList posts={posts} />
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 880px;
+    padding: 80px 0 48px;
+  }
+
+  .topic {
+    color: var(--accent);
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: -0.03em;
+  }
+
+  .lede {
+    max-width: 640px;
+    font-size: var(--text-lede);
+    line-height: var(--leading-lede);
+    color: var(--muted);
+  }
+
+  .list {
+    padding-bottom: 96px;
+  }
+
+  .chips {
+    padding-bottom: 32px;
+  }
+</style>

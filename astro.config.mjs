@@ -1,7 +1,9 @@
 // @ts-check
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { unified } from '@astrojs/markdown-remark';
 import { defineConfig, fontProviders } from 'astro/config';
+import { markdownOptions } from './src/plugins/markdown.ts';
 
 // BaseLayout.astro inlines this script verbatim. Astro hashes the scripts it
 // bundles but not is:inline ones, so the CSP allows this one by its own hash.
@@ -70,6 +72,16 @@ export default defineConfig({
       },
     },
   ],
+
+  // Posts go through the remark/rehype pipeline (unified), not Astro 7's
+  // default Sätteri, so the sanitiser and our plugins in src/plugins/ run.
+  // Astro's own Shiki is off: it would run before the sanitiser;
+  // src/plugins/rehype-code.ts highlights after it instead.
+  // https://docs.astro.build/en/reference/markdown-processors/unified/
+  markdown: {
+    syntaxHighlight: false,
+    processor: unified(markdownOptions),
+  },
 
   // Astro writes a <meta http-equiv="content-security-policy"> into every page
   // and adds hashes of the scripts and styles it emits to script-src and

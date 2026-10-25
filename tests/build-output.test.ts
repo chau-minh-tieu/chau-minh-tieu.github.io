@@ -2,14 +2,16 @@
  * Rules checked on the built site in dist/ (run `pnpm build` first):
  * every page carries a CSP that allows each of its inline scripts and styles
  * by hash, nothing is loaded from another origin, no email address is
- * published, and served SVGs carry no metadata.
+ * published, served images carry no metadata, drafts are never built,
+ * unlisted posts stay out of every list, and the sitemap matches the pages.
  *
  * Locally the suite is skipped when dist/ is missing; in CI it is required.
  */
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { extname, join, relative } from 'node:path';
+import { extname, join, relative, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { findImageMetadata, IMAGE_EXTENSIONS } from '../scripts/lib/image-metadata.ts';
 import { findEmails } from '../scripts/lib/privacy.ts';
 
 const DIST = join(import.meta.dirname, '..', 'dist');
@@ -96,5 +98,81 @@ describe.skipIf(!built)('build output', () => {
     for (const file of files.filter((f) => f.endsWith('.svg'))) {
       expect(read(file), name(file)).not.toMatch(/<metadata|c2pa|xmp|xpacket|exif/i);
     }
+  });
+});
+
+/** The URL a built page is served at: dist/tags/ai/index.html → https://…/tags/ai/ */
+function urlOf(page: string): string {
+  return `${SITE}/${name(page).split(sep).join('/').replace(/(^|\/)index\.html$/, '$1')}`;
+}
+
+const DRAFT = 'draft-fixture';
+const UNLISTED = '/posts/kitchen-sink/';
+
+describe.skipIf(!built)('statuses and feeds', () => {
+  it('never builds a draft', () => {
+    expect(files.filter((file) => file.includes(DRAFT)).map(name)).toEqual([]);
+    for (const file of files.filter((f) => TEXT_EXTENSIONS.has(extname(f)))) {
+      expect(read(file), name(file)).not.toContain(DRAFT);
+    }
+  });
+
+  it('builds unlisted posts with noindex', () => {
+    const html = read(join(DIST, 'posts', 'kitchen-sink', 'index.html'));
+    expect(html).toContain('<meta name="robots" content="noindex">');
+  });
+
+  it('keeps unlisted posts out of home, tag pages, RSS and the sitemap', () => {
+    const lists = [
+      join(DIST, 'index.html'),
+      ...pages.filter((page) => name(page).startsWith(`tags${sep}`)),
+      join(DIST, 'rss.xml'),
+      join(DIST, 'sitemap.xml'),
+    ];
+    expect(lists.length).toBeGreaterThan(4);
+    for (const file of lists) expect(read(file), name(file)).not.toContain(UNLISTED);
+  });
+
+  it('lists exactly the indexable pages in the sitemap', () => {
+    const sitemap = read(join(DIST, 'sitemap.xml'));
+    const listed = Array.from(sitemap.matchAll(/<loc>([^<]+)<\/loc>/g), (m) => m[1]).sort();
+    const indexable = pages
+      .filter((page) => !page.endsWith(`${sep}404.html`) && !read(page).includes('name="robots" content="noindex"'))
+      .map(urlOf)
+      .sort();
+    expect(listed).toEqual(indexable);
+  });
+});
+
+describe.skipIf(!built)('post content', () => {
+  const post = built ? read(join(DIST, 'posts', 'kitchen-sink', 'index.html')) : '';
+
+  it('renders every component of the kitchen-sink post', () => {
+    for (const marker of [
+      'class="toc"',
+      'class="sidenotes"',
+      'class="callout"',
+      '<caption><span class="table-num">Table 1</span>',
+      'class="verdict"',
+      '<span class="figure-num">Fig. 2</span>',
+      'class="figure figure-frame"',
+      '<span class="code-file">roles.sql</span>',
+      'class="line highlighted"',
+      'class="tok-keyword"',
+      'data-copy=""',
+      '<blockquote>',
+    ]) {
+      expect(post, marker).toContain(marker);
+    }
+  });
+
+  it('renders hostile HTML from the post body inert', () => {
+    expect(post).not.toMatch(/alert\(|javascript:|<iframe/);
+  });
+
+  it('serves images without metadata', () => {
+    const images = files.filter((file) => IMAGE_EXTENSIONS.has(extname(file).toLowerCase()));
+    expect(images.length).toBeGreaterThan(0);
+    for (const image of images) expect(findImageMetadata(readFileSync(image)), name(image)).toEqual([]);
   });
 });

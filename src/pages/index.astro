@@ -1,6 +1,11 @@
 ---
-// Home. F1 ships the hero only; F5 adds the post list and selected projects.
+// Home: hero and the Writing list. F5 adds selected projects.
+import PostList from '../components/PostList.astro';
+import TopicChips from '../components/TopicChips.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { listedPosts } from '../lib/collection.ts';
+
+const posts = await listedPosts();
 ---
 
 <BaseLayout>
@@ -19,6 +24,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         where I write down what I learn.
       </p>
     </header>
+
+    <section class="writing" aria-labelledby="writing-title">
+      <div class="writing-head">
+        <h2 id="writing-title">Writing</h2>
+        <TopicChips current="all" />
+      </div>
+      <PostList posts={posts} />
+    </section>
   </div>
 </BaseLayout>
 
@@ -64,5 +77,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: var(--text-lede);
     line-height: var(--leading-lede);
     color: var(--muted);
+  }
+
+  .writing {
+    padding-bottom: 96px;
+  }
+
+  .writing-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 32px;
+  }
+
+  h2 {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    letter-spacing: -0.02em;
   }
 </style>

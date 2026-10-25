@@ -25,7 +25,7 @@
    2. **Build** on branch `feat/NN-slug`. Stop mid-build only if continuing would breach a guardrail (section 3), make a change that cannot be undone, or contradict an approved decision. Otherwise decide, proceed, and record the decision in the debrief.
    3. **Checks:** typecheck, build, tests, privacy check all green locally. Never hand back a red build; if something cannot be fixed, say so at the top of the message.
    4. **PR** with `gh` (title `feat(NN): …`, body links the feature doc, screenshots of UI changes if a headless browser is available locally). The owner merges.
-   5. **Debrief**, appended to the same feature doc (section 7). It ends with the brief for the next feature, so one owner reply can close one feature and open the next.
+   5. **Debrief**, appended to the same feature doc (section 7). ~~It ends with the brief for the next feature, so one owner reply can close one feature and open the next.~~ *Owner decision, 2026-10-25: one feature per chat. The feature's chat checks the draft brief against current docs, revises it on the feature branch and waits for "go"; builds, runs the checks, opens the PR with screenshots and appends the debrief, whose "Next" only names the next feature. Then it waits while the owner reviews the PR, answers questions in the teaching style and logs them in the debrief's Q&A on the PR branch. On "review done" it gives the merge command (`gh pr merge <N> --squash --delete-branch`) and never merges itself. After the merge it verifies read-only (local `main` equals `origin/main` at the squash commit, clean working tree, branch deleted, the `main` ruleset still applies) and ends with a copy-paste prompt that starts the next feature's chat in the same loop.*
 2. **Batched questions.** Ask every open question in one message, numbered, each with a default and a one-line reason. "defaults" accepts all.
 3. **GitHub setup guides.** When the owner must act in GitHub's UI, give one numbered guide: exact click path, the expected end state, and the equivalent `gh` command. After the owner confirms, verify with read-only `gh api` calls. The owner always enters secret values; never ask for them in chat.
 4. **Time checkpoints.** Report elapsed time against the budget in every debrief. ~~If the site is not live by 2 h 30 min, or F5 is not done by 4 h 15 min, propose concrete cuts from the stretch list before starting the next feature.~~ *Owner decision, 2026-10-25: the budget may run over. Nothing is scoped down at checkpoints; features run in the order of section 8.*
@@ -63,7 +63,7 @@ The repository is public. Code, docs, content, commit messages, branch names, PR
 
 ### 3.2 Repository and Git
 
-- Never push to `main`, force-push, merge PRs, change repository settings or visibility, or delete branches you did not create. Configure `.claude/settings.json` to deny these, allow read-only commands (`git status`, `git diff`, `git log`, `gh pr view`, `gh run view`, `gh api` GET), leave everything else on ask. Verify the current permission-rule syntax.
+- Never push to `main`, force-push, merge PRs, change repository settings or visibility, or delete branches you did not create. Configure `.claude/settings.json` to deny these, allow read-only commands (`git status`, `git diff`, `git log`, `gh pr view`, `gh run view`, `gh api` GET), leave everything else on ask. Verify the current permission-rule syntax. *Owner decision, 2026-10-25: committing and pushing to `feat/*` and `post/*` branches and opening the PR need no approval, so `.claude/settings.json` allows explicit pushes to those branches. The owner runs the merge command.*
 - The owner applies repository settings from your setup guides.
 - Conventional commits. Commits use the owner's GitHub no-reply email. Never commit secrets, `.privacy-terms` or `.env*`.
 
@@ -307,7 +307,7 @@ Tag label · filter chip (link) · theme toggle · code block (header with file 
   6. Deviations and gotchas.
   7. Time used: this feature and cumulative, against the budget.
   8. Q&A log.
-  9. Next: the brief for the next feature.
+  9. Next: ~~the brief for the next feature~~ the next feature's name; its own chat writes the brief (owner decision, 2026-10-25, section 2.1).
 - `docs/runbook.md` (F7): publishing a post end to end, unpublishing, rolling back a deploy.
 
 Teaching style: mental model before mechanics; anchor new ideas to what the owner knows (an Astro page ↔ a server-side template rendered once at build time; a content collection ↔ a typed table validated by a Pydantic-like schema; remark/rehype ↔ a compiler pipeline of AST transforms; CSS custom properties ↔ configuration injected at runtime; the Pages artifact ↔ a container image built from a larger build context). Direct and concise; tables for comparisons.

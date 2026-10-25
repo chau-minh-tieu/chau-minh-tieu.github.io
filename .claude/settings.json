@@ -19,10 +19,14 @@
       "Bash(gh ruleset list *)",
       "Bash(gh ruleset view *)",
       "Bash(gh api -X GET *)",
-      "Bash(gh api --method GET *)"
+      "Bash(gh api --method GET *)",
+      "Bash(git push origin feat/*)",
+      "Bash(git push -u origin feat/*)",
+      "Bash(git push origin post/*)",
+      "Bash(git push -u origin post/*)"
     ],
     "ask": [
-      "Bash(git push *)"
+      "Bash(git push)"
     ],
     "deny": [
       "Bash(git push * main)",

@@ -16,11 +16,14 @@ interface Props {
   /** Page title; the site name is appended. Omit on the home page. */
   title?: string;
   description?: string;
+  /** Asks search engines not to index the page (unlisted posts). */
+  noindex?: boolean;
 }
 
 const {
   title,
   description = 'Notes on software, data & AI, and engineering leadership.',
+  noindex = false,
 } = Astro.props;
 
 const fullTitle = title ? `${title} · Chau Tieu` : 'Chau Tieu';
@@ -37,6 +40,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="alternate" type="application/rss+xml" title="Chau Tieu" href="/rss.xml" />
     <Font cssVariable="--font-inter" preload />
     <Font cssVariable="--font-jetbrains-mono" />
   </head>
