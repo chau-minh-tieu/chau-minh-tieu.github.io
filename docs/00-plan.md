@@ -25,13 +25,14 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 | pnpm | 12.15.0 via corepack 0.36.0 | Node 25 and later no longer bundle [corepack](https://github.com/nodejs/corepack); install it from npm. Q2 |
 | Astro | 7.4.2 | [Docs](https://docs.astro.build); requires Node ≥ 22.23 |
 | TypeScript | 6.0.3 | Not 7.x: `@astrojs/check` 0.9.12 supports TypeScript 5–6 only |
-| `@astrojs/check` · `rss` · `sitemap` | 0.9.12 · 4.0.19 · 3.7.4 | |
+| `@astrojs/check` · `rss` | 0.9.12 · 4.0.19 | Sitemap: own endpoint, not `@astrojs/sitemap` (deviation 8) |
 | Shiki, `@shikijs/transformers` | 4.5.0 | [Transformers](https://shiki.style/packages/transformers) |
 | Zod | from `astro/zod` (Zod 4) | No separate dependency ([collections](https://docs.astro.build/en/guides/content-collections/)) |
 | Vitest | 5.0.5 | |
 | Fonts | `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono` 5.3.0 | OFL, self-hosted |
 | `@astrojs/markdown-remark` | 7.3.4 | F2: keeps the remark/rehype pipeline (deviation 6) |
-| `rehype-sanitize` | 6.0.0 | |
+| `rehype-raw` · `rehype-sanitize` | 7.0.0 · 6.0.0 | |
+| `unist-util-visit` · `hast-util-to-string` | 5.1.0 · 3.0.1 | Not 5.2.0: younger than pnpm 12's one-day [`minimumReleaseAge`](https://pnpm.io/settings/dependency-resolution#minimumreleaseage) on 2026-10-25 |
 | GitHub actions | `checkout` v7.0.1 · `setup-node` v7.1.0 · `cache` v6.1.0 · `configure-pages` v6.0.0 · `upload-pages-artifact` v5.0.0 · `deploy-pages` v5.0.1 | Pinned by commit SHA. Q5 |
 
 ## Fixed decisions (HANDOFF.md 4.2): implementation notes
@@ -40,8 +41,8 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 |---|---|
 | Framework | Astro 7, static output, `tsconfig` extends `astro/tsconfigs/strict` |
 | Packages | Single package; `packageManager` field and `.nvmrc` pin pnpm and Node |
-| Content | `src/content.config.ts`, `glob()` loader over `src/content/posts/**/index.md`, schema of section 6.2 |
-| Code highlighting | Custom Shiki theme from the 5.1 code tokens; meta-highlight, title and line-number transformers; `transformerStyleToClass` so highlighted code carries classes, not inline styles (see CSP) |
+| Content | `src/content.config.ts`, `glob()` loader over `src/content/posts/*/index.md` (id = folder name), schema of section 6.2 in `src/lib/schema.ts` |
+| Code highlighting | Custom Shiki theme from the 5.1 code tokens; `transformerMetaHighlight`; our own transformer turns token colours into classes (`tok-keyword`), so code carries no inline styles (see CSP). Runs in our rehype step after the sanitiser (deviation 7) |
 | CSP | Astro's built-in `security.csp` (stable since Astro 6) writes the `<meta>` tag with hashes for the scripts and styles it emits; `default-src 'self'` and the other directives are added through `directives`. It does not hash `is:inline` scripts, so `astro.config.mjs` hashes the theme script itself. Astro documents that it does not cover Shiki's inline styles, which F2 replaces with classes ([reference](https://docs.astro.build/en/reference/configuration-reference/)) |
 | Styling | Plain CSS with custom properties; F1 makes the case against a framework |
 | Fonts | Astro's Fonts API, `fontProviders.local()` over the woff2 files of the `@fontsource-variable` packages, Latin subset: no CDN at build or run time, generated fallback metrics, Inter preloaded ([guide](https://docs.astro.build/en/guides/fonts/)). Deviation 5 |
@@ -72,7 +73,9 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 3. "Latest stable versions": TypeScript stays on 6.0.3 until `@astrojs/check` supports 7.
 4. Issue creation can now be restricted to collaborators natively ([changelog, June 2026](https://github.blog/changelog/2026-06-29-restrict-issue-creation-to-collaborators-only/)), so no expiring interaction limit is needed (Q6).
 5. Fonts (F1): in Astro 7.4.2 the `npm` font provider with `remote: false` fails the build. unifont returns `file://` URLs, and Astro's font fetcher reads only plain paths. The `local` provider over the same package files gives the same result. Revisit when Astro fixes it.
-6. Markdown (found while writing the F2 brief): since Astro 7 the default `.md` processor is Sätteri, Astro's native pipeline, which has its own plugin API and does not run remark/rehype plugins ([Markdown processors](https://docs.astro.build/en/guides/markdown-content/)). F2 proposes `@astrojs/markdown-remark` with `processor: unified()` to keep the remark/rehype pipeline of HANDOFF.md 4.2.
+6. Markdown (found while writing the F2 brief): since Astro 7 the default `.md` processor is Sätteri, Astro's native pipeline, which has its own plugin API and does not run remark/rehype plugins ([Markdown processors](https://docs.astro.build/en/guides/markdown-content/)). F2 uses `@astrojs/markdown-remark` with `processor: unified()` to keep the remark/rehype pipeline of HANDOFF.md 4.2.
+7. Highlighting (F2): in `unified()`, Astro runs its Shiki step before user rehype plugins and rehype-raw after them (read in the 7.3.4 source; the docs do not say). Sanitising after Astro's Shiki would mean allowlisting every class it emits, so `markdown.syntaxHighlight` is off and `src/plugins/rehype-code.ts` highlights after rehype-sanitize. HANDOFF.md 4.2's choice (Shiki with a custom theme and transformers) is unchanged.
+8. Sitemap (F2): our own `src/pages/sitemap.xml.ts` instead of `@astrojs/sitemap`, whose `filter` sees only URLs: leaving out unlisted posts would need a second frontmatter parser in `astro.config.mjs`. A build-output test checks that the sitemap lists exactly the indexable pages.
 
 ## Kickoff decisions
 
@@ -92,3 +95,4 @@ Asked as open questions in F0; the owner accepted all ten defaults on 2026-10-25
 ## Later decisions
 
 - **2026-10-25, after F1: the time budget may run over.** Nothing is scoped down at the checkpoints of HANDOFF.md 2.4, and features run in the order of section 8. Elapsed time is still reported in every debrief.
+- **2026-10-25, at the start of F2: one feature per chat.** Each feature's chat writes its own brief against current docs and waits for "go"; builds and opens the PR; waits while the owner reviews and asks questions (logged in the debrief's Q&A); on "review done" gives the merge command and never merges; verifies the merge read-only; and ends with a handoff prompt for the next chat. A debrief's "Next" names the next feature instead of containing its brief. Recorded in HANDOFF.md 2.1 and 7, and CLAUDE.md rules 1 and 6.
