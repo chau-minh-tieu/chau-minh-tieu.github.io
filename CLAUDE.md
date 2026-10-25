@@ -64,4 +64,16 @@ Standing rules for Claude Code in this repository. `HANDOFF.md` is the source of
 
 ## Commands
 
-Added in F1, when the project is scaffolded.
+Node 26.12.1 (`.nvmrc`) and pnpm 12.15.0 (`packageManager`, through corepack). Non-interactive shells may pick another Node: put `~/.nvm/versions/node/v26.12.1/bin` first on `PATH` and confirm `pnpm -v` prints 12.15.0.
+
+| Command | What it does |
+|---|---|
+| `pnpm install` | Installs the pinned dependencies and enables `.githooks/` (privacy check on every commit and commit message) |
+| `pnpm dev` | Dev server on http://localhost:4321. The CSP is not active in dev |
+| `pnpm build` | Static build into `dist/` |
+| `pnpm preview` | Serves `dist/` with the CSP active |
+| `pnpm check` | Typechecks `.astro`, `.ts` and `.js` files (`astro check`) |
+| `pnpm test` | Vitest: unit tests, plus build-output tests over `dist/` (skipped locally without a build, required in CI) |
+| `pnpm privacy` | Privacy check over all tracked files |
+
+Before handing back: `pnpm check && pnpm build && pnpm test && pnpm privacy`.

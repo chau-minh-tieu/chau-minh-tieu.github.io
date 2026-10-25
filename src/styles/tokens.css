@@ -1,0 +1,80 @@
+/*
+ * Design tokens (HANDOFF.md section 5.1 and 5.2).
+ *
+ * Every colour token holds its light and its dark value in one light-dark()
+ * call. The `color-scheme` property on <html> decides which of the two
+ * applies: "light dark" follows the operating system (prefers-color-scheme),
+ * and the theme toggle narrows it to one value through data-theme.
+ * The rules that use the tokens never change; only the values do.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Page colours */
+  --bg: light-dark(#faf8f3, #141311);
+  --surface: light-dark(#f2efe8, #1d1b18);
+  --ink: light-dark(#1c1a17, #ece8df);
+  --muted: light-dark(#5e5a52, #a39e93);
+  --line: light-dark(#ddd8ce, #34312c);
+
+  /* Topic accents: tag labels and in-post details only, under 5% of a page */
+  --engineering: light-dark(#1f3a5f, #8fa9cc);
+  --ai: light-dark(#7d5e14, #d4b26a);
+  --leadership: light-dark(#7a2632, #d08a92);
+
+  /* Brand: the same in both themes */
+  --brand: #7a2632;
+  --on-brand: #faf8f3;
+
+  /* Families. --font-inter and --font-jetbrains-mono come from Astro's Fonts
+     API (astro.config.mjs) and already include metric-matched fallbacks. */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Type scale: size / line height. rem follows the reader's browser font
+     size setting; 1rem is 16px by default. */
+  --text-hero: 4rem; /* 64px */
+  --leading-hero: 4.25rem; /* 68px */
+  --text-display: 3.5rem; /* 56px */
+  --leading-display: 3.75rem; /* 60px */
+  --text-title: 2rem; /* 32px */
+  --leading-title: 2.375rem; /* 38px */
+  --text-heading: 1.5rem; /* 24px */
+  --leading-heading: 2rem; /* 32px */
+  --text-lede: 1.25rem; /* 20px */
+  --leading-lede: 2rem; /* 32px */
+  --text-body: 1.125rem; /* 18px */
+  --leading-body: 1.875rem; /* 30px */
+  --text-nav: 0.9375rem; /* 15px */
+  --text-small: 0.875rem; /* 14px */
+  --leading-small: 1.375rem; /* 22px */
+  --text-label: 0.75rem; /* 12px */
+  --leading-label: 1rem; /* 16px */
+  --text-mono: 0.9375rem; /* 15px */
+  --leading-mono: 1.5rem; /* 24px */
+
+  /* Layout */
+  --container: 1120px;
+  --gutter: 40px;
+  --measure: 680px;
+}
+
+/* The toggle's choice, applied by the inline script in BaseLayout.astro before
+   the first paint. With no stored choice, data-theme is absent and the
+   operating system decides. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --gutter: 20px;
+    --text-hero: 2.5rem; /* 40px */
+    --leading-hero: 2.75rem; /* 44px */
+  }
+}

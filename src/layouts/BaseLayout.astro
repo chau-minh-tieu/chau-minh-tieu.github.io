@@ -1,0 +1,51 @@
+---
+// The HTML document every page shares: <head>, theme bootstrap, fonts, nav,
+// main content slot and footer. Rendered once per page at build time.
+import { Font } from 'astro:assets';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteNav from '../components/SiteNav.astro';
+// Applies a stored theme before the first paint, so the page never flashes the
+// other theme. Rendered with is:inline as a blocking <head> script (Astro would
+// otherwise bundle it into a deferred module); astro.config.mjs adds its hash
+// to the CSP.
+import themeInit from '../scripts/theme-init.js?raw';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  /** Page title; the site name is appended. Omit on the home page. */
+  title?: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Notes on software, data & AI, and engineering leadership.',
+} = Astro.props;
+
+const fullTitle = title ? `${title} · Chau Tieu` : 'Chau Tieu';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={themeInit} />
+    <meta name="color-scheme" content="light dark" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-jetbrains-mono" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteNav />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

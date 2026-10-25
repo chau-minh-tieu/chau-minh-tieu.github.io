@@ -1,0 +1,94 @@
+# Checks every pull request into main. The job names `verify` and `privacy`
+# are the status checks the main ruleset requires (Setup Guide B1), so
+# renaming a job means updating the ruleset too.
+name: PR
+
+on:
+  pull_request:
+    branches: [main]
+
+# Workflow default: read-only token. Jobs repeat it explicitly.
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: verify
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          # The pnpm store is cached below; setup-node would look for pnpm before it exists.
+          package-manager-cache: false
+
+      # Node 25 and later no longer bundle corepack. Corepack then provides the
+      # pnpm version pinned in package.json's packageManager field.
+      - name: Install corepack and pnpm
+        run: |
+          npm install --global corepack@0.36.0
+          corepack enable
+          pnpm --version
+
+      - name: Locate the pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm check
+
+      # Build before tests: tests/build-output.test.ts inspects dist/.
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+  privacy:
+    name: privacy
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history, so the PR's commit messages can be read.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      # The script uses only Node built-ins: no install step. Event data reaches
+      # it through env, never interpolated into the script.
+      - name: Scan tracked files and commit messages
+        env:
+          PRIVACY_TERMS: ${{ secrets.PRIVACY_TERMS }}
+          # Forks get no secrets: skip the term scan there, require it otherwise.
+          PRIVACY_REQUIRE_TERMS: ${{ github.event.pull_request.head.repo.full_name == github.repository && '1' || '0' }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/privacy-check.ts --tracked --commits "$BASE_SHA..$HEAD_SHA"

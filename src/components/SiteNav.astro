@@ -1,0 +1,86 @@
+---
+// Site header: monogram and name linking home, the three section links,
+// and the theme toggle. The current section gets aria-current="page".
+import ThemeToggle from './ThemeToggle.astro';
+
+const path = Astro.url.pathname;
+
+const links = [
+  {
+    href: '/',
+    label: 'Writing',
+    current: path === '/' || path.startsWith('/posts/') || path.startsWith('/tags/'),
+  },
+  { href: '/projects/', label: 'Projects', current: path.startsWith('/projects/') },
+  { href: '/about/', label: 'About', current: path.startsWith('/about/') },
+];
+---
+
+<header class="wrap">
+  <nav class="nav" aria-label="Main">
+    <a class="brand" href="/">
+      <img class="monogram" src="/brand/monogram-oxblood.svg" width="32" height="32" alt="" />
+      <span class="brand-name">Chau Tieu</span>
+    </a>
+    <div class="links">
+      {
+        links.map((link) => (
+          <a href={link.href} aria-current={link.current ? 'page' : undefined}>
+            {link.label}
+          </a>
+        ))
+      }
+      <ThemeToggle />
+    </div>
+  </nav>
+</header>
+
+<style>
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 24px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .monogram {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .brand-name {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .links a {
+    font-size: var(--text-nav);
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .links a:hover,
+  .links a[aria-current='page'] {
+    color: var(--ink);
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+// Home. F1 ships the hero only; F5 adds the post list and selected projects.
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <div class="wrap">
+    <header class="hero">
+      <p class="label eyebrow">
+        <span class="engineering">Engineering</span>
+        <span class="dot" aria-hidden="true">·</span>
+        <span class="ai">AI</span>
+        <span class="dot" aria-hidden="true">·</span>
+        <span class="leadership">Leadership</span>
+      </p>
+      <h1>Notes on software, data &amp; AI, and engineering leadership.</h1>
+      <p class="lede">
+        I’m Chau Tieu, an engineering manager. I’ve been building software since 2010, and this is
+        where I write down what I learn.
+      </p>
+    </header>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 880px;
+    padding: 96px 0 88px;
+  }
+
+  .eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .engineering {
+    color: var(--engineering);
+  }
+
+  .ai {
+    color: var(--ai);
+  }
+
+  .leadership {
+    color: var(--leadership);
+  }
+
+  .dot {
+    color: var(--muted);
+  }
+
+  h1 {
+    font-size: var(--text-hero);
+    line-height: var(--leading-hero);
+    letter-spacing: -0.03em;
+  }
+
+  .lede {
+    max-width: 640px;
+    font-size: var(--text-lede);
+    line-height: var(--leading-lede);
+    color: var(--muted);
+  }
+</style>
