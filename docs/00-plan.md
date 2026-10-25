@@ -33,6 +33,8 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 | `@astrojs/markdown-remark` | 7.3.4 | F2: keeps the remark/rehype pipeline (deviation 6) |
 | `rehype-raw` · `rehype-sanitize` | 7.0.0 · 6.0.0 | |
 | `unist-util-visit` · `hast-util-to-string` | 5.1.0 · 3.0.1 | Not 5.2.0: younger than pnpm 12's one-day [`minimumReleaseAge`](https://pnpm.io/settings/dependency-resolution#minimumreleaseage) on 2026-10-25 |
+| `beautiful-mermaid` | 1.1.3 | F4: diagrams to SVG at build time ([repository](https://github.com/lukilabs/beautiful-mermaid)); brings `elkjs` 0.11.1 and `entities` 7.0.1 |
+| `hast-util-from-html` · `hast-util-sanitize` · `hast-util-to-html` (dev) | 2.0.3 · 5.0.2 · 9.0.5 | F4: parse and sanitise the rendered SVG; already in the tree through `rehype-raw`, `rehype-sanitize` and Astro |
 | GitHub actions | `checkout` v7.0.1 · `setup-node` v7.1.0 · `cache` v6.1.0 · `upload-pages-artifact` v5.0.0 · `deploy-pages` v5.0.1 | Pinned by commit SHA (Q5), rechecked 2026-10-25 in F3. `configure-pages` is not used: it adapts other generators' configs, and Astro's `site` is fixed. GitHub's Pages guide still shows older majors |
 
 ## Fixed decisions (HANDOFF.md 4.2): implementation notes
@@ -55,7 +57,7 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 
 | Option | C4 (mockup Fig. 2) | CI cost | Light and dark | Verdict |
 |---|---|---|---|---|
-| `beautiful-mermaid` 1.1.3 (pure TypeScript, no browser) | No C4 type: draw Fig. 2 as a flowchart with boundary subgraphs | Negligible | One SVG themed by CSS custom properties | **Try first.** Young library, last release Feb 2026 |
+| `beautiful-mermaid` 1.1.3 (pure TypeScript, no browser) | No C4 type: draw Fig. 2 as a flowchart with boundary subgraphs | Negligible | One SVG themed by CSS custom properties | **Chosen in F4** after the spike (Fig. 1 and Fig. 2 in 1–63 ms each). Young library, last release Feb 2026 |
 | `rehype-mermaid` 3.0 + Playwright Chromium | Yes (Mermaid's C4 is experimental) | Browser download, roughly 30–60 s per run, cacheable | Two renders, or `themeCSS` mapped to variables | Fallback |
 | D2 CLI | Through containers | Binary download in CI | Own themes, mapped by hand | No: GitHub's preview shows only the source |
 | Pre-rendered SVGs, committed | Any | None | Manual | Last resort |
@@ -76,6 +78,7 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 6. Markdown (found while writing the F2 brief): since Astro 7 the default `.md` processor is Sätteri, Astro's native pipeline, which has its own plugin API and does not run remark/rehype plugins ([Markdown processors](https://docs.astro.build/en/guides/markdown-content/)). F2 uses `@astrojs/markdown-remark` with `processor: unified()` to keep the remark/rehype pipeline of HANDOFF.md 4.2.
 7. Highlighting (F2): in `unified()`, Astro runs its Shiki step before user rehype plugins and rehype-raw after them (read in the 7.3.4 source; the docs do not say). Sanitising after Astro's Shiki would mean allowlisting every class it emits, so `markdown.syntaxHighlight` is off and `src/plugins/rehype-code.ts` highlights after rehype-sanitize. HANDOFF.md 4.2's choice (Shiki with a custom theme and transformers) is unchanged.
 8. Sitemap (F2): our own `src/pages/sitemap.xml.ts` instead of `@astrojs/sitemap`, whose `filter` sees only URLs: leaving out unlisted posts would need a second frontmatter parser in `astro.config.mjs`. A build-output test checks that the sitemap lists exactly the indexable pages.
+9. Diagrams (F4): `beautiful-mermaid` reports no syntax errors; it skips a line it cannot parse. `src/plugins/rehype-diagrams.ts` renders each diagram line by line and fails the build on a line that changes nothing or drops an arrow. Its start arrowhead (`<---`, `<-->`) is drawn reversed in 1.1.3; the theme pass corrects it. Mermaid's own C4 diagram is experimental with a fixed style, so C4 views are flowcharts with a boundary subgraph (HANDOFF.md 4.3 lists C4).
 
 ## Kickoff decisions
 

@@ -7,8 +7,8 @@
  *
  * `title="…"` names the file; `{7}` or `{1,3-4}` highlights lines
  * (transformerMetaHighlight). An unknown language fails the build, so a typo
- * such as `pyhton` cannot ship as unhighlighted text. Mermaid fences are left
- * alone for the diagram step (F4).
+ * such as `pyhton` cannot ship as unhighlighted text. Mermaid fences never
+ * get here: rehype-diagrams turns them into figures first.
  *
  * Runs after rehype-sanitize: the classes and the button it adds are ours.
  */
@@ -22,7 +22,6 @@ import { codeTheme, TOKEN_CLASS } from './code-theme.ts';
 import { classes, el, isElement, text } from './hast.ts';
 
 const PLAIN = new Set(['text', 'txt', 'plain', 'plaintext']);
-const SKIPPED = new Set(['mermaid']);
 
 let highlighter: Promise<Highlighter> | undefined;
 
@@ -123,7 +122,6 @@ export const rehypeCode: Plugin<[], Root> = () => async (tree, file) => {
   const shiki = await getHighlighter();
   for (const { pre, code, parent } of blocks) {
     const name = fenceLanguage(code);
-    if (SKIPPED.has(name)) continue;
     const lang = language(name);
     if (!lang) return file.fail(`Unknown code block language "${name}"`, code);
     if (lang.id !== 'text' && !shiki.getLoadedLanguages().includes(lang.id)) {

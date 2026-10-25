@@ -70,10 +70,32 @@
   --column-gap: 56px;
   --article: calc(var(--measure) + var(--column-gap) + var(--margin-column)); /* 956px */
 
-  /* Figure palette strokes used by the screenshot frame (F4 adds the rest). */
-  --fig-rose-stroke: light-dark(#9a3d49, #d08a92);
+  /* Figure palette (HANDOFF.md 5.1): fill, stroke and text per category.
+     Diagrams use them through classes (src/plugins/diagram-theme.ts,
+     figures.css); a test checks these values against the handoff. */
+  --fig-slate-fill: light-dark(#ece9e2, #26241f);
+  --fig-slate-stroke: light-dark(#6b665d, #8a857b);
+  --fig-slate-text: light-dark(#2e2b26, #e6e1d6);
+  --fig-teal-fill: light-dark(#dfeeea, #1a2a27);
+  --fig-teal-stroke: light-dark(#2f7468, #6fb3a5);
+  --fig-teal-text: light-dark(#1d4d45, #c4e3dc);
+  --fig-violet-fill: light-dark(#ece4f3, #261e33);
+  --fig-violet-stroke: light-dark(#6e54a0, #a68fd0);
+  --fig-violet-text: light-dark(#45326b, #ddd0f0);
+  --fig-blue-fill: light-dark(#e3eaf4, #1c2533);
+  --fig-blue-stroke: light-dark(#3b5b8a, #7e9fcc);
+  --fig-blue-text: light-dark(#1f3a5f, #c9d8ec);
+  --fig-amber-fill: light-dark(#f6ead2, #2e2614);
   --fig-amber-stroke: light-dark(#a87a22, #d4a64e);
+  --fig-amber-text: light-dark(#5e430d, #f0ddb4);
+  --fig-green-fill: light-dark(#e4efdf, #1e2a1a);
   --fig-green-stroke: light-dark(#4a7a3a, #86b373);
+  --fig-green-text: light-dark(#2c4f22, #d2e5c8);
+  --fig-rose-fill: light-dark(#f4e1e2, #30191c);
+  --fig-rose-stroke: light-dark(#9a3d49, #d08a92);
+  --fig-rose-text: light-dark(#6e2430, #f0cdd1);
+  /* Connectors, the same in both themes. */
+  --fig-line: #8a857b;
 
   /* Code theme: one dark theme in both page themes. The token colours are
      also in src/plugins/code-theme.ts (Shiki's theme); a test keeps the two
