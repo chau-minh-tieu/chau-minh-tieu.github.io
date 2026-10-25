@@ -227,7 +227,7 @@ Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-t
 
 ### 8. Q&A log
 
-No questions yet.
+- **Review change: a shorter footer, about AI, with a solo-founder feel.** You asked for a line shorter than "Building software since 2010, still learning it one note at a time.", about AI, with some emotion and the feel of a solo founder's startup. From five options you chose option 3: the footer now reads "© 2026 Chau Tieu · One engineer and AI, seeing how far we get." (43 characters after the dot, 66 before). It echoes the About copy's "how far one engineer can go with AI" and adds nothing beyond HANDOFF.md 3.1. The runner-up was "A team of one, with a model for company." Recorded in HANDOFF.md 5.3; the footer screenshots (`08-home-*`, `08-mobile.png`) were retaken.
 
 ### 9. Next
 

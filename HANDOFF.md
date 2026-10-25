@@ -214,7 +214,7 @@ Connectors use `#8A857B`; external systems use a dashed slate border on the page
 
 ### 5.3 Pages and final copy
 
-**Global:** nav with the oxblood CT monogram, "Chau Tieu", links Writing · Projects · About, theme toggle (44 px target). Footer: ~~"© {year} Chau Tieu · No trackers, no cookies."~~ *Owner decision, 2026-10-25 (F8): "© {year} Chau Tieu · Building software since 2010, still learning it one note at a time."* with RSS, GitHub, Colophon links.
+**Global:** nav with the oxblood CT monogram, "Chau Tieu", links Writing · Projects · About, theme toggle (44 px target). Footer: ~~"© {year} Chau Tieu · No trackers, no cookies."~~ *Owner decisions, 2026-10-25 (F8): "© {year} Chau Tieu · One engineer and AI, seeing how far we get."* with RSS, GitHub, Colophon links.
 
 **Home** (`/`):
 - Eyebrow: "Engineering · AI · Leadership" (each word in its tag colour).
