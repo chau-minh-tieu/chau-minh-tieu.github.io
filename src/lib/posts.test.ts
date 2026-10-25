@@ -21,6 +21,7 @@ function post(id: string, pubDate: string, extra: Record<string, unknown> = {}):
     pubDate,
     tags: ['leadership'],
     status: 'published',
+    brief: 1,
     ...extra,
   });
   return { id, data };

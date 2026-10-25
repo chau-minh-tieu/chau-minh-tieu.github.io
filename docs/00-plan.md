@@ -13,7 +13,7 @@ flowchart LR
   B --> A["Pages artifact"] --> P["GitHub Pages"]
 ```
 
-Three workflows: `pr.yml` (typecheck, build, tests, privacy check; content gates on `post/*` PRs), `deploy.yml` (on `main`: check, build and test, upload the Pages artifact, deploy through the `github-pages` environment, smoke-check the live site) and `lock-briefs.yml`. `verify` and the deploy build share their setup through the local action `.github/actions/setup` (F3).
+Four workflows: `pr.yml` (typecheck, build, tests, privacy check on every PR), `post.yml` (the `content` gates on `post/*` PRs: scope, brief, PR text privacy, build, links; F6), `deploy.yml` (on `main`: check, build and test, upload the Pages artifact, deploy through the `github-pages` environment, smoke-check the live site) and `lock-briefs.yml` (locks brief issues and scans their text; F6). `verify`, `content` and the deploy build share their setup through the local action `.github/actions/setup` (F3).
 
 ## Versions
 
@@ -80,6 +80,7 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 7. Highlighting (F2): in `unified()`, Astro runs its Shiki step before user rehype plugins and rehype-raw after them (read in the 7.3.4 source; the docs do not say). Sanitising after Astro's Shiki would mean allowlisting every class it emits, so `markdown.syntaxHighlight` is off and `src/plugins/rehype-code.ts` highlights after rehype-sanitize. HANDOFF.md 4.2's choice (Shiki with a custom theme and transformers) is unchanged.
 8. Sitemap (F2): our own `src/pages/sitemap.xml.ts` instead of `@astrojs/sitemap`, whose `filter` sees only URLs: leaving out unlisted posts would need a second frontmatter parser in `astro.config.mjs`. A build-output test checks that the sitemap lists exactly the indexable pages.
 9. Diagrams (F4): `beautiful-mermaid` reports no syntax errors; it skips a line it cannot parse. `src/plugins/rehype-diagrams.ts` renders each diagram line by line and fails the build on a line that changes nothing or drops an arrow. Its start arrowhead (`<---`, `<-->`) is drawn reversed in 1.1.3; the theme pass corrects it. Mermaid's own C4 diagram is experimental with a fixed style, so C4 views are flowcharts with a boundary subgraph (HANDOFF.md 4.3 lists C4).
+10. Post gates (F6): a workflow of their own, `post.yml`, not jobs in `pr.yml` as this page first said. The brief gate reads the PR body, so it reruns on `edited`; in `pr.yml` that would rerun `verify` on every description change. The job is skipped unless the head branch starts with `post/`, and a skipped job counts as passed, so `content` can be a required check. HANDOFF.md 4.4 lists no `post.yml`.
 
 ## Kickoff decisions
 

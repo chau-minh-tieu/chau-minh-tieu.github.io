@@ -48,6 +48,11 @@ export const postSchema = z
         message: 'sources are required when tags include engineering or ai',
       });
     }
+    // Every live post traces back to a brief (HANDOFF.md 6.3). Drafts and
+    // unlisted previews may lack one; the post PR gate requires it anyway (F6).
+    if (post.status === 'published' && post.brief === undefined) {
+      ctx.addIssue({ code: 'custom', path: ['brief'], message: 'brief is required once status is published' });
+    }
     if (post.updatedDate && post.updatedDate < post.pubDate) {
       ctx.addIssue({ code: 'custom', path: ['updatedDate'], message: 'updatedDate is before pubDate' });
     }

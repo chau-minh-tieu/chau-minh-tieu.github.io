@@ -1,0 +1,94 @@
+# Brief issues (HANDOFF.md 6.3) are AI input, so their threads must hold only
+# collaborators' text, and they are public the moment they are filed.
+#   lock           locks every issue labelled `brief`, so only collaborators can
+#                  comment. Holds the only write permission and runs no
+#                  repository code.
+#   brief-privacy  scans the title, body and collaborators' comments of brief
+#                  issues for private terms and email addresses. Reads the
+#                  secret, cannot write.
+# Issue events always run this file as it is on main, never a branch's copy,
+# and their checks attach to main's latest commit. Job names stay distinct from
+# the required PR checks (`verify`, `privacy`, `content`) so a red brief scan
+# is never mistaken for one of them.
+# https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#issues
+name: Briefs
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+  issue_comment:
+    types: [created, edited]
+
+# Workflow default: read-only token. Jobs repeat or change it explicitly.
+permissions:
+  contents: read
+
+jobs:
+  lock:
+    name: lock
+    # A new brief, or an existing issue that just got the label. Issues opened
+    # from the form fire both `opened` and `labeled`; the second run finds the
+    # issue locked already.
+    if: >-
+      github.event_name == 'issues' &&
+      contains(github.event.issue.labels.*.name, 'brief') &&
+      (github.event.action == 'opened' || github.event.label.name == 'brief')
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    permissions:
+      issues: write # lock the conversation
+    concurrency:
+      group: lock-brief-${{ github.event.issue.number }}
+      cancel-in-progress: false
+    steps:
+      # gh is installed on GitHub's runners. No reason is given: GitHub's four
+      # (off-topic, too heated, resolved, spam) all describe something else.
+      - name: Lock the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          if [ "$(gh api "repos/$REPO/issues/$NUMBER" --jq .locked)" = "true" ]; then
+            echo "Issue #$NUMBER is already locked."
+          else
+            gh issue lock "$NUMBER" --repo "$REPO"
+            echo "Issue #$NUMBER locked: only collaborators can comment."
+          fi
+
+  brief-privacy:
+    name: brief-privacy
+    # Brief issues only (not pull requests, whose comments fire issue_comment
+    # too), and only text written by collaborators: a public pass or fail on an
+    # outsider's comment would let anyone test guesses against the term list.
+    # The text that counts is the comment for comment events, the issue
+    # otherwise; a label other than `brief` changes no text.
+    if: >-
+      contains(github.event.issue.labels.*.name, 'brief') &&
+      !github.event.issue.pull_request &&
+      (github.event.action != 'labeled' || github.event.label.name == 'brief') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event_name == 'issue_comment' && github.event.comment.author_association || github.event.issue.author_association)
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      # Node built-ins only: no install. The text reaches the script through
+      # env and is read as data; findings name the field, line and term index.
+      - name: Scan the brief's text
+        env:
+          PRIVACY_TERMS: ${{ secrets.PRIVACY_TERMS }}
+          PRIVACY_REQUIRE_TERMS: '1'
+          BRIEF_TITLE: ${{ github.event_name == 'issues' && github.event.issue.title || '' }}
+          BRIEF_BODY: ${{ github.event_name == 'issues' && github.event.issue.body || '' }}
+          BRIEF_COMMENT: ${{ github.event_name == 'issue_comment' && github.event.comment.body || '' }}
+        run: node scripts/privacy-check.ts --text-env BRIEF_TITLE --text-env BRIEF_BODY --text-env BRIEF_COMMENT

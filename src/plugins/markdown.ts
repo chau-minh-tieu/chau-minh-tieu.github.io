@@ -5,7 +5,8 @@
  * Astro's unified processor runs: remark-parse, GFM, smartypants, remark
  * plugins, remark-rehype, [Shiki, off here], OUR REHYPE PLUGINS, images,
  * heading ids, rehype-raw, stringify. Raw HTML in a post is still unparsed
- * text at our turn, so our list parses it first (rehype-raw), sanitises the
+ * text at our turn (rehypeRawImages refuses raw images while it is), so our
+ * list parses it first (rehype-raw), sanitises the
  * whole tree, and only then runs our own transforms and highlighting. Nothing
  * after rehype-sanitize parses author text as HTML, with one exception that
  * carries its own sanitiser: rehype-diagrams parses the SVG rendered from a
@@ -18,7 +19,7 @@ import rehypeSanitize, { defaultSchema, type Options as SanitizeSchema } from 'r
 import { rehypeAlerts } from './rehype-alerts.ts';
 import { rehypeCode, rehypeCodeMeta } from './rehype-code.ts';
 import { rehypeDiagrams } from './rehype-diagrams.ts';
-import { rehypeFigureNumbers, rehypeFigures } from './rehype-figures.ts';
+import { rehypeFigureNumbers, rehypeFigures, rehypeRawImages } from './rehype-figures.ts';
 import { rehypeSidenotes } from './rehype-sidenotes.ts';
 import { rehypeTables } from './rehype-tables.ts';
 
@@ -45,6 +46,7 @@ export const sanitizeSchema: SanitizeSchema = {
 export const markdownOptions: UnifiedProcessorOptions = {
   rehypePlugins: [
     rehypeCodeMeta,
+    rehypeRawImages,
     rehypeRaw,
     [rehypeSanitize, sanitizeSchema],
     rehypeAlerts,

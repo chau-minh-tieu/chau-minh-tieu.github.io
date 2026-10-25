@@ -1,0 +1,95 @@
+# The brief for one post (HANDOFF.md 6.3). The drafting AI reads the issue
+# body and collaborators' comments; .github/workflows/lock-briefs.yml locks the
+# issue on creation and scans its text for private terms. GitHub applies the
+# label only if it exists (Setup Guide C).
+# https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms
+name: Post brief
+description: The brief an AI drafts a post from. The issue is public, locked on creation, and read as AI input.
+title: 'Brief: '
+labels: [brief]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue is **public** and becomes the drafting AI's input. It is locked as soon as it is filed, so only collaborators can comment.
+
+        Write in generic terms: no names of employers, clients or colleagues, no cities or addresses, no email addresses, no internal figures, no trading positions or results. Describe people as roles and keep leadership lessons composite and time-shifted.
+
+  - type: input
+    id: working-title
+    attributes:
+      label: Working title
+      description: The AI may propose a better one in the outline.
+      placeholder: Why the model never computes a number
+    validations:
+      required: true
+
+  - type: dropdown
+    id: primary-tag
+    attributes:
+      label: Primary tag
+      description: Sets the post's accent colour. Engineering and AI posts must cite sources.
+      options:
+        - engineering
+        - ai
+        - leadership
+    validations:
+      required: true
+
+  - type: textarea
+    id: thesis
+    attributes:
+      label: Thesis
+      description: The one claim the post argues, in one or two sentences.
+    validations:
+      required: true
+
+  - type: input
+    id: audience
+    attributes:
+      label: Audience
+      description: Who should read it, and what they already know.
+      placeholder: Backend engineers who have used an LLM API but not built an agent
+    validations:
+      required: true
+
+  - type: textarea
+    id: insight
+    attributes:
+      label: Insight
+      description: What you learned, decided, measured or got wrong. Only you can supply this; it is the centre of the post.
+    validations:
+      required: true
+      min_length: 40
+
+  - type: textarea
+    id: outline
+    attributes:
+      label: Rough outline
+      description: Optional. Sections or points in order; the AI proposes an outline either way.
+
+  - type: textarea
+    id: must-include
+    attributes:
+      label: Must include
+      description: Optional. Points, examples, code or diagrams the post must have.
+
+  - type: textarea
+    id: do-not-include
+    attributes:
+      label: Do not include
+      description: Optional. Categories only, never real names (for example "the vendor we evaluated", "team sizes").
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Optional. Links to cite. The AI cites a source for every technical claim and number, and finds more if needed.
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: This brief names no employer, client, colleague, city, address or email address, and contains no internal figures or trading positions or results.
+          required: true

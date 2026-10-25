@@ -73,6 +73,12 @@ describe('postSchema', () => {
     expect(failures({ ...valid, brief: 12 })).toEqual([]);
     expect(failures({ ...valid, brief: 0 })).toEqual(['brief']);
   });
+
+  it('requires the brief once a post is published', () => {
+    expect(failures({ ...valid, status: 'published' })).toEqual(['brief']);
+    expect(failures({ ...valid, status: 'published', brief: 12 })).toEqual([]);
+    expect(failures({ ...valid, status: 'draft' })).toEqual([]);
+  });
 });
 
 describe('nowSchema', () => {

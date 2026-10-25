@@ -1,0 +1,86 @@
+# Gates for post PRs (HANDOFF.md 6.3): branches named post/*, opened by the
+# drafting AI from a brief. Every other PR gets the `content` check as
+# "skipped", which counts as passed, so the check can be required by the main
+# ruleset (Setup Guide C) without blocking feature PRs. `verify` and `privacy`
+# (pr.yml) run on post PRs as on every PR: build, schema, alt text, sources,
+# tests, files and commit messages.
+#
+# A workflow of its own because the brief step reads the PR body, so it reruns
+# when the description is edited; in pr.yml that would rerun `verify` too.
+name: Post
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+# Workflow default: read-only token. The job repeats it explicitly.
+permissions:
+  contents: read
+
+concurrency:
+  group: post-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  content:
+    name: content
+    # The head branch cannot change for an open PR, so a post PR can never be
+    # turned into a skipped one.
+    if: startsWith(github.head_ref, 'post/')
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: read # the brief issue: label, lock, author
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history, so the PR's changes can be diffed against its base.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      # The cheap gates first, with Node built-ins only and before any install:
+      # an out-of-scope change (a dependency, a workflow) fails here. Event data
+      # reaches the scripts through env, never interpolated into the shell.
+      - name: Scope (only src/content/posts/)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/post-gates.ts scope --base "$BASE_SHA" --head "$HEAD_SHA"
+
+      - name: Brief (brief in the frontmatter, Closes in the body, a locked brief issue)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/post-gates.ts brief --base "$BASE_SHA" --head "$HEAD_SHA"
+
+      # PR titles and bodies are public and drafted from the brief. Forks get no
+      # secrets: skip the term scan there, require it otherwise (as in pr.yml).
+      - name: Privacy of the PR title and body
+        env:
+          PRIVACY_TERMS: ${{ secrets.PRIVACY_TERMS }}
+          PRIVACY_REQUIRE_TERMS: ${{ github.event.pull_request.head.repo.full_name == github.repository && '1' || '0' }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node scripts/privacy-check.ts --text-env PR_TITLE --text-env PR_BODY
+
+      - uses: ./.github/actions/setup
+
+      # The schema, alt text, sources, fence languages and diagram rules fail
+      # the build (F2, F4); the links step reads the pages it writes.
+      - name: Build
+        run: pnpm build
+
+      - name: Links (every external link on the changed posts)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/link-check.ts --base "$BASE_SHA" --head "$HEAD_SHA"

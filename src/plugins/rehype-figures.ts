@@ -7,7 +7,9 @@
  * The title becomes the caption (HANDOFF.md 6.1). An image whose file name
  * starts with `screenshot-` gets the quiet window frame of the mockup; one
  * starting with `wide-` breaks out of the reading column to the full 956px.
- * A missing alt text fails the build and names the image.
+ * A missing alt text fails the build and names the image, and so does an
+ * image written as raw HTML (rehypeRawImages, F6): only Markdown images go
+ * through Astro's image pipeline, which copies, resizes and strips them.
  *
  * rehypeFigureNumbers runs after the diagrams (rehype-diagrams.ts) and
  * numbers every captioned figure, image or diagram, "Fig. N" in page order.
@@ -24,6 +26,20 @@ function frameBar(): Element {
   const dot = () => el('span', { className: ['frame-dot'] });
   return el('div', { className: ['frame-bar'], ariaHidden: 'true' }, [dot(), dot(), dot()]);
 }
+
+/**
+ * Runs before rehype-raw, while the author's HTML is still raw text: a raw
+ * <img> would reach the page unresized, with its metadata, pointing at a file
+ * the build never copies.
+ */
+export const rehypeRawImages: Plugin<[], Root> = () => (tree, file) => {
+  visit(tree, (node) => {
+    const raw = node as { type: string; value?: unknown };
+    if (raw.type === 'raw' && typeof raw.value === 'string' && /<img\b/i.test(raw.value)) {
+      file.fail('Raw <img> in the post: use Markdown image syntax, ![Alt text](./image.png)', node);
+    }
+  });
+};
 
 export const rehypeFigures: Plugin<[], Root> = () => (tree, file) => {
   visit(tree, 'element', (node) => {
