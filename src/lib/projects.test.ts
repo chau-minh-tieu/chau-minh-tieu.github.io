@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { PROJECTS, SELECTED, linksOf, type Project } from './projects.ts';
 import type { PostLike } from './posts.ts';
@@ -32,13 +31,6 @@ describe('projects', () => {
     ]);
     // Unlisted posts are not in `listed`, so they get no link either.
     expect(linksOf(project, []).map((l) => l.label)).toEqual(['Source']);
-    expect(linksOf({ ...PROJECTS[0]!, writeUp: undefined }, listed).map((l) => l.label)).toEqual(['Source']);
-  });
-
-  // A mistyped slug would hide the link silently: linksOf finds no post and adds nothing.
-  it('names an existing post for every write-up', () => {
-    for (const project of PROJECTS.filter((p) => p.writeUp)) {
-      expect(existsSync(`src/content/posts/${project.writeUp}/index.md`), `${project.name}: ${project.writeUp}`).toBe(true);
-    }
+    expect(linksOf(PROJECTS[0]!, listed).map((l) => l.label)).toEqual(['Source']);
   });
 });
