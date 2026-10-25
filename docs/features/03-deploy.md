@@ -183,7 +183,47 @@ After the merge:
 
 ### 8. Q&A log
 
-No questions yet.
+- **What do the files in `.github/` do, and how do they flow?** `.github/` is configuration that GitHub reads, not code the site ships. A workflow is a pipeline definition (a Jenkinsfile, roughly): `on:` names the repository event that starts it, each job runs on a fresh VM with its own token, and steps run in order. An action is a reusable step, like a shared library function. There are three files:
+
+  | File | Kind | Started by | Purpose |
+  |---|---|---|---|
+  | `workflows/pr.yml` | Workflow | A pull request into `main` (open, push, reopen) | The merge gate: `verify` and `privacy`, required by the `main` ruleset |
+  | `workflows/deploy.yml` | Workflow | A push to `main` (a merge), or manually | `build` → `deploy` → `smoke`: publish the site and check it live |
+  | `actions/setup/action.yml` | Composite action | Called as a step by `verify` and `build` | Node, pnpm, the store cache and the install, in one place |
+
+  | Job | Token | Runs our code | Does |
+  |---|---|---|---|
+  | `pr.yml` `verify` | `contents: read` | Yes | Setup, typecheck, build, tests |
+  | `pr.yml` `privacy` | `contents: read`, plus the `PRIVACY_TERMS` secret | Our script only (Node built-ins) | Terms, email-like strings and image metadata in tracked files and the PR's commit messages |
+  | `deploy.yml` `build` | `contents: read` | Yes | Setup, typecheck, build, tests, upload `dist/` as the artifact |
+  | `deploy.yml` `deploy` | `pages: write`, `id-token: write` | No | `actions/deploy-pages` publishes the artifact through `github-pages` |
+  | `deploy.yml` `smoke` | `contents: read` | Our script only | `scripts/smoke.ts` against the live site |
+
+  ```mermaid
+  flowchart TB
+    subgraph Local["Your machine"]
+      C["git commit"] --> H[".githooks: pre-commit, commit-msg<br/>privacy check"]
+    end
+    H --> PUSH["push feat/* branch, open PR"]
+    subgraph PRW["pr.yml: on pull_request"]
+      V["verify<br/>setup action · check · build · test"]
+      PV["privacy<br/>files + commit messages"]
+    end
+    PUSH --> V
+    PUSH --> PV
+    V --> RS{"ruleset on main<br/>needs both green"}
+    PV --> RS
+    RS -->|"owner merges (squash)"| MAIN["push to main"]
+    subgraph DW["deploy.yml: on push to main"]
+      B["build<br/>setup action · check · build · test"] -->|"artifact: tar of dist/"| D["deploy<br/>environment github-pages"]
+      D -->|"output: page_url"| S["smoke<br/>/version.txt = commit, then checks"]
+    end
+    MAIN --> B
+    D --> P["GitHub Pages"]
+    S -.-> P
+  ```
+
+  How the pieces connect: a job's `name:` becomes the check name the ruleset waits for (rename one and PRs wait forever); `needs:` orders jobs, and data crosses between them only as an artifact (`build` → `deploy`) or a job output (`page_url` → `smoke`), because each job is a fresh VM; `concurrency` cancels a stale PR run when you push again (`pr-<number>`, cancel in progress) but never a deploy (`pages`). What is not in files: the ruleset, the `github-pages` environment and the Actions policy live in the repository's settings (Setup Guides A, B1, B2); the local hooks live in `.githooks/`. Gotchas: a `pull_request` run uses the workflow files as changed by the PR, which is how PR #4 tested the new setup action, while `deploy.yml` runs from `main` only, so its changes take effect after the merge; a local action can only be used after `actions/checkout`, because it is read from the checked-out files. F6 adds `ISSUE_TEMPLATE/`, a PR template and `lock-briefs.yml`. Docs: [Workflow syntax](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions), [Composite actions](https://docs.github.com/en/actions/tutorials/create-actions/create-a-composite-action).
 
 ### 9. Next
 
