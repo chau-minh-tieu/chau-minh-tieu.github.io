@@ -238,7 +238,14 @@ Read-only check afterwards: `gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.g
 
 ### 8. Q&A log
 
-No questions yet.
+- **What do I need to do in Setup Guide C?** Two small settings changes, at two different moments; both are yours because they change the repository, and I verify each read-only afterwards.
+
+  | Step | What it changes | When | Why then |
+  |---|---|---|---|
+  | C1: create the labels `brief` and `post` | Two labels, repository data with no effect on code | Any time before the first brief; before or after the merge both work | The form names the label `brief` but cannot create it. GitHub drops a missing label silently, and `lock-briefs.yml` acts only on issues labelled `brief`, so an unlabelled brief is never locked, scanned or accepted by the `content` gate |
+  | C2: add `content` to the `main` ruleset's required checks | The merge gate: PRs wait for `verify`, `privacy` and `content` | After the merge, once the test post PR shows `content` green | Only then has the gate run for real. Required before that, a bug in it could block every post PR, and on PR #7 it only reports "skipped" |
+
+  Mental model: the form refers to the label by name, like a foreign key; the label row must exist first, and GitHub does not raise an error when it is missing. The ruleset is the policy that turns a check name into a merge condition; adding `content` changes nothing for feature PRs (their `content` is skipped, which counts as passed) and makes it mandatory for `post/*` PRs. Order: review and merge PR #7 → C1 (if not done already) → test brief, which locks itself → test post PR, `content` green → C2 → I check `GET …/rules/branches/main`. The UI path is the simpler one for C2: the `gh api -X PUT` command replaces the whole ruleset, so it repeats every existing rule. Docs: [Managing labels](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels), [About rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
 
 ### 9. Next
 
