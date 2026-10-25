@@ -1,0 +1,38 @@
+---
+// Site footer. The year is the build year; every deploy rebuilds the site.
+const year = new Date().getFullYear();
+---
+
+<footer class="wrap">
+  <div class="foot">
+    <p class="note">© {year} Chau Tieu · No trackers, no cookies.</p>
+    <nav class="links" aria-label="Footer">
+      <a href="/rss.xml">RSS</a>
+      <a href="https://github.com/chau-minh-tieu">GitHub</a>
+      <a href="/about/#colophon">Colophon</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 32px 0 48px;
+    border-top: 1px solid var(--line);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .note {
+    color: var(--muted);
+  }
+
+  .links {
+    display: flex;
+    gap: 24px;
+  }
+</style>

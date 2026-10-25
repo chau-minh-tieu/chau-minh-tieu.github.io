@@ -30,6 +30,7 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 | Zod | from `astro/zod` (Zod 4) | No separate dependency ([collections](https://docs.astro.build/en/guides/content-collections/)) |
 | Vitest | 5.0.5 | |
 | Fonts | `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono` 5.3.0 | OFL, self-hosted |
+| `@astrojs/markdown-remark` | 7.3.4 | F2: keeps the remark/rehype pipeline (deviation 6) |
 | `rehype-sanitize` | 6.0.0 | |
 | GitHub actions | `checkout` v7.0.1 · `setup-node` v7.1.0 · `cache` v6.1.0 · `configure-pages` v6.0.0 · `upload-pages-artifact` v5.0.0 · `deploy-pages` v5.0.1 | Pinned by commit SHA. Q5 |
 
@@ -41,9 +42,9 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 | Packages | Single package; `packageManager` field and `.nvmrc` pin pnpm and Node |
 | Content | `src/content.config.ts`, `glob()` loader over `src/content/posts/**/index.md`, schema of section 6.2 |
 | Code highlighting | Custom Shiki theme from the 5.1 code tokens; meta-highlight, title and line-number transformers; `transformerStyleToClass` so highlighted code carries classes, not inline styles (see CSP) |
-| CSP | Astro's built-in `security.csp` (stable since Astro 6) writes the `<meta>` tag with hashes for every script and style; `default-src 'self'` and the other directives are added through `directives`. Astro documents that it does not cover Shiki's inline styles, which the class transformer removes ([reference](https://docs.astro.build/en/reference/configuration-reference/)) |
+| CSP | Astro's built-in `security.csp` (stable since Astro 6) writes the `<meta>` tag with hashes for the scripts and styles it emits; `default-src 'self'` and the other directives are added through `directives`. It does not hash `is:inline` scripts, so `astro.config.mjs` hashes the theme script itself. Astro documents that it does not cover Shiki's inline styles, which F2 replaces with classes ([reference](https://docs.astro.build/en/reference/configuration-reference/)) |
 | Styling | Plain CSS with custom properties; F1 makes the case against a framework |
-| Fonts | Astro's Fonts API, `fontProviders.npm({ remote: false })` over the `@fontsource-variable` packages: no CDN at build or run time, generated fallback metrics ([guide](https://docs.astro.build/en/guides/fonts/)) |
+| Fonts | Astro's Fonts API, `fontProviders.local()` over the woff2 files of the `@fontsource-variable` packages, Latin subset: no CDN at build or run time, generated fallback metrics, Inter preloaded ([guide](https://docs.astro.build/en/guides/fonts/)). Deviation 5 |
 | Privacy check | `scripts/privacy-check.ts`, run by Node's built-in TypeScript type stripping (no `tsx`); pre-commit hook in `.githooks/`, enabled by a `prepare` script setting `core.hooksPath`. Q10 |
 | Tests | Vitest for utilities and plugins; a build-output test over `dist/` for privacy and metadata rules |
 
@@ -70,6 +71,8 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 2. "pnpm via corepack": corepack has to be installed from npm on Node 26 (Q2).
 3. "Latest stable versions": TypeScript stays on 6.0.3 until `@astrojs/check` supports 7.
 4. Issue creation can now be restricted to collaborators natively ([changelog, June 2026](https://github.blog/changelog/2026-06-29-restrict-issue-creation-to-collaborators-only/)), so no expiring interaction limit is needed (Q6).
+5. Fonts (F1): in Astro 7.4.2 the `npm` font provider with `remote: false` fails the build. unifont returns `file://` URLs, and Astro's font fetcher reads only plain paths. The `local` provider over the same package files gives the same result. Revisit when Astro fixes it.
+6. Markdown (found while writing the F2 brief): since Astro 7 the default `.md` processor is Sätteri, Astro's native pipeline, which has its own plugin API and does not run remark/rehype plugins ([Markdown processors](https://docs.astro.build/en/guides/markdown-content/)). F2 proposes `@astrojs/markdown-remark` with `processor: unified()` to keep the remark/rehype pipeline of HANDOFF.md 4.2.
 
 ## Kickoff decisions
 
@@ -85,3 +88,7 @@ Asked as open questions in F0; the owner accepted all ten defaults on 2026-10-25
 8. **Keep the `Co-Authored-By: Claude` trailer on commits Claude makes.** The trailer carries Anthropic's non-personal no-reply address, the same kind of address as the owner's own commit identity, and matches the site's AI disclosure. This page does not spell it out, because committed files contain no email addresses.
 9. **Commit the mockup monograms as they are, strip their metadata when F5 copies them to `public/brand/`.** They carry a C2PA content-credentials block naming the generating tool; it holds no personal data and the privacy scan is clean.
 10. **Pre-commit hook without a dependency** (`.githooks/` and `core.hooksPath`). Nothing extra to trust or update, compared with husky or lefthook.
+
+## Later decisions
+
+- **2026-10-25, after F1: the time budget may run over.** Nothing is scoped down at the checkpoints of HANDOFF.md 2.4, and features run in the order of section 8. Elapsed time is still reported in every debrief.

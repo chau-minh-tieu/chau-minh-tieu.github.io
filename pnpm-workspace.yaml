@@ -1,0 +1,2 @@
+# pnpm settings for this single-package repository (no workspace packages).
+saveExact: true

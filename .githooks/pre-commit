@@ -1,0 +1,4 @@
+#!/bin/sh
+# Privacy check on the staged files (HANDOFF.md 3.1).
+# Enabled by `pnpm install`: the prepare script sets core.hooksPath to .githooks.
+exec node scripts/privacy-check.ts --staged

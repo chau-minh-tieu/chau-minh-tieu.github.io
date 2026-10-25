@@ -1,0 +1,3 @@
+#!/bin/sh
+# Privacy check on the commit message (HANDOFF.md 3.1). Commit messages are public.
+exec node scripts/privacy-check.ts --message-file "$1"
