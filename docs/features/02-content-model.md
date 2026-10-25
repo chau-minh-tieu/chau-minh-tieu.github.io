@@ -214,6 +214,19 @@ Alt text is required (the build fails without it), and so is a known fence langu
 
 - **Pushes to feature branches (owner instruction).** Committing and pushing feature branches and opening the PR need no permission; the owner runs the merge command. Asked whether `.claude/settings.json` should match, the owner said yes. Mental model: Claude Code checks deny rules first, then ask, then allow, and the first match wins regardless of how specific a rule is ([permissions](https://code.claude.com/docs/en/permissions)). The old ask rule `Bash(git push *)` matched every push, so allow rules alone would have changed nothing. Now: `git push [-u] origin feat/*` and `post/*` are allowed; a bare `git push` still asks, because its target branch is not in the command text; the deny rules still refuse `main`, `--force`, `+refspec` and deletions, even inside an allowed pattern such as `git push origin feat/x:main`. Recorded in HANDOFF.md 3.2, CLAUDE.md and `docs/00-plan.md`.
 - **What is a Zod schema?** A validator and a type in one declaration: Pydantic for TypeScript, or Bean Validation annotations plus the record they sit on. TypeScript types are erased at compile time, so data from outside the program (frontmatter, JSON) is never checked unless something checks it at run time; Zod does, and `z.output<typeof postSchema>` derives the static type from the same declaration, so the two cannot drift. Here, `src/content.config.ts` hands `postSchema` (`src/lib/schema.ts`) to the collection: Astro parses every post's frontmatter with it at build time and fails with file and field, and pages get `post.data` fully typed for `pnpm check`. `parse` also returns a cleaned copy: dates coerced, defaults filled, strings trimmed. Mistakes: an `interface` alone for external data (no run-time check); `z.object`, which silently drops a misspelt key, hence `z.strictObject`; expecting all errors at once (refinements run only after the shape is valid). Docs: [Zod API](https://zod.dev/api).
+- **How does the site work, from the entry point to the rendered pages?** It is a batch job, not a server: `pnpm build` runs Astro once in Node and writes plain files to `dist/`; GitHub Pages (F3) only serves them. Astro loads `astro.config.mjs`, syncs the collection (`src/content.config.ts`: `glob()` finds the posts, Zod validates the frontmatter, the unified pipeline turns each body into HTML, cached in `.astro/data-store.json`), finds the routes (every file in `src/pages/` is a URL; `getStaticPaths()` expands `posts/[slug]` and `tags/[tag]`), renders each page through its layout and components, runs the endpoints (`rss.xml.ts`, `sitemap.xml.ts`), then bundles CSS and JS, writes the CSP with hashes, copies fonts and re-encodes images. All lists read `listedPosts()` (`src/lib/collection.ts`), so one status rule drives home, tags, RSS and sitemap. In the browser only three small scripts run: the theme bootstrap, the toggle and the copy buttons. `pnpm dev` renders on request with drafts and without the CSP; `pnpm build` renders everything once; `pnpm preview` serves `dist/` as Pages will. File roles: part 2 of this debrief and F1's file tour.
+
+  ```mermaid
+  flowchart LR
+    B["pnpm build"] --> C["astro.config.mjs"]
+    C --> S["content sync<br/>glob · Zod · Markdown → HTML"]
+    S --> R["routes in src/pages<br/>getStaticPaths"]
+    R --> P["render pages<br/>layouts · components"]
+    R --> E["endpoints<br/>rss · sitemap"]
+    P --> O["bundle · CSP hashes<br/>fonts · images"]
+    E --> D["dist/"]
+    O --> D
+  ```
 
 ### 9. Next
 
