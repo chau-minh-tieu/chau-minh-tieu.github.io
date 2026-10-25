@@ -36,7 +36,8 @@ Standing rules for Claude Code in this repository. `HANDOFF.md` is the source of
 ## Git and GitHub
 
 - Never push to `main`, force-push, merge PRs, change repository settings or visibility, or delete branches you did not create.
-- `.claude/settings.json` denies the usual forms of those commands. Those rules match command text and are not a security boundary; the `main` ruleset (Setup Guide B1) is.
+- Commit, push to `feat/*` or `post/*` and open the PR without asking (owner decision, 2026-10-25); push with an explicit branch, `git push origin feat/NN-slug`. The owner runs the merge command.
+- `.claude/settings.json` denies the usual forms of those commands, allows explicit pushes to `feat/*` and `post/*`, and asks for a bare `git push`. Deny rules win over ask, ask over allow. Those rules match command text and are not a security boundary; the `main` ruleset (Setup Guide B1) is.
 - Conventional commits. Commits use the owner's GitHub no-reply address from repo-local git config. Never commit secrets, `.privacy-terms` or `.env*`.
 - Branches: `feat/NN-slug` for features, `post/<slug>` for posts.
 

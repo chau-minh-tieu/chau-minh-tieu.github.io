@@ -212,7 +212,7 @@ Alt text is required (the build fails without it), and so is a known fence langu
 
 ### 8. Q&A log
 
-No questions yet.
+- **Pushes to feature branches (owner instruction).** Committing and pushing feature branches and opening the PR need no permission; the owner runs the merge command. Asked whether `.claude/settings.json` should match, the owner said yes. Mental model: Claude Code checks deny rules first, then ask, then allow, and the first match wins regardless of how specific a rule is ([permissions](https://code.claude.com/docs/en/permissions)). The old ask rule `Bash(git push *)` matched every push, so allow rules alone would have changed nothing. Now: `git push [-u] origin feat/*` and `post/*` are allowed; a bare `git push` still asks, because its target branch is not in the command text; the deny rules still refuse `main`, `--force`, `+refspec` and deletions, even inside an allowed pattern such as `git push origin feat/x:main`. Recorded in HANDOFF.md 3.2, CLAUDE.md and `docs/00-plan.md`.
 
 ### 9. Next
 

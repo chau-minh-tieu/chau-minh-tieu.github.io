@@ -63,7 +63,7 @@ The repository is public. Code, docs, content, commit messages, branch names, PR
 
 ### 3.2 Repository and Git
 
-- Never push to `main`, force-push, merge PRs, change repository settings or visibility, or delete branches you did not create. Configure `.claude/settings.json` to deny these, allow read-only commands (`git status`, `git diff`, `git log`, `gh pr view`, `gh run view`, `gh api` GET), leave everything else on ask. Verify the current permission-rule syntax.
+- Never push to `main`, force-push, merge PRs, change repository settings or visibility, or delete branches you did not create. Configure `.claude/settings.json` to deny these, allow read-only commands (`git status`, `git diff`, `git log`, `gh pr view`, `gh run view`, `gh api` GET), leave everything else on ask. Verify the current permission-rule syntax. *Owner decision, 2026-10-25: committing and pushing to `feat/*` and `post/*` branches and opening the PR need no approval, so `.claude/settings.json` allows explicit pushes to those branches. The owner runs the merge command.*
 - The owner applies repository settings from your setup guides.
 - Conventional commits. Commits use the owner's GitHub no-reply email. Never commit secrets, `.privacy-terms` or `.env*`.
 
