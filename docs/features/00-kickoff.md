@@ -134,8 +134,8 @@ All read-only. Prefix each path with `repos/chau-minh-tieu/chau-minh-tieu.github
 
 | | Time |
 |---|---|
-| F0 | about 45 minutes against a 25-minute timebox: 10 minutes for the plan, the rest for installing `gh` and Node 26 and applying Guide A |
-| Cumulative | about 45 minutes of 4–6 hours |
+| F0 | about 50 minutes against a 25-minute timebox: 10 minutes for the plan, the rest for installing `gh` and Node 26, applying Guide A and closing out |
+| Cumulative | about 50 minutes of 4–6 hours |
 
 Estimate, not a clock reading: there was a long break mid-feature, and the clock was not read at every step. From F1 on, times come from the clock.
 
