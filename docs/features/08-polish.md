@@ -117,6 +117,8 @@ gh repo edit chau-minh-tieu/chau-minh-tieu.github.io --homepage https://chau-min
 
 Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.github.io --jq '{homepage, topics, has_wiki, has_projects}'`.
 
+**Guide D verified at 00:03 on 2026-10-26, read-only.** You ran the `gh repo edit` command. `GET /repos/…`: `homepage` `https://chau-minh-tieu.github.io`, `topics` `astro`, `blog`, `github-pages`, `typescript`, `has_wiki: false`, `has_projects: false`; the description is unchanged.
+
 ### 2. File tour
 
 | File | Single responsibility | Depends on |
