@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blog design system</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF8F3}
+.ds{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;color:#1C1A17}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.code{background:#1B1916;border:1px solid #2E2B26;border-radius:10px;overflow:hidden;color:#E6E1D6}
+.code-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px 8px 16px;border-bottom:1px solid #2E2B26;background:#211F1B}
+.code-body{overflow-x:auto;padding:14px 0;font-size:14px;line-height:23px}
+.line{display:flex;min-width:max-content}
+.ln{width:44px;flex:none;color:#8F897F;text-align:right;padding-right:18px;box-sizing:border-box;user-select:none;font-variant-numeric:tabular-nums}
+.src{white-space:pre;padding-right:24px}
+.hl{background:#2A2620}
+.copy{font:inherit;font-size:12px;font-weight:500;height:30px;padding:0 10px;border-radius:6px;border:1px solid #3A3630;background:transparent;color:#C9C2B5;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.k{color:#C4A7E7}.s{color:#A9C77D}.n{color:#E8A06A}.f{color:#8FB4E8}.t{color:#7FC4B5}.c{color:#9A948A;font-style:italic}.p{color:#C9C2B5}.b{color:#E58C8A}
+.tok{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #DDD8CE}
+.sw{width:28px;height:18px;border-radius:4px;flex:none}
+.cat{display:flex;flex-direction:column;gap:8px}
+.catcard{height:76px;box-sizing:border-box;border-radius:10px;display:flex;flex-direction:column;justify-content:center;padding:0 12px;font-size:14px;line-height:19px}
+a{color:#1C1A17;text-decoration-color:#C9C3B6;text-underline-offset:3px}
+a:hover{text-decoration-color:#1C1A17}
+</style>
+</helmet>
+<div class="ds" style="width: 1280px; box-sizing: border-box; padding: 96px 96px 120px; background: #FAF8F3; display: flex; flex-direction: column; gap: 88px">
+
+  <header style="display: flex; flex-direction: column; gap: 20px; max-width: 900px">
+    <div style="display: flex; align-items: center; gap: 14px">
+      <div aria-hidden="true" style="width: 36px; height: 36px; border-radius: 50%; background: #7A2632; color: #FAF8F3; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; letter-spacing: 0.01em">CT</div>
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">Chau Tieu · Blog design system · v0.1 draft</span>
+    </div>
+    <h1 style="margin: 0; font-size: 56px; line-height: 60px; font-weight: 600; letter-spacing: -0.025em">Monochrome is the structure.<br>Colour is the annotation.</h1>
+    <p style="margin: 0; font-size: 19px; line-height: 31px; color: #5E5A52; max-width: 720px">Apple’s precision, the typography of an academic journal, an old-money palette. One sans-serif family, one reading column, and three muted accents for topics, and a fuller palette kept for code and figures.</p>
+  </header>
+
+  <section style="display: flex; flex-direction: column; gap: 28px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">01 — Principles</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; border-top: 1px solid #DDD8CE; padding-top: 28px">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h3 style="margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: -0.01em">One column, generous margins</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 26px; color: #5E5A52">A 680 px reading measure with a quiet margin for sidenotes. Whitespace does the work that boxes and shadows usually do.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h3 style="margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: -0.01em">Precision over decoration</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 26px; color: #5E5A52">Hairline rules, aligned numbers, consistent rhythm. No gradients, no glass, no stock imagery, no emoji.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h3 style="margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: -0.01em">Colour carries meaning</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 26px; color: #5E5A52">Page chrome stays monochrome, one accent per topic. Inside code and figures a fuller palette encodes information, and each colour always means the same kind of thing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">02 — Colour</h2>
+
+    <div style="display: grid; grid-template-columns: 160px repeat(5, minmax(0, 1fr)); gap: 16px; align-items: stretch; border-top: 1px solid #DDD8CE; padding-top: 28px">
+      <div style="display: flex; flex-direction: column; gap: 4px; justify-content: center">
+        <span style="font-size: 16px; font-weight: 600">Light</span>
+        <span style="font-size: 13px; line-height: 20px; color: #5E5A52">Ivory paper, warm ink</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #FAF8F3; border: 1px solid #DDD8CE"></div>
+        <div style="font-size: 14px; font-weight: 600">Paper</div>
+        <div class="mono" style="font-size: 13px; color: #5E5A52">#FAF8F3 · page</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #F2EFE8; border: 1px solid #DDD8CE"></div>
+        <div style="font-size: 14px; font-weight: 600">Surface</div>
+        <div class="mono" style="font-size: 13px; color: #5E5A52">#F2EFE8 · code, tables</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #1C1A17"></div>
+        <div style="font-size: 14px; font-weight: 600">Ink</div>
+        <div class="mono" style="font-size: 13px; color: #5E5A52">#1C1A17 · 16.4:1</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #5E5A52"></div>
+        <div style="font-size: 14px; font-weight: 600">Muted</div>
+        <div class="mono" style="font-size: 13px; color: #5E5A52">#5E5A52 · 6.5:1</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #DDD8CE"></div>
+        <div style="font-size: 14px; font-weight: 600">Hairline</div>
+        <div class="mono" style="font-size: 13px; color: #5E5A52">#DDD8CE · rules only</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 160px repeat(5, minmax(0, 1fr)); gap: 16px; align-items: stretch; background: #141311; border-radius: 10px; padding: 24px">
+      <div style="display: flex; flex-direction: column; gap: 4px; justify-content: center">
+        <span style="font-size: 16px; font-weight: 600; color: #ECE8DF">Dark</span>
+        <span style="font-size: 13px; line-height: 20px; color: #A39E93">Warm black, never #000</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #141311; border: 1px solid #34312C"></div>
+        <div style="font-size: 14px; font-weight: 600; color: #ECE8DF">Paper</div>
+        <div class="mono" style="font-size: 13px; color: #A39E93">#141311</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #1D1B18; border: 1px solid #34312C"></div>
+        <div style="font-size: 14px; font-weight: 600; color: #ECE8DF">Surface</div>
+        <div class="mono" style="font-size: 13px; color: #A39E93">#1D1B18</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #ECE8DF"></div>
+        <div style="font-size: 14px; font-weight: 600; color: #ECE8DF">Ink</div>
+        <div class="mono" style="font-size: 13px; color: #A39E93">#ECE8DF · 15.2:1</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #A39E93"></div>
+        <div style="font-size: 14px; font-weight: 600; color: #ECE8DF">Muted</div>
+        <div class="mono" style="font-size: 13px; color: #A39E93">#A39E93 · 7.0:1</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="height: 96px; border-radius: 6px; background: #34312C"></div>
+        <div style="font-size: 14px; font-weight: 600; color: #ECE8DF">Hairline</div>
+        <div class="mono" style="font-size: 13px; color: #A39E93">#34312C</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 160px repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch">
+      <div style="display: flex; flex-direction: column; gap: 4px; justify-content: center">
+        <span style="font-size: 16px; font-weight: 600">Accents</span>
+        <span style="font-size: 13px; line-height: 20px; color: #5E5A52">One per topic. Light / dark</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; height: 96px; border-radius: 6px; overflow: hidden">
+          <div style="flex: 1; background: #1F3A5F"></div>
+          <div style="flex: 1; background: #8FA9CC"></div>
+        </div>
+        <div style="font-size: 14px; font-weight: 600; color: #1F3A5F">Navy — Engineering</div>
+        <div class="mono" style="font-size: 13px; color: #5E5A52">#1F3A5F 10.8:1 · #8FA9CC 7.7:1</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; height: 96px; border-radius: 6px; overflow: hidden">
+          <div style="flex: 1; background: #7D5E14"></div>
+          <div style="flex: 1; background: #D4B26A"></div>
+        </div>
+        <div style="font-size: 14px; font-weight: 600; color: #7D5E14">Ochre — AI</div>
+        <div class="mono" style="font-size: 13px; color: #5E5A52">#7D5E14 5.7:1 · #D4B26A 9.2:1</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; height: 96px; border-radius: 6px; overflow: hidden">
+          <div style="flex: 1; background: #7A2632"></div>
+          <div style="flex: 1; background: #D08A92"></div>
+        </div>
+        <div style="font-size: 14px; font-weight: 600; color: #7A2632">Oxblood — Leadership · brand</div>
+        <div class="mono" style="font-size: 13px; color: #5E5A52">#7A2632 9.2:1 · #D08A92 6.8:1</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">03 — Typography · Inter (optical sizes) + JetBrains Mono</h2>
+    <div style="display: flex; flex-direction: column; border-top: 1px solid #DDD8CE">
+      <div style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid #DDD8CE">
+        <div class="mono" style="font-size: 13px; line-height: 20px; color: #5E5A52">Display<br>600 · 56/60 · −0.025em</div>
+        <div style="font-size: 56px; line-height: 60px; font-weight: 600; letter-spacing: -0.025em">Let Postgres do the math</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid #DDD8CE">
+        <div class="mono" style="font-size: 13px; line-height: 20px; color: #5E5A52">Title<br>600 · 32/38 · −0.02em</div>
+        <div style="font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -0.02em">Testing a model like a system</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid #DDD8CE">
+        <div class="mono" style="font-size: 13px; line-height: 20px; color: #5E5A52">Heading<br>600 · 22/30 · −0.01em</div>
+        <div style="font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: -0.01em">Why the model never touches the numbers</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid #DDD8CE">
+        <div class="mono" style="font-size: 13px; line-height: 20px; color: #5E5A52">Body<br>400 · 18/30</div>
+        <div style="font-size: 18px; line-height: 30px; max-width: 680px">The model writes the query; the database does the arithmetic. Every number on the dashboard can be traced back to a single SQL statement that a test can re-run.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid #DDD8CE">
+        <div class="mono" style="font-size: 13px; line-height: 20px; color: #5E5A52">Small · captions<br>400 · 15/24</div>
+        <div style="font-size: 15px; line-height: 24px; color: #5E5A52; max-width: 680px">Fig. 1 — The model writes queries; the database does the arithmetic.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid #DDD8CE">
+        <div class="mono" style="font-size: 13px; line-height: 20px; color: #5E5A52">Label<br>600 · 12/16 · +0.08em · caps</div>
+        <div style="font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase"><span style="color: #7D5E14">AI</span><span style="color: #5E5A52"> · Nov 2, 2026 · 9 min read</span></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid #DDD8CE">
+        <div class="mono" style="font-size: 13px; line-height: 20px; color: #5E5A52">Mono<br>400 · 15/24</div>
+        <div class="mono" style="font-size: 15px; line-height: 24px">SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY merge_hours) FROM prs;</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid #DDD8CE">
+        <div class="mono" style="font-size: 13px; line-height: 20px; color: #5E5A52">Numbers<br>tabular-nums</div>
+        <div style="font-size: 18px; line-height: 30px; font-variant-numeric: tabular-nums">730 tests · 53 eval questions · 1,300 requests · 29 min</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">04 — Code · one dark theme in both modes</h2>
+    <div style="display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 48px; border-top: 1px solid #DDD8CE; padding-top: 28px; align-items: start">
+      <div style="display: flex; flex-direction: column">
+        <div class="tok"><span class="sw" style="background: #C4A7E7"></span><span style="font-size: 14px; font-weight: 600; width: 150px">Keyword</span><span class="mono" style="font-size: 13px; color: #5E5A52">#C4A7E7 · 8.4:1</span></div>
+        <div class="tok"><span class="sw" style="background: #A9C77D"></span><span style="font-size: 14px; font-weight: 600; width: 150px">String</span><span class="mono" style="font-size: 13px; color: #5E5A52">#A9C77D · 9.3:1</span></div>
+        <div class="tok"><span class="sw" style="background: #E8A06A"></span><span style="font-size: 14px; font-weight: 600; width: 150px">Number, constant</span><span class="mono" style="font-size: 13px; color: #5E5A52">#E8A06A · 8.1:1</span></div>
+        <div class="tok"><span class="sw" style="background: #8FB4E8"></span><span style="font-size: 14px; font-weight: 600; width: 150px">Function</span><span class="mono" style="font-size: 13px; color: #5E5A52">#8FB4E8 · 8.2:1</span></div>
+        <div class="tok"><span class="sw" style="background: #7FC4B5"></span><span style="font-size: 14px; font-weight: 600; width: 150px">Type, class</span><span class="mono" style="font-size: 13px; color: #5E5A52">#7FC4B5 · 8.7:1</span></div>
+        <div class="tok"><span class="sw" style="background: #E58C8A"></span><span style="font-size: 14px; font-weight: 600; width: 150px">Built-in, decorator</span><span class="mono" style="font-size: 13px; color: #5E5A52">#E58C8A · 7.1:1</span></div>
+        <div class="tok"><span class="sw" style="background: #9A948A"></span><span style="font-size: 14px; font-weight: 600; width: 150px">Comment</span><span class="mono" style="font-size: 13px; color: #5E5A52">#9A948A · 5.8:1</span></div>
+        <div class="tok"><span class="sw" style="background: #E6E1D6; border: 1px solid #DDD8CE"></span><span style="font-size: 14px; font-weight: 600; width: 150px">Text</span><span class="mono" style="font-size: 13px; color: #5E5A52">#E6E1D6 · 13.5:1</span></div>
+        <div class="tok"><span class="sw" style="background: #1B1916"></span><span style="font-size: 14px; font-weight: 600; width: 150px">Background</span><span class="mono" style="font-size: 13px; color: #5E5A52">#1B1916 · line #2A2620</span></div>
+        <p style="margin: 0; padding-top: 14px; font-size: 14px; line-height: 22px; color: #5E5A52">Contrast measured on the code background. Rendered by Shiki at build time with a custom theme; file name, line numbers, highlighted lines and the copy button come from Shiki transformers and one small script.</p>
+      </div>
+      <div class="code mono">
+        <div class="code-head">
+          <div style="display: flex; align-items: center; gap: 10px; font-size: 13px">
+            <span style="color: #E6E1D6">content.config.ts</span>
+            <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #8FB4E8; border: 1px solid #3A3630; border-radius: 4px; padding: 2px 6px">TS</span>
+          </div>
+          <button type="button" class="copy" aria-label="Copy code"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>Copy</button>
+        </div>
+        <div class="code-body">
+          <div class="line"><span class="ln">1</span><span class="src"><span class="k">import</span> <span class="p">{</span> z <span class="p">}</span> <span class="k">from</span> <span class="s">"zod"</span><span class="p">;</span></span></div>
+          <div class="line"><span class="ln">2</span><span class="src"> </span></div>
+          <div class="line"><span class="ln">3</span><span class="src"><span class="k">export const</span> Post <span class="p">=</span> z<span class="p">.</span><span class="f">object</span><span class="p">({</span></span></div>
+          <div class="line"><span class="ln">4</span><span class="src">  title<span class="p">:</span> z<span class="p">.</span><span class="f">string</span><span class="p">().</span><span class="f">max</span><span class="p">(</span><span class="n">120</span><span class="p">),</span></span></div>
+          <div class="line"><span class="ln">5</span><span class="src">  description<span class="p">:</span> z<span class="p">.</span><span class="f">string</span><span class="p">().</span><span class="f">max</span><span class="p">(</span><span class="n">160</span><span class="p">),</span></span></div>
+          <div class="line hl"><span class="ln">6</span><span class="src">  tags<span class="p">:</span> z<span class="p">.</span><span class="f">array</span><span class="p">(</span>z<span class="p">.</span><span class="f">enum</span><span class="p">([</span><span class="s">"engineering"</span><span class="p">,</span> <span class="s">"ai"</span><span class="p">,</span> <span class="s">"leadership"</span><span class="p">])),</span></span></div>
+          <div class="line"><span class="ln">7</span><span class="src">  draft<span class="p">:</span> z<span class="p">.</span><span class="f">boolean</span><span class="p">().</span><span class="f">default</span><span class="p">(</span><span class="n">true</span><span class="p">),</span></span></div>
+          <div class="line"><span class="ln">8</span><span class="src"><span class="p">});</span></span></div>
+          <div class="line"><span class="ln">9</span><span class="src"> </span></div>
+          <div class="line"><span class="ln">10</span><span class="src"><span class="k">export type</span> <span class="t">Post</span> <span class="p">=</span> z<span class="p">.</span><span class="t">infer</span><span class="p">&lt;</span><span class="k">typeof</span> Post<span class="p">&gt;;</span></span></div>
+          <div class="line"><span class="ln">11</span><span class="src"><span class="c">// frontmatter is validated at build time; a bad post fails CI</span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">05 — Figures · categorical palette</h2>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 14px; border-top: 1px solid #DDD8CE; padding-top: 28px">
+      <div class="cat">
+        <div class="catcard" style="background: #ECE9E2; border: 1.5px solid #6B665D; color: #2E2B26"><b>Slate</b><span style="font-size: 12px">People, neutral</span></div>
+        <div class="catcard" style="background: #26241F; border: 1.5px solid #8A857B; color: #E6E1D6"><b>Slate</b><span style="font-size: 12px">Dark</span></div>
+        <span class="mono" style="font-size: 11px; line-height: 16px; color: #5E5A52">#ECE9E2 / #6B665D<br>#26241F / #8A857B</span>
+      </div>
+      <div class="cat">
+        <div class="catcard" style="background: #DFEEEA; border: 1.5px solid #2F7468; color: #1D4D45"><b>Teal</b><span style="font-size: 12px">Web apps, UI</span></div>
+        <div class="catcard" style="background: #1A2A27; border: 1.5px solid #6FB3A5; color: #C4E3DC"><b>Teal</b><span style="font-size: 12px">Dark</span></div>
+        <span class="mono" style="font-size: 11px; line-height: 16px; color: #5E5A52">#DFEEEA / #2F7468<br>#1A2A27 / #6FB3A5</span>
+      </div>
+      <div class="cat">
+        <div class="catcard" style="background: #ECE4F3; border: 1.5px solid #6E54A0; color: #45326B"><b>Violet</b><span style="font-size: 12px">AI models, agents</span></div>
+        <div class="catcard" style="background: #261E33; border: 1.5px solid #A68FD0; color: #DDD0F0"><b>Violet</b><span style="font-size: 12px">Dark</span></div>
+        <span class="mono" style="font-size: 11px; line-height: 16px; color: #5E5A52">#ECE4F3 / #6E54A0<br>#261E33 / #A68FD0</span>
+      </div>
+      <div class="cat">
+        <div class="catcard" style="background: #E3EAF4; border: 1.5px solid #3B5B8A; color: #1F3A5F"><b>Blue</b><span style="font-size: 12px">Data stores</span></div>
+        <div class="catcard" style="background: #1C2533; border: 1.5px solid #7E9FCC; color: #C9D8EC"><b>Blue</b><span style="font-size: 12px">Dark</span></div>
+        <span class="mono" style="font-size: 11px; line-height: 16px; color: #5E5A52">#E3EAF4 / #3B5B8A<br>#1C2533 / #7E9FCC</span>
+      </div>
+      <div class="cat">
+        <div class="catcard" style="background: #F6EAD2; border: 1.5px solid #A87A22; color: #5E430D"><b>Amber</b><span style="font-size: 12px">Workers, jobs</span></div>
+        <div class="catcard" style="background: #2E2614; border: 1.5px solid #D4A64E; color: #F0DDB4"><b>Amber</b><span style="font-size: 12px">Dark</span></div>
+        <span class="mono" style="font-size: 11px; line-height: 16px; color: #5E5A52">#F6EAD2 / #A87A22<br>#2E2614 / #D4A64E</span>
+      </div>
+      <div class="cat">
+        <div class="catcard" style="background: #E4EFDF; border: 1.5px solid #4A7A3A; color: #2C4F22"><b>Green</b><span style="font-size: 12px">Data, success</span></div>
+        <div class="catcard" style="background: #1E2A1A; border: 1.5px solid #86B373; color: #D2E5C8"><b>Green</b><span style="font-size: 12px">Dark</span></div>
+        <span class="mono" style="font-size: 11px; line-height: 16px; color: #5E5A52">#E4EFDF / #4A7A3A<br>#1E2A1A / #86B373</span>
+      </div>
+      <div class="cat">
+        <div class="catcard" style="background: #F4E1E2; border: 1.5px solid #9A3D49; color: #6E2430"><b>Rose</b><span style="font-size: 12px">Risks, errors</span></div>
+        <div class="catcard" style="background: #30191C; border: 1.5px solid #D08A92; color: #F0CDD1"><b>Rose</b><span style="font-size: 12px">Dark</span></div>
+        <span class="mono" style="font-size: 11px; line-height: 16px; color: #5E5A52">#F4E1E2 / #9A3D49<br>#30191C / #D08A92</span>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; padding-top: 8px">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h3 style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 600">Kinds of figure</h3>
+        <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 16px; line-height: 26px">
+          <li><b>Flowchart</b> — process and data flow (Mermaid)</li>
+          <li><b>Sequence</b> — who calls whom, in order (Mermaid)</li>
+          <li><b>C4 context / container</b> — system structure (Mermaid C4 or D2)</li>
+          <li><b>Screenshot</b> — real UI in a quiet window frame, metadata stripped</li>
+        </ul>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h3 style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 600">Rules</h3>
+        <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 16px; line-height: 26px">
+          <li>Colour encodes a category, never decoration; the legend says which.</li>
+          <li>Rendered to SVG at build time: follows light and dark mode, ships no diagram JavaScript.</li>
+          <li>Every figure has a numbered caption; text in shapes stays at 4.5:1 or better.</li>
+          <li>Wide figures break out to the full 956 px measure.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">06 — Components</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; border-top: 1px solid #DDD8CE; padding-top: 28px">
+
+      <div style="display: flex; flex-direction: column; gap: 32px">
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Tags</div>
+          <div style="display: flex; gap: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase">
+            <span style="color: #1F3A5F">Engineering</span>
+            <span style="color: #7D5E14">AI</span>
+            <span style="color: #7A2632">Leadership</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Filter</div>
+          <div style="display: flex; gap: 8px">
+            <button type="button" aria-pressed="true" style="font: inherit; font-size: 14px; font-weight: 500; height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #1C1A17; background: #1C1A17; color: #FAF8F3">All</button>
+            <button type="button" aria-pressed="false" style="font: inherit; font-size: 14px; font-weight: 500; height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #DDD8CE; background: transparent; color: #1C1A17">Engineering</button>
+            <button type="button" aria-pressed="false" style="font: inherit; font-size: 14px; font-weight: 500; height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #DDD8CE; background: transparent; color: #1C1A17">AI</button>
+            <button type="button" aria-pressed="false" style="font: inherit; font-size: 14px; font-weight: 500; height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #DDD8CE; background: transparent; color: #1C1A17">Leadership</button>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Links</div>
+          <p style="margin: 0; font-size: 18px; line-height: 30px">Inline links are <a href="#">underlined with a hairline</a> that darkens on hover. Calls to action are plain text: <a href="#" style="font-weight: 600; text-decoration: none">Read the post →</a></p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Monogram</div>
+          <div style="display: flex; align-items: center; gap: 20px">
+            <div aria-hidden="true" style="width: 96px; height: 96px; border-radius: 50%; background: #7A2632; color: #FAF8F3; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 600; letter-spacing: 0.01em">CT</div>
+            <div aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; background: #7A2632; color: #FAF8F3; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600">CT</div>
+            <span style="font-size: 15px; line-height: 24px; color: #5E5A52">Inter Display 600 on oxblood. Avatar, nav mark and favicon.</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Sidenote</div>
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 32px">
+            <p style="margin: 0; font-size: 18px; line-height: 30px">A read-only role turns a bad query into a wrong answer, not a damaged database.<sup style="font-size: 12px; color: #7D5E14; font-weight: 600">1</sup></p>
+            <p style="margin: 0; font-size: 14px; line-height: 22px; color: #5E5A52"><span style="color: #7D5E14; font-weight: 600">1</span> Sits in the margin on wide screens, drops below the paragraph on phones.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 32px">
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Image frame</div>
+          <div style="border: 1px solid #DDD8CE; border-radius: 12px; overflow: hidden; background: #F2EFE8">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #DDD8CE; background: #FAF8F3">
+              <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #9A3D49"></span>
+              <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #A87A22"></span>
+              <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #4A7A3A"></span>
+              <span class="mono" style="margin-left: 12px; font-size: 12px; color: #5E5A52; background: #F2EFE8; padding: 4px 10px; border-radius: 6px">localhost:8501</span>
+            </div>
+            <div style="height: 120px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5E5A52">Screenshots sit in a quiet window frame</div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Table</div>
+          <table style="border-collapse: collapse; font-size: 15px; line-height: 22px; font-variant-numeric: tabular-nums; width: 100%">
+            <thead>
+              <tr>
+                <th style="text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52; padding: 0 0 10px; border-bottom: 1px solid #1C1A17">Metric</th>
+                <th style="text-align: right; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52; padding: 0 0 10px; border-bottom: 1px solid #1C1A17">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding: 10px 0; border-bottom: 1px solid #DDD8CE">Automated tests</td><td style="padding: 10px 0; border-bottom: 1px solid #DDD8CE; text-align: right">≈730</td></tr>
+              <tr><td style="padding: 10px 0; border-bottom: 1px solid #DDD8CE">Graded eval questions</td><td style="padding: 10px 0; border-bottom: 1px solid #DDD8CE; text-align: right">53</td></tr>
+              <tr><td style="padding: 10px 0">First full sync</td><td style="padding: 10px 0; text-align: right">≈29 min</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Note</div>
+          <div style="background: #F2EFE8; border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">Note</span>
+            <p style="margin: 0; font-size: 16px; line-height: 26px">Written as GitHub-style alerts in Markdown, so the pull request preview matches the published page.</p>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="mono" style="font-size: 13px; color: #5E5A52">Spacing · 8 px base</div>
+          <div style="display: flex; align-items: flex-end; gap: 16px">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 8px; height: 8px; background: #1C1A17"></div><span class="mono" style="font-size: 12px; color: #5E5A52">8</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 16px; height: 16px; background: #1C1A17"></div><span class="mono" style="font-size: 12px; color: #5E5A52">16</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 24px; height: 24px; background: #1C1A17"></div><span class="mono" style="font-size: 12px; color: #5E5A52">24</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 32px; height: 32px; background: #1C1A17"></div><span class="mono" style="font-size: 12px; color: #5E5A52">32</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 48px; height: 48px; background: #1C1A17"></div><span class="mono" style="font-size: 12px; color: #5E5A52">48</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 64px; height: 64px; background: #1C1A17"></div><span class="mono" style="font-size: 12px; color: #5E5A52">64</span></div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 96px; height: 96px; background: #1C1A17"></div><span class="mono" style="font-size: 12px; color: #5E5A52">96</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 28px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5E5A52">07 — Layout</h2>
+    <div style="border-top: 1px solid #DDD8CE; padding-top: 28px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; gap: 56px; align-items: stretch; height: 120px">
+        <div style="width: 680px; background: #F2EFE8; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #5E5A52">Reading column · 680 px · body 18/30</div>
+        <div style="width: 220px; border: 1px dashed #C9C3B6; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #5E5A52; text-align: center; padding: 0 12px">Sidenotes · 220 px</div>
+      </div>
+      <p style="margin: 0; font-size: 15px; line-height: 24px; color: #5E5A52">Container 1120 px · 56 px gutter · below 960 px the sidenote column folds into the text and the nav wraps. Breakpoints: 960 and 640.</p>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":3700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

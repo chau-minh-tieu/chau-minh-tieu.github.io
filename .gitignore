@@ -1,0 +1,11 @@
+# Local privacy blocklist: never commit
+.privacy-terms
+
+# Secrets and local env
+.env
+.env.*
+
+# Build output and dependencies
+node_modules/
+dist/
+.astro/

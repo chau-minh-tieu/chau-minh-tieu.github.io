@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home — Chau Tieu</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.site{--bg:#FAF8F3;--surface:#F2EFE8;--ink:#1C1A17;--muted:#5E5A52;--line:#DDD8CE;--engineering:#1F3A5F;--ai:#7D5E14;--leadership:#7A2632;--brand:#7A2632;--on-brand:#FAF8F3;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+.site[data-theme="dark"]{--bg:#141311;--surface:#1D1B18;--ink:#ECE8DF;--muted:#A39E93;--line:#34312C;--engineering:#8FA9CC;--ai:#D4B26A;--leadership:#D08A92}
+.site a{color:var(--ink);text-decoration-color:var(--line);text-underline-offset:3px}
+.site a:hover{text-decoration-color:var(--ink)}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{max-width:1120px;margin:0 auto;padding:0 40px;box-sizing:border-box}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0}
+.navlinks{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.chip{font:inherit;font-size:14px;font-weight:500;height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.iconbtn{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:22px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.postrow{display:grid;grid-template-columns:150px minmax(0,1fr);column-gap:40px;row-gap:8px;padding:28px 0;border-top:1px solid var(--line)}
+.projects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:32px 0 48px;border-top:1px solid var(--line)}
+@media (max-width:640px){
+  .wrap{padding:0 20px}
+  .postrow{grid-template-columns:1fr}
+  .projects{grid-template-columns:1fr}
+  .hero-title{font-size:40px !important;line-height:44px !important}
+}
+</style>
+</helmet>
+<div class="site" data-theme="{{theme}}" style="min-height: 100vh">
+  <div class="wrap">
+
+    <nav class="nav" aria-label="Main">
+      <a href="Home.dc.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none">
+        <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 50%; background: var(--brand); color: var(--on-brand); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.01em">CT</span>
+        <span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em">Chau Tieu</span>
+      </a>
+      <div class="navlinks">
+        <a href="Home.dc.html" aria-current="page" style="font-size: 15px; font-weight: 500; text-decoration: none">Writing</a>
+        <a href="Projects.dc.html" style="font-size: 15px; font-weight: 500; text-decoration: none; color: var(--muted)">Projects</a>
+        <a href="About.dc.html" style="font-size: 15px; font-weight: 500; text-decoration: none; color: var(--muted)">About</a>
+        <button type="button" class="iconbtn" aria-label="{{themeLabel}}" onClick="{{toggleTheme}}">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{false}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          </sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{true}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>
+          </sc-if>
+        </button>
+      </div>
+    </nav>
+
+    <header style="padding: 96px 0 88px; display: flex; flex-direction: column; gap: 28px; max-width: 880px">
+      <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; display: flex; gap: 10px; flex-wrap: wrap">
+        <span style="color: var(--engineering)">Engineering</span><span style="color: var(--muted)">·</span>
+        <span style="color: var(--ai)">AI</span><span style="color: var(--muted)">·</span>
+        <span style="color: var(--leadership)">Leadership</span>
+      </div>
+      <h1 class="hero-title" style="margin: 0; font-size: 64px; line-height: 68px; font-weight: 600; letter-spacing: -0.03em">Notes on software, data &amp; AI, and engineering leadership.</h1>
+      <p style="margin: 0; font-size: 20px; line-height: 32px; color: var(--muted); max-width: 640px">I’m Chau Tieu, an engineering manager. I’ve been building software since 2010, and this is where I write down what I learn.</p>
+    </header>
+
+    <section aria-labelledby="writing-title" style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 96px">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-bottom: 24px">
+        <h2 id="writing-title" style="margin: 0; font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -0.02em">Writing</h2>
+        <div role="group" aria-label="Filter posts by topic" style="display: flex; gap: 8px; flex-wrap: wrap">
+          <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+            <button type="button" class="chip" aria-pressed="{{f.pressed}}" onClick="{{f.pick}}">{{f.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <sc-for list="{{posts}}" as="p" hint-placeholder-count="5">
+          <article class="postrow">
+            <div style="font-size: 13px; line-height: 22px; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px">{{p.date}}</div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <span style="font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--{{p.tag}})">{{p.tagLabel}} · {{p.read}}</span>
+              <h3 style="margin: 0; font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -0.015em"><a href="Post.dc.html" style="text-decoration: none">{{p.title}}</a></h3>
+              <p style="margin: 0; font-size: 17px; line-height: 28px; color: var(--muted); max-width: 680px">{{p.dek}}</p>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-labelledby="projects-title" style="display: flex; flex-direction: column; gap: 28px; padding-bottom: 112px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--ink); padding-top: 28px">
+        <h2 id="projects-title" style="margin: 0; font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -0.02em">Selected projects</h2>
+        <a href="Projects.dc.html" style="font-size: 15px; font-weight: 600; text-decoration: none">All projects →</a>
+      </div>
+      <div class="projects">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <h3 class="mono" style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 500">delivery-metrics</h3>
+          <p style="margin: 0; font-size: 17px; line-height: 28px; color: var(--muted)">Self-hosted engineering metrics with a Claude-powered assistant. The model writes SQL; Postgres computes every number, under a read-only role.</p>
+          <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Python · Postgres 17 · pgvector · Streamlit</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <h3 class="mono" style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 500">chau-minh-tieu.github.io</h3>
+          <p style="margin: 0; font-size: 17px; line-height: 28px; color: var(--muted)">This site. Posts are drafted by AI from issue briefs and reviewed line by line in pull requests before they ship.</p>
+          <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Astro · TypeScript · GitHub Actions</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span style="font-size: 14px; color: var(--muted)">© 2026 Chau Tieu · No trackers, no cookies.</span>
+      <div style="display: flex; gap: 24px; font-size: 14px">
+        <a href="#">RSS</a>
+        <a href="https://github.com/chau-minh-tieu">GitHub</a>
+        <a href="About.dc.html">Colophon</a>
+      </div>
+    </footer>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const theme = this.state.theme || this.props.theme || 'light';
+    const isDark = theme === 'dark';
+    const tag = this.state.tag || 'all';
+    const all = [
+      { date: 'Jan 11, 2027', tag: 'leadership', tagLabel: 'Leadership', read: '7 min', title: 'What I look for in senior AI engineers', dek: 'Notes from the interviewer’s side of the table: judgement over tool lists, and why the best answer is often “it depends, and here is on what”.' },
+      { date: 'Dec 14, 2026', tag: 'engineering', tagLabel: 'Engineering', read: '11 min', title: 'Learning React as a backend engineer', dek: 'Zod is Pydantic, TanStack Query is a read-through cache, and a component is a pure function. Mostly.' },
+      { date: 'Nov 30, 2026', tag: 'ai', tagLabel: 'AI', read: '8 min', title: 'Drafted by AI, edited by a human', dek: 'The workflow and quality gates behind this blog, and the one field in every brief that a model cannot fill in for me.' },
+      { date: 'Nov 16, 2026', tag: 'engineering', tagLabel: 'Engineering', read: '10 min', title: 'A backend with no server', dek: 'GitHub Issues as the database, Actions as the worker, Pages as the read side: a minimal CQRS that runs for free.' },
+      { date: 'Nov 2, 2026', tag: 'ai', tagLabel: 'AI', read: '9 min', title: 'Let Postgres do the math', dek: 'An analytics assistant that writes SQL instead of guessing numbers, and the eval suite that keeps it honest.' }
+    ];
+    const filters = [
+      { id: 'all', label: 'All' },
+      { id: 'engineering', label: 'Engineering' },
+      { id: 'ai', label: 'AI' },
+      { id: 'leadership', label: 'Leadership' }
+    ].map((f) => ({ ...f, pressed: f.id === tag ? 'true' : 'false', pick: () => this.setState({ tag: f.id }) }));
+    return {
+      theme,
+      isDark,
+      isLight: !isDark,
+      themeLabel: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+      toggleTheme: () => this.setState({ theme: isDark ? 'light' : 'dark' }),
+      filters,
+      posts: all.filter((p) => tag === 'all' || p.tag === tag)
+    };
+  }
+}
+</script>
+</body>
+</html>

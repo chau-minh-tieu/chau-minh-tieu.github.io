@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>About — Chau Tieu</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.site{--bg:#FAF8F3;--surface:#F2EFE8;--ink:#1C1A17;--muted:#5E5A52;--line:#DDD8CE;--engineering:#1F3A5F;--ai:#7D5E14;--leadership:#7A2632;--brand:#7A2632;--on-brand:#FAF8F3;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+.site[data-theme="dark"]{--bg:#141311;--surface:#1D1B18;--ink:#ECE8DF;--muted:#A39E93;--line:#34312C;--engineering:#8FA9CC;--ai:#D4B26A;--leadership:#D08A92}
+.site a{color:var(--ink);text-decoration-color:var(--line);text-underline-offset:3px}
+.site a:hover{text-decoration-color:var(--ink)}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{max-width:1120px;margin:0 auto;padding:0 40px;box-sizing:border-box}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0}
+.navlinks{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.iconbtn{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:22px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.aboutgrid{display:grid;grid-template-columns:minmax(0,680px) 280px;column-gap:80px;row-gap:56px;align-items:start}
+.topic{display:grid;grid-template-columns:140px minmax(0,1fr);column-gap:24px;row-gap:6px;padding:18px 0;border-top:1px solid var(--line)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:32px 0 48px;border-top:1px solid var(--line)}
+@media (max-width:960px){
+  .aboutgrid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .wrap{padding:0 20px}
+  .topic{grid-template-columns:1fr}
+  .page-title{font-size:40px !important;line-height:44px !important}
+}
+</style>
+</helmet>
+<div class="site" data-theme="{{theme}}" style="min-height: 100vh">
+  <div class="wrap">
+
+    <nav class="nav" aria-label="Main">
+      <a href="Home.dc.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none">
+        <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 50%; background: var(--brand); color: var(--on-brand); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.01em">CT</span>
+        <span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em">Chau Tieu</span>
+      </a>
+      <div class="navlinks">
+        <a href="Home.dc.html" style="font-size: 15px; font-weight: 500; text-decoration: none; color: var(--muted)">Writing</a>
+        <a href="Projects.dc.html" style="font-size: 15px; font-weight: 500; text-decoration: none; color: var(--muted)">Projects</a>
+        <a href="About.dc.html" aria-current="page" style="font-size: 15px; font-weight: 500; text-decoration: none">About</a>
+        <button type="button" class="iconbtn" aria-label="{{themeLabel}}" onClick="{{toggleTheme}}">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{false}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          </sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{true}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>
+          </sc-if>
+        </button>
+      </div>
+    </nav>
+
+    <header style="padding: 96px 0 64px; display: flex; flex-direction: column; gap: 28px; max-width: 760px">
+      <div aria-hidden="true" style="width: 96px; height: 96px; border-radius: 50%; background: var(--brand); color: var(--on-brand); display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 600; letter-spacing: 0.01em">CT</div>
+      <h1 class="page-title" style="margin: 0; font-size: 56px; line-height: 60px; font-weight: 600; letter-spacing: -0.03em">About</h1>
+    </header>
+
+    <div class="aboutgrid" style="padding-bottom: 112px">
+      <div style="display: flex; flex-direction: column; gap: 56px">
+
+        <section style="display: flex; flex-direction: column; gap: 22px">
+          <p style="margin: 0; font-size: 22px; line-height: 34px">I’ve been building software since 2010, starting with data and reporting, then moving into software engineering and leadership across Vietnam and Singapore. Today I’m an engineering manager, responsible for people and technical direction.</p>
+          <p style="margin: 0; font-size: 18px; line-height: 30px">I came to machine learning through quantitative research, building models and data pipelines for financial markets, a field that punishes anything that only works on paper. I currently focus on engineering leadership, system design, cloud, machine learning and AI.</p>
+          <p style="margin: 0; font-size: 18px; line-height: 30px">I’m also interested in startups and solo founding, especially how far one engineer can go with AI. I’m building <a href="https://www.reignedge.com">Reign Edge</a>, an AI-native trading platform, as a side project.</p>
+          <p style="margin: 0; font-size: 18px; line-height: 30px">When I’m away from the keyboard, I travel, usually toward the sea or up a mountain trail.</p>
+          <p style="margin: 0; font-size: 18px; line-height: 30px; color: var(--muted)">This site is where I write down what I learn, so I understand it properly.</p>
+        </section>
+
+        <section aria-labelledby="topics-title" style="display: flex; flex-direction: column; gap: 8px">
+          <h2 id="topics-title" style="margin: 0 0 12px; font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em">What I write about</h2>
+          <div class="topic">
+            <span style="font-size: 12px; line-height: 26px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--engineering)">Engineering</span>
+            <p style="margin: 0; font-size: 17px; line-height: 28px">Backend systems, system design, data, and the occasional deep dive into a tool I had to understand.</p>
+          </div>
+          <div class="topic">
+            <span style="font-size: 12px; line-height: 26px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ai)">AI</span>
+            <p style="margin: 0; font-size: 17px; line-height: 28px">Agents, LLM tooling, and building software with a model in the loop, including where it goes wrong.</p>
+          </div>
+          <div class="topic" style="border-bottom: 1px solid var(--line)">
+            <span style="font-size: 12px; line-height: 26px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--leadership)">Leadership</span>
+            <p style="margin: 0; font-size: 17px; line-height: 28px">Hiring, growing engineers, and making technical decisions as a team. Lessons, never stories about people.</p>
+          </div>
+        </section>
+
+        <section aria-labelledby="now-title" style="display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+            <h2 id="now-title" style="margin: 0; font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em">Now</h2>
+            <span style="font-size: 13px; color: var(--muted)">Updated [Month 2026]</span>
+          </div>
+          <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 17px; line-height: 28px; color: var(--muted)">
+            <li>[What you are building this month]</li>
+            <li>[What you are learning]</li>
+            <li>[What you are reading]</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="process-title" style="display: flex; flex-direction: column; gap: 14px">
+          <h2 id="process-title" style="margin: 0; font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em">How posts are written</h2>
+          <p style="margin: 0; font-size: 18px; line-height: 30px">Every post starts as a brief I write myself: the argument, the reader, and what I actually learned. A model drafts from that brief. I review every line in a pull request, check the sources, and cut what I would not say. If a post gets something wrong, that is my mistake, not the model’s.</p>
+        </section>
+
+      </div>
+
+      <aside style="display: flex; flex-direction: column; gap: 40px">
+        <section aria-labelledby="elsewhere-title" style="display: flex; flex-direction: column; gap: 12px">
+          <h2 id="elsewhere-title" style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Elsewhere</h2>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 16px; line-height: 24px">
+            <li style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line)"><a href="https://github.com/chau-minh-tieu" style="text-decoration: none">GitHub</a><span style="color: var(--muted)">↗</span></li>
+            <li style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line)"><a href="https://www.linkedin.com/in/tieuminhchau" style="text-decoration: none">LinkedIn</a><span style="color: var(--muted)">↗</span></li>
+            <li style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line)"><a href="#" style="text-decoration: none">RSS</a><span style="color: var(--muted)">↗</span></li>
+          </ul>
+        </section>
+        <section aria-labelledby="colophon-title" style="display: flex; flex-direction: column; gap: 12px">
+          <h2 id="colophon-title" style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Colophon</h2>
+          <p style="margin: 0; font-size: 15px; line-height: 24px; color: var(--muted)">Built with Astro and hosted on GitHub Pages. Set in Inter and JetBrains Mono. No analytics, no cookies, no third-party scripts.</p>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="foot">
+      <span style="font-size: 14px; color: var(--muted)">© 2026 Chau Tieu · No trackers, no cookies.</span>
+      <div style="display: flex; gap: 24px; font-size: 14px">
+        <a href="#">RSS</a>
+        <a href="https://github.com/chau-minh-tieu">GitHub</a>
+        <a href="About.dc.html">Colophon</a>
+      </div>
+    </footer>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":2000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const theme = this.state.theme || this.props.theme || 'light';
+    const isDark = theme === 'dark';
+    return {
+      theme,
+      isDark,
+      isLight: !isDark,
+      themeLabel: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+      toggleTheme: () => this.setState({ theme: isDark ? 'light' : 'dark' })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Let Postgres do the math — Chau Tieu</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.site{--bg:#FAF8F3;--surface:#F2EFE8;--ink:#1C1A17;--muted:#5E5A52;--line:#DDD8CE;--engineering:#1F3A5F;--ai:#7D5E14;--leadership:#7A2632;--brand:#7A2632;--on-brand:#FAF8F3;--accent:var(--ai);background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+.site[data-theme="dark"]{--bg:#141311;--surface:#1D1B18;--ink:#ECE8DF;--muted:#A39E93;--line:#34312C;--engineering:#8FA9CC;--ai:#D4B26A;--leadership:#D08A92}
+.site a{color:var(--ink);text-decoration-color:var(--line);text-underline-offset:3px}
+.site a:hover{text-decoration-color:var(--ink)}
+.site .prose a{text-decoration-color:var(--accent)}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{max-width:1120px;margin:0 auto;padding:0 40px;box-sizing:border-box}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0}
+.navlinks{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.iconbtn{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:22px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.prose{max-width:956px;margin:0 auto}
+.row{display:grid;grid-template-columns:minmax(0,680px) 220px;column-gap:56px;align-items:start}
+.row > aside{font-size:14px;line-height:22px;color:var(--muted);padding-top:4px}
+.diagram{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.site{--fig-line:#8A857B;--slate-f:#ECE9E2;--slate-s:#6B665D;--slate-t:#2E2B26;--blue-f:#E3EAF4;--blue-s:#3B5B8A;--blue-t:#1F3A5F;--teal-f:#DFEEEA;--teal-s:#2F7468;--teal-t:#1D4D45;--green-f:#E4EFDF;--green-s:#4A7A3A;--green-t:#2C4F22;--amber-f:#F6EAD2;--amber-s:#A87A22;--amber-t:#5E430D;--rose-f:#F4E1E2;--rose-s:#9A3D49;--rose-t:#6E2430;--violet-f:#ECE4F3;--violet-s:#6E54A0;--violet-t:#45326B}
+.site[data-theme="dark"]{--slate-f:#26241F;--slate-s:#8A857B;--slate-t:#E6E1D6;--blue-f:#1C2533;--blue-s:#7E9FCC;--blue-t:#C9D8EC;--teal-f:#1A2A27;--teal-s:#6FB3A5;--teal-t:#C4E3DC;--green-f:#1E2A1A;--green-s:#86B373;--green-t:#D2E5C8;--amber-f:#2E2614;--amber-s:#D4A64E;--amber-t:#F0DDB4;--rose-f:#30191C;--rose-s:#D08A92;--rose-t:#F0CDD1;--violet-f:#261E33;--violet-s:#A68FD0;--violet-t:#DDD0F0}
+.code{background:#1B1916;border:1px solid #2E2B26;border-radius:10px;overflow:hidden;color:#E6E1D6}
+.code-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px 8px 16px;border-bottom:1px solid #2E2B26;background:#211F1B}
+.code-body{overflow-x:auto;padding:14px 0;font-size:14px;line-height:23px}
+.line{display:flex;min-width:max-content}
+.ln{width:44px;flex:none;color:#8F897F;text-align:right;padding-right:18px;box-sizing:border-box;user-select:none;font-variant-numeric:tabular-nums}
+.src{white-space:pre;padding-right:24px}
+.hl{background:#2A2620}
+.copy{font:inherit;font-size:12px;font-weight:500;height:30px;padding:0 10px;border-radius:6px;border:1px solid #3A3630;background:transparent;color:#C9C2B5;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.k{color:#C4A7E7}.s{color:#A9C77D}.n{color:#E8A06A}.f{color:#8FB4E8}.t{color:#7FC4B5}.c{color:#9A948A;font-style:italic}.p{color:#C9C2B5}.b{color:#E58C8A}
+.figscroll{overflow-x:auto}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:32px 0 48px;border-top:1px solid var(--line)}
+@media (max-width:960px){
+  .row{grid-template-columns:minmax(0,1fr)}
+  .row > aside{padding-top:12px}
+}
+@media (max-width:640px){
+  .wrap{padding:0 20px}
+  .post-title{font-size:38px !important;line-height:42px !important}
+  .post-dek{font-size:19px !important;line-height:30px !important}
+}
+</style>
+</helmet>
+<div class="site" data-theme="{{theme}}" style="min-height: 100vh">
+  <div class="wrap">
+
+    <nav class="nav" aria-label="Main">
+      <a href="Home.dc.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none">
+        <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 50%; background: var(--brand); color: var(--on-brand); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.01em">CT</span>
+        <span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em">Chau Tieu</span>
+      </a>
+      <div class="navlinks">
+        <a href="Home.dc.html" style="font-size: 15px; font-weight: 500; text-decoration: none">Writing</a>
+        <a href="Projects.dc.html" style="font-size: 15px; font-weight: 500; text-decoration: none; color: var(--muted)">Projects</a>
+        <a href="About.dc.html" style="font-size: 15px; font-weight: 500; text-decoration: none; color: var(--muted)">About</a>
+        <button type="button" class="iconbtn" aria-label="{{themeLabel}}" onClick="{{toggleTheme}}">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{false}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          </sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{true}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>
+          </sc-if>
+        </button>
+      </div>
+    </nav>
+
+    <article class="prose" style="padding: 80px 0 64px">
+
+      <header class="row" style="padding-bottom: 40px">
+        <div style="display: flex; flex-direction: column; gap: 24px">
+          <div style="font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; display: flex; gap: 10px; flex-wrap: wrap; font-variant-numeric: tabular-nums">
+            <a href="Home.dc.html" style="color: var(--accent); text-decoration: none">AI</a>
+            <span style="color: var(--muted)">·</span>
+            <time datetime="2026-11-02" style="color: var(--muted)">Nov 2, 2026</time>
+            <span style="color: var(--muted)">·</span>
+            <span style="color: var(--muted)">9 min read</span>
+          </div>
+          <h1 class="post-title" style="margin: 0; font-size: 56px; line-height: 60px; font-weight: 600; letter-spacing: -0.03em">Let Postgres do the math</h1>
+          <p class="post-dek" style="margin: 0; font-size: 22px; line-height: 34px; color: var(--muted)">An analytics assistant that writes SQL instead of guessing numbers, and the eval suite that keeps it honest.</p>
+          <div style="display: flex; align-items: center; gap: 12px; padding-top: 4px">
+            <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: var(--on-brand); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600">CT</span>
+            <span style="font-size: 15px; font-weight: 500">Chau Tieu</span>
+            <span style="font-size: 15px; color: var(--muted)">· Drafted with AI, edited by me</span>
+          </div>
+        </div>
+        <aside aria-label="On this page">
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-bottom: 12px">On this page</div>
+          <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 20px; font-variant-numeric: tabular-nums">
+            <li><a href="#s1" style="text-decoration: none; color: var(--muted)">1  Asking a model for numbers</a></li>
+            <li><a href="#s2" style="text-decoration: none; color: var(--muted)">2  Queries, not arithmetic</a></li>
+            <li><a href="#s3" style="text-decoration: none; color: var(--muted)">3  Testing a model like a system</a></li>
+            <li><a href="#s4" style="text-decoration: none; color: var(--muted)">4  What I would change</a></li>
+          </ol>
+        </aside>
+      </header>
+
+      <div class="row" style="border-top: 1px solid var(--line); padding-top: 40px">
+        <p style="margin: 0 0 26px; font-size: 18px; line-height: 30px">Ask a language model how long your pull requests take to merge and it will give you an answer. It will sound right, it will be well formatted, and there is no way to tell whether it is true. For a metrics tool that is the only property that matters, so <a href="https://github.com/chau-minh-tieu/delivery-metrics">delivery-metrics</a> is built around one rule: the model never does arithmetic.</p>
+        <aside></aside>
+      </div>
+
+      <div class="row" style="padding-top: 24px">
+        <h2 id="s1" style="margin: 0 0 18px; font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em"><span style="color: var(--muted); font-variant-numeric: tabular-nums; padding-right: 14px">1</span>The problem with asking a model for numbers</h2>
+        <aside></aside>
+      </div>
+      <div class="row">
+        <p style="margin: 0 0 26px; font-size: 18px; line-height: 30px">A model that reads raw rows and summarises them is doing two jobs at once: understanding the question and computing the answer. It is good at the first and unreliable at the second, and the failure is silent. A median that is off by a few hours looks exactly like a correct one.<sup style="font-size: 12px; font-weight: 600; color: var(--accent); padding-left: 2px">1</sup></p>
+        <aside><span style="color: var(--accent); font-weight: 600; padding-right: 6px">1</span>Not a criticism of any particular model. Arithmetic over thousands of rows is simply the wrong job for a text predictor.</aside>
+      </div>
+
+      <div class="row" style="padding-top: 24px">
+        <h2 id="s2" style="margin: 0 0 18px; font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em"><span style="color: var(--muted); font-variant-numeric: tabular-nums; padding-right: 14px">2</span>The model writes queries; the database does the arithmetic</h2>
+        <aside></aside>
+      </div>
+      <div class="row">
+        <p style="margin: 0 0 32px; font-size: 18px; line-height: 30px">Instead of handing the model data, delivery-metrics hands it a schema. Its only output is SQL. Postgres runs the query and returns rows; the model then explains the result in plain language, with the query attached so anyone can check it.</p>
+        <aside></aside>
+      </div>
+
+      <figure class="row" style="margin: 0 0 40px">
+        <div class="diagram" role="img" aria-label="Flow: a question goes to the model, which writes SQL; Postgres runs it under a read-only role and returns rows; the model explains the result.">
+          <div style="border: 1.5px solid var(--slate-s); background: var(--slate-f); color: var(--slate-t); border-radius: 10px; padding: 12px 14px; font-size: 14px; line-height: 20px"><b>Question</b><br><span style="font-size: 12px">from an engineer</span></div>
+          <span aria-hidden="true" style="color: var(--fig-line); font-size: 18px">→</span>
+          <div style="border: 1.5px solid var(--violet-s); background: var(--violet-f); color: var(--violet-t); border-radius: 10px; padding: 12px 14px; font-size: 14px; line-height: 20px"><b>Model</b><br><span style="font-size: 12px">writes SQL</span></div>
+          <span aria-hidden="true" style="color: var(--fig-line); font-size: 18px">→</span>
+          <div style="border: 1.5px solid var(--blue-s); background: var(--blue-f); color: var(--blue-t); border-radius: 10px; padding: 12px 14px; font-size: 14px; line-height: 20px"><b>Postgres</b><br><span style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase">read-only role</span></div>
+          <span aria-hidden="true" style="color: var(--fig-line); font-size: 18px">→</span>
+          <div style="border: 1.5px solid var(--green-s); background: var(--green-f); color: var(--green-t); border-radius: 10px; padding: 12px 14px; font-size: 14px; line-height: 20px"><b>Rows</b><br><span style="font-size: 12px">exact numbers</span></div>
+          <span aria-hidden="true" style="color: var(--fig-line); font-size: 18px">→</span>
+          <div style="border: 1.5px solid var(--violet-s); background: var(--violet-f); color: var(--violet-t); border-radius: 10px; padding: 12px 14px; font-size: 14px; line-height: 20px"><b>Model</b><br><span style="font-size: 12px">explains, cites query</span></div>
+        </div>
+        <figcaption style="font-size: 14px; line-height: 22px; color: var(--muted); padding-top: 4px"><span style="font-weight: 600; color: var(--ink)">Fig. 1</span> The model writes queries; the database does the arithmetic. Every answer carries its query.</figcaption>
+      </figure>
+
+      <div class="row">
+        <p style="margin: 0 0 26px; font-size: 18px; line-height: 30px">The query runs as a database role that can read and do nothing else.<sup style="font-size: 12px; font-weight: 600; color: var(--accent); padding-left: 2px">2</sup> That single grant is the whole safety model: no prompt has to be trusted to behave.</p>
+        <aside><span style="color: var(--accent); font-weight: 600; padding-right: 6px">2</span>A read-only role turns a bad query into a wrong answer, not a damaged database. A wrong answer can be caught by a test.</aside>
+      </div>
+
+      <div class="row">
+        <div class="code mono" style="margin: 0 0 36px">
+          <div class="code-head">
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 13px">
+              <span style="color: #E6E1D6">roles.sql</span>
+              <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #8FB4E8; border: 1px solid #3A3630; border-radius: 4px; padding: 2px 6px">SQL</span>
+            </div>
+            <button type="button" class="copy" aria-label="Copy code"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>Copy</button>
+          </div>
+          <div class="code-body">
+            <div class="line"><span class="ln">1</span><span class="src"><span class="k">CREATE ROLE</span> analyst_ro <span class="k">NOLOGIN</span><span class="p">;</span></span></div>
+            <div class="line"><span class="ln">2</span><span class="src"><span class="k">GRANT USAGE ON SCHEMA</span> metrics <span class="k">TO</span> analyst_ro<span class="p">;</span></span></div>
+            <div class="line"><span class="ln">3</span><span class="src"><span class="k">GRANT SELECT ON ALL TABLES IN SCHEMA</span> metrics <span class="k">TO</span> analyst_ro<span class="p">;</span></span></div>
+            <div class="line"><span class="ln">4</span><span class="src"><span class="k">ALTER ROLE</span> analyst_ro <span class="k">SET</span> statement_timeout <span class="p">=</span> <span class="s">'5s'</span><span class="p">;</span></span></div>
+            <div class="line"><span class="ln">5</span><span class="src"> </span></div>
+            <div class="line"><span class="ln">6</span><span class="src"><span class="c">-- every model-generated statement runs as this role</span></span></div>
+            <div class="line hl"><span class="ln">7</span><span class="src"><span class="k">SET ROLE</span> analyst_ro<span class="p">;</span></span></div>
+          </div>
+        </div>
+        <aside>Illustrative SQL. The highlighted line is the one that matters.</aside>
+      </div>
+
+      <div class="row">
+        <div style="margin: 0 0 40px; overflow-x: auto">
+          <table style="border-collapse: collapse; width: 100%; font-size: 15px; line-height: 22px">
+            <caption style="text-align: left; font-size: 14px; color: var(--muted); padding-bottom: 12px"><span style="font-weight: 600; color: var(--ink)">Table 1</span> Who computes the number?</caption>
+            <thead>
+              <tr>
+                <th scope="col" style="text-align: left; padding: 0 16px 10px 0; border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)"></th>
+                <th scope="col" style="text-align: left; padding: 0 16px 10px 0; border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Model computes</th>
+                <th scope="col" style="text-align: left; padding: 0 0 10px; border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Postgres computes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row" style="text-align: left; font-weight: 600; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line)">Accuracy</th>
+                <td style="padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); color: var(--muted)">Approximate</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid var(--line)">Exact</td>
+              </tr>
+              <tr>
+                <th scope="row" style="text-align: left; font-weight: 600; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line)">Audit trail</th>
+                <td style="padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); color: var(--muted)">None</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid var(--line)">The query, attached to every answer</td>
+              </tr>
+              <tr>
+                <th scope="row" style="text-align: left; font-weight: 600; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line)">Failure mode</th>
+                <td style="padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); color: var(--muted)">Silent arithmetic error</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid var(--line)">A wrong query: visible and testable</td>
+              </tr>
+              <tr>
+                <th scope="row" style="text-align: left; font-weight: 600; padding: 12px 16px 12px 0">Verdict</th>
+                <td style="padding: 12px 16px 12px 0; color: var(--muted)">Avoid</td>
+                <td style="padding: 12px 0; font-weight: 600; color: var(--accent)">Use this</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <aside></aside>
+      </div>
+
+      <div class="row">
+        <p style="margin: 0 0 28px; font-size: 18px; line-height: 30px">Zoomed out, the system has four moving parts. The sync worker is the only one that writes to the database; the assistant is the only one that talks to the model, and it holds the narrowest grant.</p>
+        <aside></aside>
+      </div>
+
+      <figure style="margin: 8px 0 52px">
+        <div class="figscroll">
+          <div role="img" aria-label="Container diagram. An engineer uses the dashboard. The dashboard sends questions to the assistant and reads the metrics database for charts. The assistant sends the schema and question to the Claude API and runs read-only SQL on the metrics database. The sync worker fetches from the GitHub API and writes to the metrics database." style="position: relative; width: 956px; height: 800px">
+            <div style="position: absolute; left: 48px; top: 200px; width: 904px; height: 384px; box-sizing: border-box; border: 1.5px dashed var(--fig-line); border-radius: 14px"></div>
+
+            <svg width="8" height="119" viewBox="0 0 8 119" preserveAspectRatio="none" style="position: absolute; left: 176px; top: 128px; width: 8px; height: 119px; overflow: visible; fill: none; stroke: var(--fig-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-1" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#8A857B" stroke="none" style="stroke: none; fill: #8A857B; fill: context-stroke"></path></marker></defs><path d="M 4 0 L 4 115" marker-end="url(#dc-arrow-head-filled-1)"></path></svg>
+            <svg width="119" height="8" viewBox="0 0 119 8" preserveAspectRatio="none" style="position: absolute; left: 280px; top: 288px; width: 119px; height: 8px; overflow: visible; fill: none; stroke: var(--fig-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-2" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#8A857B" stroke="none" style="stroke: none; fill: #8A857B; fill: context-stroke"></path></marker></defs><path d="M 0 4 L 115 4" marker-end="url(#dc-arrow-head-filled-2)"></path></svg>
+            <svg width="8" height="119" viewBox="0 0 8 119" preserveAspectRatio="none" style="position: absolute; left: 496px; top: 129px; width: 8px; height: 119px; overflow: visible; fill: none; stroke: var(--fig-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-3" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#8A857B" stroke="none" style="stroke: none; fill: #8A857B; fill: context-stroke"></path></marker></defs><path d="M 4 119 L 4 4" marker-end="url(#dc-arrow-head-filled-3)"></path></svg>
+            <svg width="8" height="119" viewBox="0 0 8 119" preserveAspectRatio="none" style="position: absolute; left: 496px; top: 336px; width: 8px; height: 119px; overflow: visible; fill: none; stroke: var(--fig-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-4" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#8A857B" stroke="none" style="stroke: none; fill: #8A857B; fill: context-stroke"></path></marker></defs><path d="M 4 0 L 4 115" marker-end="url(#dc-arrow-head-filled-4)"></path></svg>
+            <svg width="119" height="8" viewBox="0 0 119 8" preserveAspectRatio="none" style="position: absolute; left: 601px; top: 496px; width: 119px; height: 8px; overflow: visible; fill: none; stroke: var(--fig-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-5" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#8A857B" stroke="none" style="stroke: none; fill: #8A857B; fill: context-stroke"></path></marker></defs><path d="M 119 4 L 4 4" marker-end="url(#dc-arrow-head-filled-5)"></path></svg>
+            <svg width="8" height="119" viewBox="0 0 8 119" preserveAspectRatio="none" style="position: absolute; left: 816px; top: 544px; width: 8px; height: 119px; overflow: visible; fill: none; stroke: var(--fig-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-6" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#8A857B" stroke="none" style="stroke: none; fill: #8A857B; fill: context-stroke"></path></marker></defs><path d="M 4 0 L 4 115" marker-end="url(#dc-arrow-head-filled-6)"></path></svg>
+            <svg width="8" height="164" viewBox="0 0 8 164" preserveAspectRatio="none" style="position: absolute; left: 176px; top: 336px; width: 8px; height: 164px; overflow: visible; fill: none; stroke: var(--fig-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M 4 0 L 4 164"></path></svg>
+            <svg width="219" height="8" viewBox="0 0 219 8" preserveAspectRatio="none" style="position: absolute; left: 180px; top: 496px; width: 219px; height: 8px; overflow: visible; fill: none; stroke: var(--fig-line); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-7" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#8A857B" stroke="none" style="stroke: none; fill: #8A857B; fill: context-stroke"></path></marker></defs><path d="M 0 4 L 215 4" marker-end="url(#dc-arrow-head-filled-7)"></path></svg>
+
+            <div style="position: absolute; left: 80px; top: 40px; width: 200px; height: 88px; box-sizing: border-box; padding: 8px 14px; display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; background: var(--slate-f); border: 1.5px solid var(--slate-s); border-radius: 44px; color: var(--slate-t); font-size: 15px; line-height: 20px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span><b>Engineer</b><br><span style="font-size: 12px">Person</span></span></div>
+            <div style="position: absolute; left: 400px; top: 40px; width: 200px; height: 88px; box-sizing: border-box; padding: 8px 14px; display: flex; align-items: center; justify-content: center; text-align: center; background: var(--bg); border: 1.5px dashed var(--slate-s); border-radius: 10px; color: var(--slate-t); font-size: 15px; line-height: 20px"><span><b>Claude API</b><br><span style="font-size: 12px">External system</span></span></div>
+            <div style="position: absolute; left: 80px; top: 248px; width: 200px; height: 88px; box-sizing: border-box; padding: 8px 14px; display: flex; align-items: center; justify-content: center; text-align: center; background: var(--teal-f); border: 1.5px solid var(--teal-s); border-radius: 10px; color: var(--teal-t); font-size: 15px; line-height: 20px"><span><b>Dashboard</b><br><span style="font-size: 12px">Container · Streamlit</span></span></div>
+            <div style="position: absolute; left: 400px; top: 248px; width: 200px; height: 88px; box-sizing: border-box; padding: 8px 14px; display: flex; align-items: center; justify-content: center; text-align: center; background: var(--violet-f); border: 1.5px solid var(--violet-s); border-radius: 10px; color: var(--violet-t); font-size: 15px; line-height: 20px"><span><b>Assistant</b><br><span style="font-size: 12px">Container · Python</span></span></div>
+            <div style="position: absolute; left: 400px; top: 456px; width: 200px; height: 88px; box-sizing: border-box; padding: 8px 14px; display: flex; align-items: center; justify-content: center; text-align: center; background: var(--blue-f); border: 1.5px solid var(--blue-s); border-radius: 50% / 16px; color: var(--blue-t); font-size: 15px; line-height: 20px"><span><b>Metrics DB</b><br><span style="font-size: 12px">Postgres 17 + pgvector</span></span></div>
+            <div style="position: absolute; left: 720px; top: 456px; width: 200px; height: 88px; box-sizing: border-box; padding: 8px 14px; display: flex; align-items: center; justify-content: center; text-align: center; background: var(--amber-f); border: 1.5px solid var(--amber-s); border-radius: 10px; color: var(--amber-t); font-size: 15px; line-height: 20px"><span><b>Sync worker</b><br><span style="font-size: 12px">Container · Python</span></span></div>
+            <div style="position: absolute; left: 720px; top: 664px; width: 200px; height: 88px; box-sizing: border-box; padding: 8px 14px; display: flex; align-items: center; justify-content: center; text-align: center; background: var(--bg); border: 1.5px dashed var(--slate-s); border-radius: 10px; color: var(--slate-t); font-size: 15px; line-height: 20px"><span><b>GitHub API</b><br><span style="font-size: 12px">External system</span></span></div>
+
+            <div style="position: absolute; left: 704px; top: 212px; width: 232px; text-align: right; font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">delivery-metrics · system</div>
+            <div style="position: absolute; left: 192px; top: 179px; width: 168px; font-size: 13px; line-height: 16px; color: var(--muted)">asks in plain English</div>
+            <div style="position: absolute; left: 304px; top: 264px; width: 72px; text-align: center; font-size: 13px; line-height: 16px; color: var(--muted)">question</div>
+            <div style="position: absolute; left: 512px; top: 180px; width: 140px; font-size: 13px; line-height: 16px; color: var(--muted)">schema + question</div>
+            <div style="position: absolute; left: 512px; top: 387px; width: 104px; font-size: 13px; line-height: 16px; color: var(--muted)">read-only SQL</div>
+            <div style="position: absolute; left: 632px; top: 472px; width: 56px; text-align: center; font-size: 13px; line-height: 16px; color: var(--muted)">writes</div>
+            <div style="position: absolute; left: 672px; top: 595px; width: 136px; text-align: right; font-size: 13px; line-height: 16px; color: var(--muted)">fetches over REST</div>
+            <div style="position: absolute; left: 226px; top: 472px; width: 128px; text-align: center; font-size: 13px; line-height: 16px; color: var(--muted)">reads for charts</div>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px 20px; padding-top: 16px; font-size: 13px; line-height: 18px; color: var(--muted)">
+          <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: var(--slate-f); border: 1.5px solid var(--slate-s)"></span>Person</span>
+          <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: var(--teal-f); border: 1.5px solid var(--teal-s)"></span>Web app</span>
+          <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: var(--violet-f); border: 1.5px solid var(--violet-s)"></span>AI component</span>
+          <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: var(--blue-f); border: 1.5px solid var(--blue-s)"></span>Data store</span>
+          <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: var(--amber-f); border: 1.5px solid var(--amber-s)"></span>Worker</span>
+          <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; border: 1.5px dashed var(--slate-s)"></span>External system</span>
+        </div>
+        <figcaption style="font-size: 14px; line-height: 22px; color: var(--muted); padding-top: 12px; max-width: 680px"><span style="font-weight: 600; color: var(--ink)">Fig. 2</span> Simplified container view (C4, level 2). Only the assistant talks to the model, and it holds the narrowest database grant.</figcaption>
+      </figure>
+
+      <div class="row" style="padding-top: 24px">
+        <h2 id="s3" style="margin: 0 0 18px; font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em"><span style="color: var(--muted); font-variant-numeric: tabular-nums; padding-right: 14px">3</span>Testing a model like a system</h2>
+        <aside></aside>
+      </div>
+      <div class="row">
+        <p style="margin: 0 0 26px; font-size: 18px; line-height: 30px">Around 730 unit tests cover the code around the model. None of them can tell you whether the assistant answers questions well. For that the project keeps a graded evaluation suite: 53 questions with known answers, run against the same database the assistant uses.<sup style="font-size: 12px; font-weight: 600; color: var(--accent); padding-left: 2px">3</sup></p>
+        <aside><span style="color: var(--accent); font-weight: 600; padding-right: 6px">3</span>The suite lives next to the tests, so changing a prompt is reviewed like changing code.</aside>
+      </div>
+
+      <div class="row">
+        <div class="code mono" style="margin: 0 0 36px">
+          <div class="code-head">
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 13px">
+              <span style="color: #E6E1D6">eval/grade.py</span>
+              <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #7FC4B5; border: 1px solid #3A3630; border-radius: 4px; padding: 2px 6px">Python</span>
+            </div>
+            <button type="button" class="copy" aria-label="Copy code"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>Copy</button>
+          </div>
+          <div class="code-body">
+            <div class="line"><span class="ln">1</span><span class="src"><span class="k">from</span> dataclasses <span class="k">import</span> dataclass</span></div>
+            <div class="line"><span class="ln">2</span><span class="src"> </span></div>
+            <div class="line"><span class="ln">3</span><span class="src"><span class="b">@dataclass</span><span class="p">(</span>frozen<span class="p">=</span><span class="n">True</span><span class="p">)</span></span></div>
+            <div class="line"><span class="ln">4</span><span class="src"><span class="k">class</span> <span class="t">EvalCase</span><span class="p">:</span></span></div>
+            <div class="line"><span class="ln">5</span><span class="src">    question<span class="p">:</span> <span class="t">str</span></span></div>
+            <div class="line"><span class="ln">6</span><span class="src">    expected<span class="p">:</span> <span class="t">float</span></span></div>
+            <div class="line"><span class="ln">7</span><span class="src">    tolerance<span class="p">:</span> <span class="t">float</span> <span class="p">=</span> <span class="n">0.01</span></span></div>
+            <div class="line"><span class="ln">8</span><span class="src"> </span></div>
+            <div class="line"><span class="ln">9</span><span class="src"><span class="k">def</span> <span class="f">grade</span><span class="p">(</span>case<span class="p">:</span> <span class="t">EvalCase</span><span class="p">,</span> answer<span class="p">:</span> <span class="t">float</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="t">bool</span><span class="p">:</span></span></div>
+            <div class="line"><span class="ln">10</span><span class="src">    <span class="s">"""Pass only if the number matches what Postgres computed."""</span></span></div>
+            <div class="line hl"><span class="ln">11</span><span class="src">    <span class="k">return</span> <span class="b">abs</span><span class="p">(</span>answer <span class="p">-</span> case<span class="p">.</span>expected<span class="p">)</span> <span class="p">&lt;=</span> case<span class="p">.</span>tolerance</span></div>
+          </div>
+        </div>
+        <aside>Illustrative, not the project’s code. A case passes only when the assistant’s number matches the database.</aside>
+      </div>
+
+      <blockquote class="row" style="margin: 16px 0 44px">
+        <p style="margin: 0; padding-top: 20px; border-top: 2px solid var(--accent); font-size: 28px; line-height: 38px; font-weight: 600; letter-spacing: -0.02em">If a number cannot be traced to a query, it does not belong on the dashboard.</p>
+        <aside></aside>
+      </blockquote>
+
+      <div class="row">
+        <div style="margin: 0 0 32px; overflow-x: auto">
+          <table style="border-collapse: collapse; width: 100%; font-size: 15px; line-height: 22px; font-variant-numeric: tabular-nums">
+            <caption style="text-align: left; font-size: 14px; color: var(--muted); padding-bottom: 12px"><span style="font-weight: 600; color: var(--ink)">Table 2</span> The project at a glance</caption>
+            <tbody>
+              <tr><th scope="row" style="text-align: left; font-weight: 400; padding: 11px 16px 11px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line)">Automated tests</th><td style="text-align: right; padding: 11px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line)">≈730</td></tr>
+              <tr><th scope="row" style="text-align: left; font-weight: 400; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--line)">Graded eval questions</th><td style="text-align: right; padding: 11px 0; border-bottom: 1px solid var(--line)">53</td></tr>
+              <tr><th scope="row" style="text-align: left; font-weight: 400; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--line)">First full sync</th><td style="text-align: right; padding: 11px 0; border-bottom: 1px solid var(--line)">≈29 min</td></tr>
+              <tr><th scope="row" style="text-align: left; font-weight: 400; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--line)">GitHub API requests, first sync</th><td style="text-align: right; padding: 11px 0; border-bottom: 1px solid var(--line)">≈1,300</td></tr>
+              <tr><th scope="row" style="text-align: left; font-weight: 400; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--ink)">Median time to merge, sample data</th><td style="text-align: right; padding: 11px 0; border-bottom: 1px solid var(--ink)">2.1 h</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside></aside>
+      </div>
+
+      <div class="row">
+        <p style="margin: 0 0 28px; font-size: 18px; line-height: 30px">This is what an engineer actually sees: the question, an answer in plain language, and the query underneath it.</p>
+        <aside></aside>
+      </div>
+
+      <figure style="margin: 0 0 44px">
+        <div style="border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface)">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--bg)">
+            <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: var(--rose-s)"></span>
+            <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: var(--amber-s)"></span>
+            <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: var(--green-s)"></span>
+            <span class="mono" style="margin-left: 12px; font-size: 12px; color: var(--muted); background: var(--surface); padding: 4px 10px; border-radius: 6px">localhost:8501</span>
+          </div>
+          <div style="aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; text-align: center; font-size: 15px; line-height: 24px; color: var(--muted)">[Screenshot: the dashboard with the assistant panel open. A real image, metadata stripped.]</div>
+        </div>
+        <figcaption style="font-size: 14px; line-height: 22px; color: var(--muted); padding-top: 12px; max-width: 680px"><span style="font-weight: 600; color: var(--ink)">Fig. 3</span> The assistant answers in prose and shows the SQL it ran.</figcaption>
+      </figure>
+
+      <div class="row">
+        <div style="background: var(--surface); border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; margin: 0 0 36px">
+          <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Note</span>
+          <p style="margin: 0; font-size: 16px; line-height: 26px">Figures come from the project README and a sync of my own repositories. Your numbers will differ.</p>
+        </div>
+        <aside></aside>
+      </div>
+
+      <div class="row" style="padding-top: 24px">
+        <h2 id="s4" style="margin: 0 0 18px; font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em"><span style="color: var(--muted); font-variant-numeric: tabular-nums; padding-right: 14px">4</span>What I would do differently</h2>
+        <aside></aside>
+      </div>
+      <div class="row">
+        <p style="margin: 0 0 48px; padding: 20px 22px; border: 1px dashed var(--muted); border-radius: 8px; font-size: 17px; line-height: 28px; color: var(--muted)">[Your reflection. The section only you can write: what surprised you, what failed first, and what you would change next time.]</p>
+        <aside></aside>
+      </div>
+
+      <footer class="row" style="border-top: 1px solid var(--line); padding-top: 32px">
+        <div style="display: flex; flex-direction: column; gap: 28px">
+          <p style="margin: 0; font-size: 15px; line-height: 24px; color: var(--muted)">Drafted with AI from my notes and the project’s code. Reviewed and edited by me.</p>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Sources</span>
+            <ol style="margin: 0; padding-left: 20px; font-size: 15px; line-height: 26px">
+              <li><a href="https://github.com/chau-minh-tieu/delivery-metrics">delivery-metrics</a>, GitHub repository</li>
+              <li><a href="#">PostgreSQL documentation</a>, Database roles</li>
+              <li><a href="#">pgvector</a>, vector similarity search for Postgres</li>
+            </ol>
+          </div>
+          <a href="#" style="font-size: 15px; font-weight: 600; text-decoration: none">Discuss this post on GitHub →</a>
+          <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--line); padding-top: 24px">
+            <a href="Home.dc.html" style="text-decoration: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+              <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)">Next</span>
+              <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">A backend with no server →</span>
+            </a>
+          </div>
+        </div>
+        <aside></aside>
+      </footer>
+
+    </article>
+
+    <footer class="foot">
+      <span style="font-size: 14px; color: var(--muted)">© 2026 Chau Tieu · No trackers, no cookies.</span>
+      <div style="display: flex; gap: 24px; font-size: 14px">
+        <a href="#">RSS</a>
+        <a href="https://github.com/chau-minh-tieu">GitHub</a>
+        <a href="About.dc.html">Colophon</a>
+      </div>
+    </footer>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":6600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const theme = this.state.theme || this.props.theme || 'light';
+    const isDark = theme === 'dark';
+    return {
+      theme,
+      isDark,
+      isLight: !isDark,
+      themeLabel: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+      toggleTheme: () => this.setState({ theme: isDark ? 'light' : 'dark' })
+    };
+  }
+}
+</script>
+</body>
+</html>
