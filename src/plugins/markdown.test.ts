@@ -22,11 +22,18 @@ describe('sanitising', () => {
         '',
         '<iframe src="https://example.com/"></iframe>',
         '',
-        '<p onclick="alert(1)" style="color: red">Text <img src="x.png" alt="x" onerror="alert(1)"></p>',
+        '<p onclick="alert(1)" style="color: red">Text <a href="https://example.com/" onmouseover="alert(1)">link</a></p>',
       ),
     );
-    expect(html).not.toMatch(/<script|alert|<style|display: none|<iframe|onclick|onerror|style=/);
-    expect(html).toContain('<p>Text <img src="x.png" alt="x"></p>');
+    expect(html).not.toMatch(/<script|alert|<style|display: none|<iframe|onclick|onmouseover|style=/);
+    expect(html).toContain('<p>Text <a href="https://example.com/">link</a></p>');
+  });
+
+  it('fails on a raw <img>, which would skip the image pipeline', async () => {
+    for (const markdown of ['Text <img src="x.png" alt="x">', '<IMG SRC="x.png" ALT="x">', '<p><img src="x.png" alt="x"></p>']) {
+      await expect(render(markdown), markdown).rejects.toThrow('Raw <img> in the post');
+    }
+    expect(await render('Text `<img src="x.png">` in code.')).toContain('<code>&#x3C;img src="x.png"></code>');
   });
 
   it('drops javascript: and mailto: links in Markdown and in HTML', async () => {

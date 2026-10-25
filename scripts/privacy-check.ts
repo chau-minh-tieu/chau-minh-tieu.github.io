@@ -7,12 +7,15 @@
  *   node scripts/privacy-check.ts --staged             staged files (pre-commit hook)
  *   node scripts/privacy-check.ts --commits A..B       commit messages in a range (CI)
  *   node scripts/privacy-check.ts --message-file PATH  the message being committed (commit-msg hook)
+ *   node scripts/privacy-check.ts --text-env NAME      text in an environment variable (CI: brief
+ *                                                      issues, post PR titles and bodies); repeatable
  *
  * Terms come from the PRIVACY_TERMS environment variable or, when it is empty,
  * from .privacy-terms at the repository root: one term per line, # comments.
  * Matching ignores case and diacritics and needs whole words or phrases.
- * Files are scanned for terms and email addresses; commit messages for terms
- * only, because commit trailers carry addresses by design. Raster images are
+ * Files and texts are scanned for terms and email addresses; commit messages
+ * for terms only, because commit trailers carry addresses by design. A text is
+ * reported by the variable's name, so a finding never repeats the text. Raster images are
  * checked for metadata (EXIF with GPS, XMP, IPTC, C2PA): the repository is
  * public, so stripping images only in the built site would not be enough.
  *
@@ -76,6 +79,7 @@ function main(): number {
         staged: { type: 'boolean', default: false },
         commits: { type: 'string' },
         'message-file': { type: 'string' },
+        'text-env': { type: 'string', multiple: true, default: [] },
       },
       strict: true,
     }));
@@ -85,8 +89,13 @@ function main(): number {
   }
   const range = values.commits;
   const messageFile = values['message-file'];
-  if (!values.tracked && !values.staged && range === undefined && messageFile === undefined) {
-    console.error('privacy: pass --tracked, --staged, --commits <range> or --message-file <path>');
+  const textVars = values['text-env'];
+  if (!values.tracked && !values.staged && range === undefined && messageFile === undefined && textVars.length === 0) {
+    console.error('privacy: pass --tracked, --staged, --commits <range>, --message-file <path> or --text-env <name>');
+    return 2;
+  }
+  if (textVars.some((name) => !/^[A-Z_][A-Z0-9_]*$/.test(name))) {
+    console.error('privacy: --text-env needs an environment variable name such as BRIEF_BODY');
     return 2;
   }
   if (range !== undefined && (range === '' || range.startsWith('-'))) {
@@ -109,6 +118,7 @@ function main(): number {
   let files = 0;
   let images = 0;
   let messages = 0;
+  let texts = 0;
 
   const scanFile = (file: string, content: Buffer) => {
     if (IMAGE_EXTENSIONS.has(extname(file).toLowerCase())) {
@@ -134,6 +144,16 @@ function main(): number {
     messages++;
     for (const { line, term } of findTerms(text, terms)) {
       findings.push({ location, line, message: describe(term, source) });
+    }
+  };
+
+  const scanText = (location: string, text: string) => {
+    texts++;
+    for (const { line, term } of findTerms(text, terms)) {
+      findings.push({ location, line, message: describe(term, source) });
+    }
+    for (const line of findEmails(text)) {
+      findings.push({ location, line, message: 'email-like string' });
     }
   };
 
@@ -170,6 +190,10 @@ function main(): number {
     scanMessage('commit message', lines.join('\n'));
   }
 
+  // An unset or empty variable is an empty field (an issue without a body, a
+  // comment event's title): nothing to scan, but still counted.
+  for (const name of textVars) scanText(`text ${name}`, process.env[name] ?? '');
+
   for (const finding of findings) {
     if (inActions && finding.file) {
       console.log(`::error file=${finding.file},line=${finding.line},title=Privacy check::${finding.message}`);
@@ -180,7 +204,13 @@ function main(): number {
     }
   }
 
-  const scanned = `${files} file(s), ${images} image(s), ${messages} commit message(s), ${terms.length} term(s)`;
+  const scanned = [
+    `${files} file(s)`,
+    `${images} image(s)`,
+    `${messages} commit message(s)`,
+    ...(textVars.length > 0 ? [`${texts} text(s)`] : []),
+    `${terms.length} term(s)`,
+  ].join(', ');
   if (findings.length > 0) {
     console.log(`privacy: ${findings.length} finding(s) in ${scanned}`);
     return 1;

@@ -15,6 +15,7 @@
     "test": "vitest run",
     "privacy": "node scripts/privacy-check.ts --tracked",
     "smoke": "node scripts/smoke.ts",
+    "links": "node scripts/link-check.ts",
     "prepare": "git config core.hooksPath .githooks || true",
     "astro": "astro"
   },

@@ -4,6 +4,7 @@
  * with the reason when the site does not behave as the build-output tests
  * promise for dist/. Requests never follow redirects: a 200 must be a real 200.
  */
+import { attributes, decode } from './html.ts';
 
 export type Fetch = (url: string, init?: RequestInit) => Promise<Response>;
 
@@ -43,24 +44,12 @@ export function siteRoot(input: string): URL {
   return new URL('/', url);
 }
 
-const decode = (value: string) =>
-  value.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-
 const TAG = /<(script|link|img|source)\b([^>]*)>/gi;
-const ATTRIBUTE = /([^\s"'=<>/]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
 const STYLE_BLOCK = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
 const CSS_URL = /url\(\s*(?:"([^"]*)"|'([^']*)'|([^)\s]*))\s*\)/gi;
 
 /** Link types that make the browser load something; canonical, alternate and the like do not. */
 const LOADING_RELS = new Set(['stylesheet', 'preload', 'modulepreload', 'icon', 'apple-touch-icon', 'manifest']);
-
-function attributes(source: string): Map<string, string> {
-  const map = new Map<string, string>();
-  for (const [, key, double, single, bare] of source.matchAll(ATTRIBUTE)) {
-    map.set(key!.toLowerCase(), decode(double ?? single ?? bare ?? ''));
-  }
-  return map;
-}
 
 /** URLs in a srcset: "a.webp 1x, b.webp 2x" → a.webp, b.webp. */
 function srcset(value: string | undefined): string[] {
