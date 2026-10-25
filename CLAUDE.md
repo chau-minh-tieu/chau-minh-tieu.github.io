@@ -77,5 +77,6 @@ Node 26.12.1 (`.nvmrc`) and pnpm 12.15.0 (`packageManager`, through corepack). N
 | `pnpm check` | Typechecks `.astro`, `.ts` and `.js` files (`astro check`) |
 | `pnpm test` | Vitest: unit tests, plus build-output tests over `dist/` (skipped locally without a build, required in CI) |
 | `pnpm privacy` | Privacy check over all tracked files |
+| `pnpm smoke [url]` | Smoke checks against a deployed site: the live site by default, or `http://localhost:4321` under `pnpm preview`. `--version <sha>` waits for that commit. The `smoke` job of `deploy.yml` runs it after every deploy |
 
 Before handing back: `pnpm check && pnpm build && pnpm test && pnpm privacy`.

@@ -27,32 +27,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          # The pnpm store is cached below; setup-node would look for pnpm before it exists.
-          package-manager-cache: false
-
-      # Node 25 and later no longer bundle corepack. Corepack then provides the
-      # pnpm version pinned in package.json's packageManager field.
-      - name: Install corepack and pnpm
-        run: |
-          npm install --global corepack@0.36.0
-          corepack enable
-          pnpm --version
-
-      - name: Locate the pnpm store
-        id: pnpm-store
-        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ${{ steps.pnpm-store.outputs.path }}
-          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: pnpm-store-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      # Node, pnpm and dependencies; shared with the build job of deploy.yml.
+      - uses: ./.github/actions/setup
 
       - name: Typecheck
         run: pnpm check

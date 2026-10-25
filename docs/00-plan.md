@@ -13,7 +13,7 @@ flowchart LR
   B --> A["Pages artifact"] --> P["GitHub Pages"]
 ```
 
-Three workflows: `pr.yml` (typecheck, build, tests, privacy check; content gates on `post/*` PRs), `deploy.yml` (build on `main`, upload the Pages artifact, deploy through the `github-pages` environment) and `lock-briefs.yml`.
+Three workflows: `pr.yml` (typecheck, build, tests, privacy check; content gates on `post/*` PRs), `deploy.yml` (on `main`: check, build and test, upload the Pages artifact, deploy through the `github-pages` environment, smoke-check the live site) and `lock-briefs.yml`. `verify` and the deploy build share their setup through the local action `.github/actions/setup` (F3).
 
 ## Versions
 
@@ -33,7 +33,7 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 | `@astrojs/markdown-remark` | 7.3.4 | F2: keeps the remark/rehype pipeline (deviation 6) |
 | `rehype-raw` · `rehype-sanitize` | 7.0.0 · 6.0.0 | |
 | `unist-util-visit` · `hast-util-to-string` | 5.1.0 · 3.0.1 | Not 5.2.0: younger than pnpm 12's one-day [`minimumReleaseAge`](https://pnpm.io/settings/dependency-resolution#minimumreleaseage) on 2026-10-25 |
-| GitHub actions | `checkout` v7.0.1 · `setup-node` v7.1.0 · `cache` v6.1.0 · `configure-pages` v6.0.0 · `upload-pages-artifact` v5.0.0 · `deploy-pages` v5.0.1 | Pinned by commit SHA. Q5 |
+| GitHub actions | `checkout` v7.0.1 · `setup-node` v7.1.0 · `cache` v6.1.0 · `upload-pages-artifact` v5.0.0 · `deploy-pages` v5.0.1 | Pinned by commit SHA (Q5), rechecked 2026-10-25 in F3. `configure-pages` is not used: it adapts other generators' configs, and Astro's `site` is fixed. GitHub's Pages guide still shows older majors |
 
 ## Fixed decisions (HANDOFF.md 4.2): implementation notes
 

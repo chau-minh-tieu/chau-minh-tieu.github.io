@@ -99,6 +99,11 @@ describe.skipIf(!built)('build output', () => {
       expect(read(file), name(file)).not.toMatch(/<metadata|c2pa|xmp|xpacket|exif/i);
     }
   });
+
+  it('writes the commit it was built from to /version.txt', () => {
+    // GitHub Actions sets GITHUB_SHA for the build and the tests alike.
+    expect(read(join(DIST, 'version.txt'))).toBe(`${process.env.GITHUB_SHA || 'local'}\n`);
+  });
 });
 
 /** The URL a built page is served at: dist/tags/ai/index.html → https://…/tags/ai/ */
