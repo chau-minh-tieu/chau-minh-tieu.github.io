@@ -1,0 +1,48 @@
+---
+// /projects/: everything in src/lib/projects.ts, in order (HANDOFF.md 5.3).
+import ProjectRow from '../components/ProjectRow.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { listedPosts } from '../lib/collection.ts';
+import { PROJECTS, linksOf } from '../lib/projects.ts';
+
+const posts = await listedPosts();
+const lede = 'Things I build in my own time, in public. Each one started as a question I wanted answered properly.';
+---
+
+<BaseLayout title="Projects" description={lede}>
+  <div class="wrap">
+    <header class="head">
+      <h1>Projects</h1>
+      <p class="lede">{lede}</p>
+    </header>
+    <section class="list" aria-label="Project list">
+      {PROJECTS.map((project) => <ProjectRow project={project} links={linksOf(project, posts)} />)}
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 760px;
+    padding: 96px 0 64px;
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: -0.03em;
+  }
+
+  .lede {
+    font-size: var(--text-lede);
+    line-height: var(--leading-lede);
+    color: var(--muted);
+  }
+
+  .list {
+    padding-bottom: 96px;
+  }
+</style>

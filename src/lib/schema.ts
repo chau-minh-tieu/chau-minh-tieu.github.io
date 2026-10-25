@@ -54,3 +54,14 @@ export const postSchema = z
   });
 
 export type PostData = z.output<typeof postSchema>;
+
+/**
+ * The "Now" list on About (src/data/now.yaml): the month it was last updated
+ * and exactly three items, rendered as plain text.
+ */
+export const nowSchema = z.strictObject({
+  updated: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'updated must be a month as YYYY-MM, quoted'),
+  items: z.array(z.string().trim().min(1)).length(3),
+});
+
+export type NowData = z.output<typeof nowSchema>;

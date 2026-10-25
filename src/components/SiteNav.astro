@@ -1,6 +1,7 @@
 ---
 // Site header: monogram and name linking home, the three section links,
 // and the theme toggle. The current section gets aria-current="page".
+import Monogram from './Monogram.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 const path = Astro.url.pathname;
@@ -19,7 +20,7 @@ const links = [
 <header class="wrap">
   <nav class="nav" aria-label="Main">
     <a class="brand" href="/">
-      <img class="monogram" src="/brand/monogram-oxblood.svg" width="32" height="32" alt="" />
+      <Monogram size={32} />
       <span class="brand-name">Chau Tieu</span>
     </a>
     <div class="links">
@@ -50,12 +51,6 @@ const links = [
     align-items: center;
     gap: 12px;
     text-decoration: none;
-  }
-
-  .monogram {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
   }
 
   .brand-name {

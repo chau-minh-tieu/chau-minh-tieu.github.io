@@ -85,6 +85,16 @@ export function formatDate(date: Date): string {
   return DATE_FORMAT.format(date);
 }
 
+/** '2026-10' → 'October 2026' (the "Now" list's month). */
+export function formatMonth(month: string): string {
+  const [year, number] = month.split('-').map(Number);
+  return new Date(Date.UTC(year!, number! - 1)).toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
 /** "2026-11-02", for <time datetime>. */
 export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);

@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { cspOf, cssUrls, type Fetch, hasNoindex, isLocal, resourceUrls, siteRoot, smokeChecks } from './smoke.ts';
+import {
+  cspOf,
+  cssUrls,
+  type Fetch,
+  hasNoindex,
+  isLocal,
+  ogImageOf,
+  resourceUrls,
+  siteRoot,
+  smokeChecks,
+} from './smoke.ts';
 
 const ROOT = new URL('https://example.github.io/');
 const hrefs = (urls: URL[]) => urls.map((url) => url.href);
@@ -80,8 +90,12 @@ describe('cssUrls', () => {
   });
 });
 
-describe('cspOf and hasNoindex', () => {
+describe('cspOf, hasNoindex and ogImageOf', () => {
   it('read the meta tags Astro writes', () => {
+    expect(ogImageOf('<meta property="og:image" content="https://example.github.io/og.png?v=1&amp;x=2">')).toBe(
+      'https://example.github.io/og.png?v=1&x=2',
+    );
+    expect(ogImageOf('<p>none</p>')).toBeUndefined();
     const html = `<meta http-equiv="content-security-policy" content="default-src 'self'; object-src 'none'"><meta name="robots" content="noindex">`;
     expect(cspOf(html)).toBe("default-src 'self'; object-src 'none'");
     expect(hasNoindex(html)).toBe(true);
@@ -97,7 +111,20 @@ const CSP = `<meta http-equiv="content-security-policy" content="default-src 'se
 
 function goodSite(): Site {
   return {
-    'https://example.github.io/': { type: 'text/html', body: `${CSP}<link rel="stylesheet" href="/_astro/a.css">` },
+    'https://example.github.io/': {
+      type: 'text/html',
+      body: `${CSP}<link rel="stylesheet" href="/_astro/a.css"><meta property="og:image" content="https://chau-minh-tieu.github.io/og.png">`,
+    },
+    'https://example.github.io/projects/': { type: 'text/html', body: CSP },
+    'https://example.github.io/about/': { type: 'text/html', body: CSP },
+    'https://example.github.io/favicon.ico': { type: 'image/vnd.microsoft.icon', body: 'x' },
+    'https://example.github.io/favicon.svg': { type: 'image/svg+xml', body: '<svg/>' },
+    'https://example.github.io/apple-touch-icon.png': { type: 'image/png', body: 'x' },
+    'https://example.github.io/og.png': { type: 'image/png', body: 'x' },
+    'https://example.github.io/smoke-check-missing-page/': {
+      status: 404,
+      body: '<meta name="robots" content="noindex"><h1>Page not found</h1>',
+    },
     'https://example.github.io/_astro/a.css': { type: 'text/css', body: 'b{src:url(/_astro/fonts/f.woff2)}' },
     'https://example.github.io/_astro/fonts/f.woff2': { type: 'font/woff2', body: 'x' },
     'https://example.github.io/posts/kitchen-sink/': {
@@ -144,8 +171,9 @@ describe('smokeChecks', () => {
 
   it('runs Pages redirect checks only against a non-local host', () => {
     const names = (root: URL) => smokeChecks(root).map((check) => check.name);
-    expect(names(ROOT)).toEqual(['version', 'home', 'assets', 'feeds', 'unlisted', 'draft', 'https redirect', 'trailing slash']);
-    expect(names(new URL('http://localhost:4321/'))).toEqual(['version', 'home', 'assets', 'feeds', 'unlisted', 'draft']);
+    const everywhere = ['version', 'home', 'pages', 'assets', 'brand', 'feeds', 'unlisted', 'draft', 'not found'];
+    expect(names(ROOT)).toEqual([...everywhere, 'https redirect', 'trailing slash']);
+    expect(names(new URL('http://localhost:4321/'))).toEqual(everywhere);
   });
 
   it('fails until the expected version is served', async () => {
@@ -184,6 +212,32 @@ describe('smokeChecks', () => {
     const site = goodSite();
     site['https://example.github.io/posts/draft-fixture/'] = { body: 'draft' };
     expect((await failures(site)).draft).toBe('GET /posts/draft-fixture/: 200, expected 404');
+  });
+
+  it('fails when a page is missing or has no CSP', async () => {
+    const site = goodSite();
+    delete site['https://example.github.io/projects/'];
+    expect((await failures(site)).pages).toBe('GET /projects/: 404, expected 200');
+    site['https://example.github.io/projects/'] = { body: '<p>no policy</p>' };
+    expect((await failures(site)).pages).toBe('GET /projects/: no CSP');
+  });
+
+  it('fails when an icon or the Open Graph image is wrong', async () => {
+    const site = goodSite();
+    site['https://example.github.io/favicon.svg']!.type = 'text/plain';
+    expect((await failures(site)).brand).toBe('GET /favicon.svg: content type text/plain');
+    const relative = goodSite();
+    relative['https://example.github.io/']!.body = `${CSP}<meta property="og:image" content="/og.png">`;
+    expect((await failures(relative)).brand).toBe('GET /: og:image is /og.png, expected an https URL');
+    const missing = goodSite();
+    delete missing['https://example.github.io/og.png'];
+    expect((await failures(missing)).brand).toBe('GET /og.png: 404, expected 200');
+  });
+
+  it("fails when a missing path does not get the site's 404 page", async () => {
+    const site = goodSite();
+    delete site['https://example.github.io/smoke-check-missing-page/'];
+    expect((await failures(site))['not found']).toBe("GET /smoke-check-missing-page/: 404 without the site's own 404 page");
   });
 
   it('fails when a redirect is missing or points elsewhere', async () => {

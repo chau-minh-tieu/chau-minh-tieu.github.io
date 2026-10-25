@@ -75,12 +75,6 @@
   line-height: var(--leading-small);
 }
 
-.byline img {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-}
-
 .byline-name {
   font-weight: 500;
 }

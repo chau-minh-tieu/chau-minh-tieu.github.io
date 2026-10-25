@@ -5,7 +5,8 @@
  * images and by the build-output test on served ones.
  *
  * JPEG, PNG and WebP are walked block by block, so a byte sequence inside
- * compressed image data is never mistaken for metadata. GIF and AVIF are
+ * compressed image data is never mistaken for metadata. ICO files (the
+ * favicon) are opened and each PNG inside is walked. GIF and AVIF are
  * searched for the markers those blocks start with.
  */
 
@@ -62,12 +63,28 @@ function webp(bytes: Uint8Array): MetadataKind[] {
   return found;
 }
 
+/** An ICO container: a directory of images, each a PNG or a headerless BMP (which has no metadata). */
+function ico(bytes: Uint8Array): MetadataKind[] {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const found: MetadataKind[] = [];
+  for (let i = 0; i < view.getUint16(4, true); i++) {
+    const entry = 6 + 16 * i;
+    if (entry + 16 > bytes.length) break;
+    const size = view.getUint32(entry + 8, true);
+    const offset = view.getUint32(entry + 12, true);
+    const image = bytes.subarray(offset, offset + size);
+    if (ascii(image, 1, 3) === 'PNG') found.push(...png(image));
+  }
+  return found;
+}
+
 /** The kinds of metadata in an image, without duplicates; empty when it is clean. */
 export function findImageMetadata(bytes: Uint8Array): MetadataKind[] {
   let found: MetadataKind[];
   if (bytes[0] === 0xff && bytes[1] === 0xd8) found = jpeg(bytes);
   else if (ascii(bytes, 1, 3) === 'PNG') found = png(bytes);
   else if (ascii(bytes, 0, 4) === 'RIFF' && ascii(bytes, 8, 4) === 'WEBP') found = webp(bytes);
+  else if (bytes.length >= 6 && bytes[0] === 0 && bytes[1] === 0 && bytes[2] === 1 && bytes[3] === 0) found = ico(bytes);
   else {
     found = [];
     if (contains(bytes, 'Exif\0\0')) found.push('EXIF');
@@ -78,4 +95,4 @@ export function findImageMetadata(bytes: Uint8Array): MetadataKind[] {
 }
 
 /** File extensions the privacy check and the build test treat as raster images. */
-export const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
+export const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.ico']);

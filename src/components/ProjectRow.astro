@@ -1,0 +1,129 @@
+---
+// One project on /projects/: name, year and status on the left; description,
+// facts, stack and links on the right. Stacks into one column under 640px.
+import type { Project, ProjectLink } from '../lib/projects.ts';
+
+interface Props {
+  project: Project;
+  links: ProjectLink[];
+}
+
+const { project, links } = Astro.props;
+---
+
+<article class="row">
+  <div class="head">
+    <h2 class:list={['name', { mono: project.mono }]}>{project.name}</h2>
+    <p class="when">{project.year} · {project.status}</p>
+  </div>
+  <div class="body">
+    <p class="description">{project.description}</p>
+    {
+      project.facts.length > 0 && (
+        <ul class="facts">
+          {project.facts.map((fact) => (
+            <li>{fact}</li>
+          ))}
+        </ul>
+      )
+    }
+    {project.stack.length > 0 && <p class="label stack">{project.stack.join(' · ')}</p>}
+    <p class="links">
+      {
+        links.map((link) => (
+          <a href={link.href}>
+            {link.label}
+            <span class="visually-hidden"> of {project.name}</span>
+            <span aria-hidden="true"> →</span>
+          </a>
+        ))
+      }
+    </p>
+  </div>
+</article>
+
+<style>
+  .row {
+    display: grid;
+    /* 300px, not the mockup's 280: "chau-minh-tieu.github.io" in 20px mono is 288px wide. */
+    grid-template-columns: 300px minmax(0, 1fr);
+    column-gap: 56px;
+    row-gap: 16px;
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .name {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .name.mono {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .when {
+    font-size: 0.8125rem;
+    line-height: var(--leading-small);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-nav);
+    line-height: var(--leading-small);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stack {
+    color: var(--muted);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    font-size: var(--text-nav);
+    font-weight: 600;
+  }
+
+  .links a {
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

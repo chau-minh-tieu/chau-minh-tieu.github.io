@@ -3,6 +3,7 @@ import {
   disclosureOf,
   discussUrl,
   formatDate,
+  formatMonth,
   isBuilt,
   isListed,
   isoDate,
@@ -74,6 +75,11 @@ describe('dates', () => {
     const date = new Date('2026-11-02T00:00:00Z');
     expect(formatDate(date)).toBe('Nov 2, 2026');
     expect(isoDate(date)).toBe('2026-11-02');
+  });
+
+  it('names the month of the "Now" list', () => {
+    expect(formatMonth('2026-10')).toBe('October 2026');
+    expect(formatMonth('2027-01')).toBe('January 2027');
   });
 });
 

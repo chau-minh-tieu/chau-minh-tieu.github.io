@@ -1,0 +1,77 @@
+---
+// /404.html: GitHub Pages serves it, with status 404, for every path that has
+// no file. It answers at any address, so it has no canonical URL, and it is
+// never indexed. Asset paths are absolute (Astro's default), so it renders
+// the same at /missing and at /posts/missing/deeper/.
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const links = [
+  { href: '/', label: 'Writing' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/about/', label: 'About' },
+];
+---
+
+<BaseLayout title="Page not found" noindex canonical={false}>
+  <div class="wrap">
+    <header class="head">
+      <p class="label code">404</p>
+      <h1>Page not found</h1>
+      <p class="lede">Nothing lives at this address. The link may be old or mistyped.</p>
+      <nav class="links" aria-label="Try instead">
+        {
+          links.map((link) => (
+            <a href={link.href}>
+              {link.label}
+              <span aria-hidden="true"> →</span>
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+  </div>
+</BaseLayout>
+
+<style>
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 760px;
+    padding: 96px 0 112px;
+  }
+
+  .code {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: -0.03em;
+  }
+
+  .lede {
+    font-size: var(--text-lede);
+    line-height: var(--leading-lede);
+    color: var(--muted);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding-top: 8px;
+    font-size: var(--text-nav);
+    font-weight: 600;
+  }
+
+  .links a {
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    text-decoration: underline;
+  }
+</style>
