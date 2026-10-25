@@ -35,3 +35,154 @@
 **Timebox.** 30 minutes of the owner's time; it may run over, and nothing here is cut (owner decision, 2026-10-25). Risk: `deploy.yml` first runs after the merge (manual runs need the workflow on `main`), so its first run is watched; the PR proves the shared setup it depends on.
 
 **Docs.** [Custom workflows for Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) · [`deploy-pages`](https://github.com/actions/deploy-pages) · [`upload-pages-artifact`](https://github.com/actions/upload-pages-artifact) · [Deployments and environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments) · [OpenID Connect](https://docs.github.com/en/actions/concepts/security/openid-connect) · [Concurrency](https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency) · [Composite actions](https://docs.github.com/en/actions/tutorials/create-actions/create-a-composite-action) · [Actions settings (local actions, SHA pinning)](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository) · [Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits) · [Astro on GitHub Pages](https://docs.astro.build/en/guides/deploy/github/)
+
+---
+
+## Debrief
+
+### 1. What was built
+
+Every push to `main` now builds the site once, tests it, and publishes exactly the tested `dist/` to GitHub Pages. Then it checks the live site.
+
+```mermaid
+flowchart LR
+  M["push to main<br/>(a merged PR)"] --> B["build<br/>check · build · test<br/>contents: read"]
+  B -->|"artifact github-pages<br/>(tar of dist/)"| D["deploy<br/>actions/deploy-pages<br/>pages + id-token: write"]
+  D -->|"environment github-pages<br/>branch policy: main"| P["GitHub Pages<br/>chau-minh-tieu.github.io"]
+  D --> S["smoke<br/>waits for /version.txt = commit,<br/>then checks the live site"]
+  S -.->|HTTPS| P
+```
+
+| Area | Result |
+|---|---|
+| Workflow | `deploy.yml`: `build` → `deploy` → `smoke` on every push to `main`, and manually from the Actions tab |
+| Privileges | Only `deploy` can publish, and it runs nothing but GitHub's deploy action. `build` and `smoke` read the code |
+| Ordering | One run at a time, never cancelled mid-deploy; the newest push replaces a waiting run |
+| Gate | `build` runs the same typecheck, build and tests as `verify` before it uploads anything |
+| Shared setup | `.github/actions/setup`: Node, pnpm, store cache, install; used by `verify` and `build` |
+| Build marker | `/version.txt` holds the commit the site was built from |
+| Smoke checks | `pnpm smoke [url]`: 6 checks anywhere, 8 on the live host; results on the run's summary page |
+| Checks | 101 tests (19 new), `verify` and `privacy` green on PR #4 |
+
+**Setup Guide B2: the `github-pages` environment.** Already in place, read on 2026-10-25 with `gh api -X GET`: Pages source **GitHub Actions** (`build_type: workflow`), **Enforce HTTPS** on, and `github-pages` deployable from `main` only. One change, in the UI:
+
+1. Repository → **Settings** → **Environments** → **github-pages**.
+2. Under **Deployment protection rules**, untick **Allow administrators to bypass configured protection rules**, then **Save protection rules**.
+3. Leave **Deployment branches and tags** as it is: **Selected branches and tags**, with the rule `main`.
+
+Expected end state: `can_admins_bypass` is `false`, and the branch policy lists only `main`. There is no equivalent `gh` command: GitHub's REST API returns `can_admins_bypass` but documents no field to set it. Read-only check, which I run after you confirm:
+
+```sh
+gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.github.io/environments/github-pages --jq '{can_admins_bypass, deployment_branch_policy}'
+gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.github.io/environments/github-pages/deployment-branch-policies --jq '.branch_policies[].name'
+```
+
+After the merge:
+
+4. **Actions** → **Deploy** → the run for the squash commit: `build`, `deploy` and `smoke` green. The run's summary page shows the smoke table, and the `deploy` box links to the site.
+5. Open https://chau-minh-tieu.github.io. I verify the same things read-only (part 4).
+
+### 2. File tour
+
+| File | Single responsibility | Depends on |
+|---|---|---|
+| `.github/workflows/deploy.yml` | Build, publish and smoke-check the site on every push to `main` | `setup` action, `scripts/smoke.ts` |
+| `.github/actions/setup/action.yml` | Node from `.nvmrc`, pnpm through corepack, the pnpm store cache, a frozen install | `.nvmrc`, `package.json`, `pnpm-lock.yaml` |
+| `.github/workflows/pr.yml` | Unchanged checks; `verify` now calls the `setup` action instead of repeating its steps | `setup` action |
+| `src/pages/version.txt.ts` | `/version.txt`: the commit the site was built from (`GITHUB_SHA`, or `local`) | — |
+| `scripts/lib/smoke.ts` | The checks: what to fetch and what counts as correct; HTML and CSS URL extraction | — |
+| `scripts/smoke.ts` | CLI around the checks: arguments, retries until a deadline, console and summary report | `scripts/lib/smoke.ts` |
+| `scripts/lib/smoke.test.ts` | Unit tests of the extraction and of every check against a fake site | `smoke.ts` (lib) |
+| `tests/build-output.test.ts` | Adds: `/version.txt` holds the build's commit | `pnpm build` |
+| `package.json` | Adds the `smoke` script | — |
+
+### 3. Concepts
+
+**Artifact deploys: build once, ship the bytes** `[CI/CD]`
+- Mental model: the Pages artifact is a container image built from a larger build context. The build context is the repository with `node_modules/`; the image is the 284 KB `dist/`. `build` produces it once, tests it, and uploads it; `deploy` promotes those exact bytes. Nothing is rebuilt between test and release, so what was tested is what ships.
+- Here: `actions/upload-pages-artifact` in `deploy.yml` packs `dist/` into a tar file and uploads it as the run's artifact `github-pages`, kept for one day. `actions/deploy-pages` hands that artifact to Pages and waits until Pages reports the deployment live.
+- Mistakes: building again in the deploy job (two builds, one tested and one shipped); symbolic links in the artifact, or a site over 1 GB (refused); dotfiles, which the upload leaves out unless `include-hidden-files` is set (Astro writes `_astro/`, so nothing is lost).
+- Docs: [Custom workflows for Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [`upload-pages-artifact`](https://github.com/actions/upload-pages-artifact)
+
+**Environments and the OIDC token** `[GitHub]`
+- Mental model: an environment is a named deployment target with a gate in front of it, like a production profile that only a release pipeline may activate. Its branch policy says which refs may deploy. A job that names the environment is checked against the gate before it starts, and every deployment is recorded in the repository's deployment history.
+- Here: `deploy` names `github-pages`. `id-token: write` lets it ask GitHub for an OIDC token, a signed JWT whose claims say which repository, workflow and branch is running. `deploy-pages` sends it to the Pages API, which checks it against the environment. `pages: write` lets the job's token create the deployment. Guide B2 turns off the administrators' bypass, so the gate applies to everyone.
+- Mistakes: `id-token: write` on a job that runs third-party code (the token can authenticate to any cloud that trusts it); expecting `if: github.ref == …` to be the protection (it only skips the job; the environment is the control); environment secrets in a job that does not name the environment (they are not available).
+- Docs: [Deployments and environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments), [OpenID Connect](https://docs.github.com/en/actions/concepts/security/openid-connect)
+
+**Least privilege by splitting jobs** `[CI/CD]`
+- Mental model: each job is its own VM with its own token, so permissions are per job, like separate service accounts for the build server and the release tool. The question for each job is "what code runs here, and what can that code do?"
+- Here: `build` runs our code and every dependency's install and build steps, with a read-only token. `deploy` holds the only write permissions and runs no checkout, no install, only `actions/deploy-pages` pinned by SHA. `smoke` reads the code and runs a script with Node built-ins only. The artifact is the only thing that crosses from `build` to `deploy`, and it is data.
+- Mistakes: `permissions:` with write access at the workflow level, which every job inherits; a "deploy" step at the end of the build job; a composite action that hides a privileged step from a reader of the workflow.
+- Docs: [Workflow syntax: `permissions`](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions)
+
+**Concurrency groups** `[CI/CD]`
+- Mental model: a named lock with a waiting slot. A group holds at most one running and one pending run. A new run takes the waiting slot and the run that waited there is cancelled; `cancel-in-progress: true` would also stop the running one.
+- Here: `concurrency: pages` on the whole of `deploy.yml`, with `cancel-in-progress: false`: a deploy is never cut off half way, and after a burst of merges the last one deploys last. Grouping the whole workflow, not only `deploy`, keeps the builds in order too: otherwise an older build that finished late could deploy over a newer one.
+- Mistakes: `cancel-in-progress: true` on a deploy (GitHub's starter workflow warns against it: production deployments should be allowed to complete); expecting a queue of every push (only the newest waiting run survives, which is what a site needs); sharing a group name between unrelated workflows.
+- Docs: [Concurrency](https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency), [Control concurrency](https://docs.github.com/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs)
+
+**What Pages adds when it serves files** `[GitHub]`
+- Mental model: Pages is a static file server behind a CDN (Fastly). It maps URLs to files in `dist/` and adds a few behaviours of its own; it runs no code of ours and sets no headers we choose.
+- Here: `http://` redirects to `https://` (Enforce HTTPS); `/posts/kitchen-sink` redirects to `/posts/kitchen-sink/`; a missing path gets GitHub's own 404 page until F5 adds `src/pages/404.astro` (Pages serves a root `404.html` automatically); responses, 404s included, are cached at the edge. Without our own headers, the CSP stays a `<meta>` tag and `frame-ancestors` stays unavailable (F1). The two redirects are smoke-checked on the live host only, because `pnpm preview` does not imitate them.
+- Mistakes: setting Astro's `base` for a user site (`<user>.github.io` is served at the root; `base` is for project sites); expecting `_headers` or `_redirects` files to work (Netlify features, not Pages); trusting a page you just loaded right after a deploy without checking which version it is.
+- Docs: [Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits), [Custom 404 page](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-custom-404-page-for-your-github-pages-site), [Astro on GitHub Pages](https://docs.astro.build/en/guides/deploy/github/)
+
+### 4. Verify it yourself
+
+| Do this | Correct result |
+|---|---|
+| `pnpm check` | `0 errors`, `0 warnings` |
+| `pnpm build && pnpm test` | `/version.txt` among the built files; `Tests 101 passed` |
+| `pnpm privacy` | `privacy: clean (…)` |
+| `pnpm preview`, then `pnpm smoke http://localhost:4321` | `ok` for version (`local`), home, assets (8 files), feeds, unlisted, draft; `all 6 checks passed` |
+| `pnpm smoke http://localhost:4321 --version deadbeef --timeout 0` | `FAIL version: /version.txt serves local, expected deadbeef`, exit code 1 |
+| `gh pr checks 4` | `verify pass`, `privacy pass`; the `verify` log shows `Run ./.github/actions/setup` |
+| After the merge: **Actions** → **Deploy** | `build`, `deploy`, `smoke` green; the summary page has the smoke table with 8 passes |
+| After the merge: `curl -s https://chau-minh-tieu.github.io/version.txt` | The squash commit's SHA (compare `git rev-parse origin/main`) |
+| After the merge: `pnpm smoke` | `all 8 checks passed` against the live site |
+| After the merge: https://chau-minh-tieu.github.io, DevTools console | The home page in both themes, no CSP errors |
+| After the merge: **Code** tab → **Deployments** (right sidebar) | `github-pages`, active, at the squash commit |
+
+### 5. Check your understanding
+
+1. Why does the `deploy` job have no `actions/checkout` step, and what would change if it ran `pnpm install` before deploying?
+   <details><summary>Answer</summary>It needs nothing from the repository: the artifact from <code>build</code> is all it publishes. Leaving the code out means the only job holding <code>pages: write</code> and <code>id-token: write</code> runs nothing but GitHub's pinned deploy action. With an install, every dependency's install scripts would run with those permissions, so one compromised package could publish its own site or use the OIDC token.</details>
+2. You merge three PRs within a minute. Which commits get deployed, and in what order?
+   <details><summary>Answer</summary>The first merge starts a run. The second waits in the <code>pages</code> group; the third replaces it, and the second run is cancelled before it starts. The first run finishes (it is never cancelled), then the third runs. The site ends at the third commit, which contains the second one's changes as well, because <code>main</code> is cumulative.</details>
+3. The `deploy` job is green but `smoke` fails on `version` after three minutes. What do you know, and what do you check first?
+   <details><summary>Answer</summary>Pages accepted the deployment, but within three minutes the live <code>/version.txt</code> never served the new commit. Either readers are still getting the previous deploy from the CDN, or the deploy published something other than expected. Check first: <code>curl -sI https://chau-minh-tieu.github.io/version.txt</code> for the <code>age</code> and <code>x-cache</code> headers, and the deployments list for which commit is active. Re-running only the <code>smoke</code> job tells caching apart from a broken deploy.</details>
+
+### 6. Deviations and gotchas
+
+- **The smoke retries share one deadline.** The brief said each check retries for up to three minutes. The checks now share one three-minute deadline and each runs at least once, so a site that is down fails in about three minutes, not eight times three.
+- **`deploy.yml` has not run yet.** GitHub runs `workflow_dispatch` only for workflows that are on the default branch, and the push trigger only fires on `main`. PR #4 proves the shared setup `build` depends on; the first real run is right after the merge.
+- **Pages caches 404s.** Before this deploy, `https://chau-minh-tieu.github.io/` came back as a 404 served from the cache (`x-cache: HIT`, `age: 371`). This is why `/version.txt` gates the checks: a green smoke run means the new commit is what readers get, not only what Pages stored.
+- **The PR's install had no cache.** `verify` logged `Cache not found`: caches are scoped to branches, so a PR can read caches made on `main` but not those of other PRs, and nothing has run on `main` yet. The first deploy run writes one on `main`; later PRs restore it.
+- **The privacy hook caught a retina-style image name** (a name, an at sign, then `2x.webp`) in a test fixture as an email-like string, so the fixture uses `chart-2x.webp`. Image names in that style would fail the privacy check in a post too; `STYLE.md` (F6) should say so.
+- **Admin bypass is a UI-only setting.** The REST API returns `can_admins_bypass` but its update endpoint has no such field (checked in GitHub's API description), so Guide B2 has no equivalent command. GitHub's docs do not say whether the bypass covers branch policies; turning it off removes the question.
+- **An older deployment exists.** At 13:13 today Pages built the first commit from the branch, before the source was switched to GitHub Actions; that commit had no `index.html`. The first Actions deploy replaces it.
+- **Local actions and SHA pinning.** The repository's policy allows local actions (`./…`), which need no pin because they come from the same commit. The actions inside one are still pinned, and the run log shows them downloaded by SHA.
+- **`version.txt` on PR runs** holds the PR's test merge commit, which never lands on `main`. Only deploys read it.
+- **Not in the sitemap.** `/version.txt` is an endpoint (`.ts`); the sitemap lists `.astro` pages, tag pages and posts only.
+- **New folder.** HANDOFF.md 4.4 lists no `.github/actions/`; the shared setup adds `.github/actions/setup/`.
+- **Ubuntu 26.** `ubuntu-latest` moves to Ubuntu 26 from 19 October; nothing here depends on the release, and `vars.RUNNER` can pin a label if one ever breaks.
+- **No screenshots in the PR.** No page changes; the live site is shown after the deploy.
+
+### 7. Time used
+
+| | Time |
+|---|---|
+| F3, brief | 16:32 to 16:39 by the clock: reading, settings checks, docs and SHA checks, the brief |
+| Waiting for "go" | 16:39 to 18:02, with the owner |
+| F3, build | 18:02 to 18:12: workflows, smoke checks, tests, PR #4 with both checks green, this debrief |
+| F3 so far | about 17 minutes of work, before Guide B2, review, merge and the first deploy; 1 h 40 min by the clock including the wait |
+| Cumulative | about 3 h 24 min of the planned 4–6 hours without the wait, 4 h 47 min with it |
+
+### 8. Q&A log
+
+No questions yet.
+
+### 9. Next
+
+F4, diagrams.
