@@ -3,7 +3,7 @@ title: The model picks the query, Postgres computes the number
 description: 'I built a chat over my GitHub history to learn how LLM apps work with data. The rule that held it together: the model never does the maths.'
 pubDate: 2026-10-25
 tags: [ai]
-status: unlisted
+status: published
 brief: 10
 sources:
   - title: delivery-metrics, README (commit df58ba6)
