@@ -77,6 +77,8 @@ gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.github.io/environments/github-
 gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.github.io/environments/github-pages/deployment-branch-policies --jq '.branch_policies[].name'
 ```
 
+**Steps 1–3 verified at 18:15 on 2026-10-25, read-only.** `GET /environments/github-pages`: `can_admins_bypass: false`, `custom_branch_policies: true`, `protected_branches: false`, one protection rule (`branch_policy`). `GET …/deployment-branch-policies`: one policy, `main` (type `branch`). `GET /pages`: `build_type: workflow`, `https_enforced: true`. The `main` ruleset is unchanged (`deletion`, `non_fast_forward`, `pull_request`, `required_status_checks`), and PR #4 is `CLEAN`.
+
 After the merge:
 
 4. **Actions** → **Deploy** → the run for the squash commit: `build`, `deploy` and `smoke` green. The run's summary page shows the smoke table, and the `deploy` box links to the site.
