@@ -91,16 +91,20 @@ Screenshots: [`img/`](img/) (`08-home-*`, `08-about-*`, `08-mobile.png`, `08-tab
 3. **Discuss link (F2).** Signed in to GitHub, click "Discuss this post on GitHub →" at the end of the post: a new discussion form in "Posts", title filled in. Close it without posting.
 4. **Copy button (F2).** Click "Copy" on a code block of the post and paste it anywhere: the code, without line numbers.
 
-**Revert rehearsal, dry run (you, before this PR merges).** While #13 is still the last merge, its revert cannot conflict:
+**Revert rehearsal, dry run (done 2026-10-26, before this PR merges).** While #13 was still the last merge, its revert could not conflict. At your request I ran `gh pr revert 13 --repo chau-minh-tieu/chau-minh-tieu.github.io --draft` at 23:59; it opened draft PR #15. Checked read-only:
+
+| Claim in the runbook | Observed on #15 |
+|---|---|
+| GitHub creates a branch whose name starts with `revert-` | `revert-13-feat/07-first-post` |
+| The PR undoes the merge | One commit, `Revert "feat(07): first post end to end (#13)"` (`cdbf1e6`), reversing exactly #13's ten files |
+| `verify` and `privacy` run | Both passed (31 s and 13 s) |
+| `content` is skipped | Skipped: the branch does not start with `post/` |
+| It can be merged like any PR | `mergeable: MERGEABLE`, `mergeStateStatus: CLEAN`; as a draft it needs **Ready for review** first |
+
+You close it without merging and delete its branch (GitHub created the branch, so the deletion is yours):
 
 ```bash
-gh pr revert 13 --repo chau-minh-tieu/chau-minh-tieu.github.io --draft
-```
-
-I then check, read-only: the branch name starts with `revert-`, `verify` and `privacy` pass, `content` is skipped, the PR is mergeable. Then you close it without merging and delete its branch (I may not delete a branch I did not create):
-
-```bash
-gh pr close <revert PR> --repo chau-minh-tieu/chau-minh-tieu.github.io --delete-branch
+gh pr close 15 --repo chau-minh-tieu/chau-minh-tieu.github.io --delete-branch
 ```
 
 **Setup Guide D: the About box (you).**
@@ -221,6 +225,7 @@ Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-t
 | F8, build | 23:34 to 23:55: records, CSS and plugins, tests, screenshots, README, licence, docs, PR #14, this debrief |
 | F8 so far | about 35 minutes of work, before your checks, the revert dry run, Guide D, review and merge |
 | Cumulative | about 8 h 14 min of active time (about 10 h 16 min by the clock) of the planned 4–6 hours |
+| Revert dry run | 23:58 to 00:01: the first "done" reached no command (as in F7); then I ran it on your request and checked #15 |
 
 ### 8. Q&A log
 
@@ -228,4 +233,4 @@ No questions yet.
 
 ### 9. Next
 
-Within F8: your four checks, the revert dry run (before the merge), Guide D, then the review. After the merge I verify `main`, the Deploy run, `pnpm smoke --version <squash sha>`, Lighthouse on the live Home and post, the README on the repository page and the detected licence. F8 ends when you call it done. Deferred, not deleted (HANDOFF.md 8): Vale rules in CI, per-post Open Graph images, the Claude Code GitHub Action, search.
+Within F8: your four checks, closing #15, Guide D, then the review. After the merge I verify `main`, the Deploy run, `pnpm smoke --version <squash sha>`, Lighthouse on the live Home and post, the README on the repository page and the detected licence. F8 ends when you call it done. Deferred, not deleted (HANDOFF.md 8): Vale rules in CI, per-post Open Graph images, the Claude Code GitHub Action, search.
