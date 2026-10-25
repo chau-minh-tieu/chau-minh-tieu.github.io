@@ -1,10 +1,15 @@
 # Brief issues (HANDOFF.md 6.3) are AI input, so their threads must hold only
 # collaborators' text, and they are public the moment they are filed.
-#   lock     locks every issue labelled `brief`, so only collaborators can
-#            comment. Holds the only write permission and runs no repository code.
-#   privacy  scans the title, body and collaborators' comments of brief issues
-#            for private terms and email addresses. Reads the secret, cannot write.
-# Issue events always run this file as it is on main, never a branch's copy.
+#   lock           locks every issue labelled `brief`, so only collaborators can
+#                  comment. Holds the only write permission and runs no
+#                  repository code.
+#   brief-privacy  scans the title, body and collaborators' comments of brief
+#                  issues for private terms and email addresses. Reads the
+#                  secret, cannot write.
+# Issue events always run this file as it is on main, never a branch's copy,
+# and their checks attach to main's latest commit. Job names stay distinct from
+# the required PR checks (`verify`, `privacy`, `content`) so a red brief scan
+# is never mistaken for one of them.
 # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#issues
 name: Briefs
 
@@ -51,8 +56,8 @@ jobs:
             echo "Issue #$NUMBER locked: only collaborators can comment."
           fi
 
-  privacy:
-    name: privacy
+  brief-privacy:
+    name: brief-privacy
     # Brief issues only (not pull requests, whose comments fire issue_comment
     # too), and only text written by collaborators: a public pass or fail on an
     # outsider's comment would let anyone test guesses against the term list.
