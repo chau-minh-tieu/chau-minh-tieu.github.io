@@ -170,9 +170,9 @@ Screenshots of the live site in [`img/`](img/): `07-post-light.png`, `07-post-da
 | Unlisted check and rollback rehearsal | 22:26 to 22:37 |
 | Publish PR #12, PR #13, merge #12 | 22:37 to 22:40 |
 | Interrupted turn | 22:40 to 23:06, not counted |
-| Live checks, Lighthouse, screenshots, debrief | 23:06 to about 23:15 |
-| F7 so far | about 2 h 04 min by the clock, about 1 h 38 min active (including your 35 minutes on the brief) against the 60–90-minute timebox, before this PR's review and merge |
-| Cumulative | about 7 h 39 min of active time (about 9 h 41 min by the clock) of the planned 4–6 hours |
+| Live checks, Lighthouse, screenshots, debrief | 23:06 to 23:11 |
+| F7 so far | about 2 h 00 min by the clock, about 1 h 34 min active (including your 35 minutes on the brief) against the 60–90-minute timebox, before this PR's review and merge |
+| Cumulative | about 7 h 35 min of active time (about 9 h 37 min by the clock) of the planned 4–6 hours |
 
 ### 8. Q&A log
 
