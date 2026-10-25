@@ -85,8 +85,9 @@ describe('nowSchema', () => {
   const now = { updated: '2026-10', items: ['Building', 'Learning', 'Reading'] };
   const fails = (input: unknown) => !nowSchema.safeParse(input).success;
 
-  it('accepts a month and exactly three items', () => {
+  it('accepts a month and exactly three items, or none to hide the section', () => {
     expect(fails(now)).toBe(false);
+    expect(fails({ ...now, items: [] })).toBe(false);
     expect(fails({ ...now, items: now.items.slice(0, 2) })).toBe(true);
     expect(fails({ ...now, items: [...now.items, 'Four'] })).toBe(true);
     expect(fails({ ...now, items: ['Building', ' ', 'Reading'] })).toBe(true);

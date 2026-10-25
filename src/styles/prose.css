@@ -98,7 +98,6 @@
   list-style: none;
   font-size: var(--text-small);
   line-height: 1.25rem;
-  font-variant-numeric: tabular-nums;
 }
 
 .toc a {
@@ -112,9 +111,12 @@
   color: var(--ink);
 }
 
+/* Tabular figures on the numbers only: in Inter they also widen hyphens, so a
+   heading such as "A read-only role" would look spaced out. */
 .toc-num {
   flex: none;
   min-width: 1ch;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Body */
@@ -300,6 +302,11 @@
   border-collapse: collapse;
   font-size: var(--text-nav);
   line-height: var(--leading-small);
+}
+
+/* Cells that hold a number (rehype-tables.ts marks them) line their digits up.
+   Text cells keep proportional figures: tabular ones widen Inter's hyphen. */
+.prose .num {
   font-variant-numeric: tabular-nums;
 }
 

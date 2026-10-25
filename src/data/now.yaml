@@ -1,9 +1,11 @@
 # "Now" on /about/: what I am doing this month (src/lib/schema.ts, nowSchema).
 # `updated` is the month as YYYY-MM, quoted; `items` are exactly three lines
-# of plain text, no Markdown and no HTML.
+# of plain text, no Markdown and no HTML. An empty list hides the section:
+#
+#   items:
+#     - 'Building …'
+#     - 'Learning …'
+#     - 'Reading …'
 now:
   updated: '2026-10'
-  items:
-    - '[What you are building this month]'
-    - '[What you are learning]'
-    - '[What you are reading]'
+  items: []

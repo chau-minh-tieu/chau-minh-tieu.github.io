@@ -96,6 +96,41 @@
 .diagram-min-920 .diagram { min-width: 920px; }
 
 /*
+ * Scroll hint. A diagram figure is a size container, so a container query
+ * knows when the figure is narrower than the diagram's floor, which is
+ * exactly when the diagram scrolls sideways. Only then the hint shows.
+ */
+.figure-diagram {
+  container-type: inline-size;
+}
+
+.scroll-hint {
+  display: none;
+  margin-top: 8px;
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+  color: var(--muted);
+}
+
+@container (width < 280px) { .diagram-min-280 .scroll-hint { display: block; } }
+@container (width < 320px) { .diagram-min-320 .scroll-hint { display: block; } }
+@container (width < 360px) { .diagram-min-360 .scroll-hint { display: block; } }
+@container (width < 400px) { .diagram-min-400 .scroll-hint { display: block; } }
+@container (width < 440px) { .diagram-min-440 .scroll-hint { display: block; } }
+@container (width < 480px) { .diagram-min-480 .scroll-hint { display: block; } }
+@container (width < 520px) { .diagram-min-520 .scroll-hint { display: block; } }
+@container (width < 560px) { .diagram-min-560 .scroll-hint { display: block; } }
+@container (width < 600px) { .diagram-min-600 .scroll-hint { display: block; } }
+@container (width < 640px) { .diagram-min-640 .scroll-hint { display: block; } }
+@container (width < 680px) { .diagram-min-680 .scroll-hint { display: block; } }
+@container (width < 720px) { .diagram-min-720 .scroll-hint { display: block; } }
+@container (width < 760px) { .diagram-min-760 .scroll-hint { display: block; } }
+@container (width < 800px) { .diagram-min-800 .scroll-hint { display: block; } }
+@container (width < 840px) { .diagram-min-840 .scroll-hint { display: block; } }
+@container (width < 880px) { .diagram-min-880 .scroll-hint { display: block; } }
+@container (width < 920px) { .diagram-min-920 .scroll-hint { display: block; } }
+
+/*
  * Diagram colours. The theme pass turns each paint the renderer wrote into a
  * fig-fill-<role> or fig-stroke-<role> class; CSS rules beat SVG
  * presentation attributes, and the tokens switch with the theme.

@@ -1,13 +1,13 @@
 ---
-// Home: hero, the Writing list and the first projects of src/lib/projects.ts.
+// Home: hero, the Writing list and the selected projects of src/lib/projects.ts.
 import PostList from '../components/PostList.astro';
 import TopicChips from '../components/TopicChips.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { listedPosts } from '../lib/collection.ts';
-import { PROJECTS, SELECTED } from '../lib/projects.ts';
+import { selectedProjects } from '../lib/projects.ts';
 
 const posts = await listedPosts();
-const selected = PROJECTS.slice(0, SELECTED);
+const selected = selectedProjects();
 ---
 
 <BaseLayout>
@@ -46,7 +46,8 @@ const selected = PROJECTS.slice(0, SELECTED);
             <article class="project">
               <h3 class:list={['project-name', { mono: project.mono }]}>{project.name}</h3>
               <p class="project-description">{project.description}</p>
-              {project.stack.length > 0 && <p class="label project-stack">{project.stack.join(' · ')}</p>}
+              {/* A project without a stack, such as Reign Edge, shows its status instead. */}
+              <p class="label project-stack">{project.stack.length > 0 ? project.stack.join(' · ') : project.status}</p>
             </article>
           ))
         }

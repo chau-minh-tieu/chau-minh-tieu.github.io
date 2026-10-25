@@ -332,12 +332,17 @@ describe.skipIf(!built)('pages and brand', () => {
     for (const paragraph of paragraphs) expect(about).toContain(paragraph.replace(/\s+/g, ' '));
   });
 
-  it('shows the selected projects on the home page and the Now list on About', () => {
+  it('shows the selected projects on the home page, and Now on About only with three items', () => {
     const home = read(join(DIST, 'index.html'));
     expect(home).toContain('Selected projects');
-    expect(home.match(/<article class="project"/g)).toHaveLength(2);
-    const now = read(join(DIST, 'about', 'index.html')).split('id="now-title"')[1]!.split('</section>')[0]!;
-    expect(now.match(/<li/g)).toHaveLength(3);
-    expect(now).toMatch(/Updated [A-Z][a-z]+ \d{4}/);
+    const names = [...home.matchAll(/<h3 class="project-name[^"]*"[^>]*>([^<]+)<\/h3>/g)].map((m) => m[1]);
+    expect(names).toEqual(['Reign Edge', 'delivery-metrics']);
+    const about = read(join(DIST, 'about', 'index.html'));
+    expect(about).not.toMatch(/\[What you are/);
+    if (about.includes('id="now-title"')) {
+      const now = about.split('id="now-title"')[1]!.split('</section>')[0]!;
+      expect(now.match(/<li/g)).toHaveLength(3);
+      expect(now).toMatch(/Updated [A-Z][a-z]+ \d{4}/);
+    }
   });
 });

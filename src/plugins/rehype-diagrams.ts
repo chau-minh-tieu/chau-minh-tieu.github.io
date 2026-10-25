@@ -384,10 +384,15 @@ export const rehypeDiagrams: Plugin<[], Root> = () => (tree, file) => {
     }
 
     const legend = legendList(source);
+    const scrolls = floor >= FLOOR_MIN;
     // A figure that may scroll sideways must be reachable by keyboard.
-    const scroll = el('div', { className: ['diagram-scroll'], ...(floor >= FLOOR_MIN && { tabIndex: 0 }) }, [svg]);
+    const scroll = el('div', { className: ['diagram-scroll'], ...(scrolls && { tabIndex: 0 }) }, [svg]);
+    // Shown by figures.css only while the figure is narrower than its floor.
+    // Hidden from screen readers, which read the SVG's label, not its pixels.
+    const hint = el('p', { className: ['scroll-hint'], ariaHidden: 'true' }, [text('Scroll sideways to see the whole figure.')]);
     const figure = el('figure', { className: figureClasses }, [
       scroll,
+      ...(scrolls ? [hint] : []),
       ...(legend ? [legend] : []),
       ...(caption.length > 0 ? [el('figcaption', {}, caption)] : []),
     ]);

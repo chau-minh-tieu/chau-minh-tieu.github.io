@@ -13,15 +13,27 @@
  * "Table N" (Pandoc's convention; GitHub shows it as a line above the table).
  * When the top-left header cell is empty, the first column holds row headers.
  * A body row whose first cell reads "Verdict" is the verdict row; its bold
- * cell takes the post's accent colour (prose.css).
+ * cell takes the post's accent colour (prose.css). A cell that holds a number
+ * gets the class `num`, for tabular figures.
  */
 import type { Element, ElementContent, Root, RootContent } from 'hast';
 import { toString } from 'hast-util-to-string';
 import type { Plugin } from 'unified';
 import { visit } from 'unist-util-visit';
-import { el, isBlank, isElement, text } from './hast.ts';
+import { classes, el, isBlank, isElement, text } from './hast.ts';
 
 const CAPTION = /^Table:\s*/;
+/**
+ * A number, with an optional sign or approximation, currency, separators,
+ * ranges and percent, and an optional short unit: "99%", "$1.08", "2.1 h",
+ * "1–63 ms", "≈730". "≈730 tests" or "read-only" are text.
+ */
+const NUMERIC = /^[≈~<>≤≥±+\-−]?\s?[$€£]?\d[\d\s.,:%–\-−×/$€£]*(\s?[a-zµ]{1,3})?$/i;
+
+/** True when a cell's text is a number, so its digits should line up. */
+export function isNumeric(value: string): boolean {
+  return NUMERIC.test(value.trim());
+}
 const TABLE_PARTS = new Set(['table', 'thead', 'tbody', 'tfoot', 'tr']);
 
 function rows(table: Element, section: 'thead' | 'tbody'): Element[] {
@@ -65,6 +77,9 @@ export const rehypeTables: Plugin<[], Root> = () => (tree) => {
     for (const row of rows(table, 'tbody')) {
       const first = cells(row)[0];
       if (first && toString(first).trim().toLowerCase() === 'verdict') row.properties.className = ['verdict'];
+      for (const cell of cells(row)) {
+        if (isNumeric(toString(cell))) cell.properties.className = [...classes(cell), 'num'];
+      }
     }
 
     const siblings = parent.children;
