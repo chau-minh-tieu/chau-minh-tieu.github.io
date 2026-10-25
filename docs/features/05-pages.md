@@ -190,11 +190,13 @@ Screenshots in the PR and in [`img/`](img/): `05-home-*`, `05-projects-*`, `05-a
 | Waiting for "go" | 19:34 to about 19:37 |
 | F5, build | 19:37 to 19:50: pages, brand files, tests, smoke checks, screenshots, this debrief, PR |
 | F5 so far | about 22 minutes of work against the 25-minute timebox, before review and merge |
-| Cumulative | about 4 h 58 min of active time (about 6 h 22 min by the clock) of the planned 4–6 hours |
+| Review | 19:49 to 19:55: Auto-fix turned on, PR #6 reviewed, both checks green |
+| F5 total | about 28 minutes by the clock (19:28 to 19:55), before the merge and the live checks |
+| Cumulative | about 5 h 04 min of active time (about 6 h 28 min by the clock) of the planned 4–6 hours |
 
 ### 8. Q&A log
 
-No questions yet.
+No questions were asked during the review (PR #6, 2026-10-25). The "Now" list still holds the three placeholders; replacing them is a one-file change to `src/data/now.yaml` in a later PR.
 
 ### 9. Next
 
