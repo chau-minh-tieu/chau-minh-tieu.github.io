@@ -1,0 +1,507 @@
+/*
+ * The post page and everything rendered from Markdown.
+ *
+ * Global rather than scoped to PostLayout.astro: Astro scopes a component's
+ * <style> by adding an attribute to the markup that component writes, and
+ * the HTML rendered from Markdown never carries it.
+ *
+ * Layout: the header and the body are the same two-column grid, a reading
+ * column (680px) and a margin (220px) for the contents and sidenotes. Every
+ * block of the body sits in the first column; the sidenotes that
+ * rehype-sidenotes.ts places right after a block go to the second column of
+ * the same row. Below 960px the grid has one column and the notes simply
+ * follow their paragraph.
+ */
+
+/* The post's accent comes from its primary tag (article[data-tag], base.css). */
+
+.post {
+  max-width: var(--article);
+  margin-inline: auto;
+  padding: 80px 0 64px;
+}
+
+.post-head,
+.prose {
+  display: grid;
+  grid-template-columns: minmax(0, var(--measure)) var(--margin-column);
+  column-gap: var(--column-gap);
+  align-items: start;
+}
+
+/* Header */
+
+.post-head {
+  padding-bottom: 40px;
+}
+
+.post-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.post-tag {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.post-title {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: -0.03em;
+}
+
+.post-dek {
+  font-size: var(--text-dek);
+  line-height: var(--leading-dek);
+  color: var(--muted);
+}
+
+.byline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+  font-size: var(--text-nav);
+  line-height: var(--leading-small);
+}
+
+.byline img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.byline-name {
+  font-weight: 500;
+}
+
+.byline-note {
+  margin-left: -6px;
+  color: var(--muted);
+}
+
+.toc-title {
+  padding-bottom: 12px;
+  color: var(--muted);
+}
+
+.toc ol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-small);
+  line-height: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.toc a {
+  display: flex;
+  gap: 10px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.toc a:hover {
+  color: var(--ink);
+}
+
+.toc-num {
+  flex: none;
+  min-width: 1ch;
+}
+
+/* Body */
+
+.prose {
+  padding-top: 40px;
+  border-top: 1px solid var(--line);
+  counter-reset: section;
+}
+
+.prose > * {
+  grid-column: 1;
+}
+
+.prose > .sidenotes {
+  grid-column: 2;
+}
+
+.prose p,
+.prose ul,
+.prose ol,
+.prose dl,
+.prose details {
+  margin: 0 0 26px;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 24px;
+}
+
+.prose li + li {
+  margin-top: 6px;
+}
+
+.prose li > p {
+  margin: 0;
+}
+
+.prose a {
+  text-decoration-color: var(--accent);
+}
+
+.prose a:hover {
+  text-decoration-color: var(--ink);
+}
+
+.prose h2 {
+  margin: 0 0 18px;
+  padding-top: 24px;
+  font-size: var(--text-section);
+  line-height: var(--leading-section);
+  letter-spacing: -0.015em;
+}
+
+/* Section numbers match the "On this page" list: both count every h2. */
+.prose h2::before {
+  counter-increment: section;
+  content: counter(section);
+  padding-right: 14px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.prose h3 {
+  margin: 0 0 12px;
+  padding-top: 8px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  letter-spacing: -0.01em;
+}
+
+.prose :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--surface);
+  font-size: 0.875em;
+}
+
+.prose kbd {
+  padding: 0.05em 0.4em;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 0.8em;
+}
+
+.prose hr {
+  margin: 8px 0 34px;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.prose img {
+  height: auto;
+}
+
+/* Sidenotes: in the margin from 960px, under their paragraph below it. */
+
+.sidenote-ref {
+  padding-left: 2px;
+  font-size: var(--text-label);
+  font-weight: 600;
+  line-height: 0;
+}
+
+.sidenote-ref a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.sidenotes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+  color: var(--muted);
+}
+
+.prose .sidenotes p {
+  margin: 0;
+}
+
+.sidenote-num {
+  padding-right: 6px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Notes from GitHub alerts: surface background and a label, no coloured border. */
+
+.callout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 36px;
+  padding: 20px 22px;
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 1rem;
+  line-height: 1.625rem;
+}
+
+.prose .callout p {
+  margin: 0;
+}
+
+.prose .callout-label {
+  font-size: var(--text-label);
+  line-height: var(--leading-label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Pull quote: a plain blockquote, under an accent rule. */
+
+.prose > blockquote {
+  margin: 16px 0 44px;
+  padding-top: 20px;
+  border-top: 2px solid var(--accent);
+}
+
+.prose > blockquote p {
+  margin: 0;
+  font-size: var(--text-pull);
+  line-height: var(--leading-pull);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Tables: hairline rules, tabular numbers, numbered caption, verdict row. */
+
+.table-scroll {
+  margin: 0 0 40px;
+  overflow-x: auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-nav);
+  line-height: var(--leading-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.prose caption {
+  padding-bottom: 12px;
+  text-align: left;
+  font-size: var(--text-small);
+  color: var(--muted);
+}
+
+.table-num,
+.figure-num {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.prose th,
+.prose td {
+  padding: 12px 16px 12px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th:last-child,
+.prose td:last-child {
+  padding-right: 0;
+}
+
+.prose thead th {
+  padding-top: 0;
+  padding-bottom: 10px;
+  border-bottom-color: var(--ink);
+  font-size: var(--text-label);
+  line-height: var(--leading-label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.prose tbody th {
+  font-weight: 600;
+}
+
+.prose tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.prose [align='right'] {
+  text-align: right;
+}
+
+.prose [align='center'] {
+  text-align: center;
+}
+
+.verdict strong {
+  color: var(--accent);
+}
+
+/* Figures: numbered captions; screenshots in a quiet window frame. */
+
+.figure {
+  margin: 0 0 44px;
+}
+
+.figure > img {
+  border-radius: 12px;
+}
+
+.frame {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.frame-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.frame-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--fig-rose-stroke);
+}
+
+.frame-dot:nth-child(2) {
+  background: var(--fig-amber-stroke);
+}
+
+.frame-dot:nth-child(3) {
+  background: var(--fig-green-stroke);
+}
+
+.figure figcaption {
+  padding-top: 12px;
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+  color: var(--muted);
+}
+
+/* Footer */
+
+.post-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: var(--measure);
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  font-size: var(--text-nav);
+  line-height: 1.5rem;
+}
+
+.disclosure {
+  color: var(--muted);
+}
+
+.sources {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sources h2 {
+  color: var(--muted);
+}
+
+.sources ol {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.625rem;
+}
+
+.discuss {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.pager-link .label {
+  color: var(--muted);
+}
+
+.pager-next {
+  margin-left: auto;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.pager-title {
+  font-size: var(--text-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 960px) {
+  .post-head,
+  .prose {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .toc {
+    padding-top: 32px;
+  }
+
+  .prose > .sidenotes {
+    grid-column: 1;
+    margin: -10px 0 26px;
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .post {
+    padding-top: 48px;
+  }
+}

@@ -1,0 +1,23 @@
+---
+// One page per built post (drafts only on the dev server), at /posts/<slug>/.
+// getStaticPaths runs once at build time and lists every page to generate.
+import { render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { builtPosts, listedPosts } from '../../lib/collection.ts';
+import { neighbours } from '../../lib/posts.ts';
+
+export async function getStaticPaths() {
+  const [built, listed] = await Promise.all([builtPosts(), listedPosts()]);
+  return built.map((post) => ({
+    params: { slug: post.id },
+    props: { post, ...neighbours(listed, post.id) },
+  }));
+}
+
+const { post, newer, older } = Astro.props;
+const { Content, headings } = await render(post);
+---
+
+<PostLayout post={post} headings={headings} newer={newer} older={older}>
+  <Content />
+</PostLayout>

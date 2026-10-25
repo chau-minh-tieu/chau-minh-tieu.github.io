@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chau-minh-tieu.github.io/sitemap.xml

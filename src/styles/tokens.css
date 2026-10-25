@@ -54,10 +54,45 @@
   --text-mono: 0.9375rem; /* 15px */
   --leading-mono: 1.5rem; /* 24px */
 
+  --text-dek: 1.375rem; /* 22px */
+  --leading-dek: 2.125rem; /* 34px */
+  --text-section: 1.625rem; /* 26px, numbered post sections */
+  --leading-section: 2.125rem; /* 34px */
+  --text-pull: 1.75rem; /* 28px */
+  --leading-pull: 2.375rem; /* 38px */
+
   /* Layout */
   --container: 1120px;
   --gutter: 40px;
   --measure: 680px;
+  /* Post: reading column, gap, margin column for contents and sidenotes. */
+  --margin-column: 220px;
+  --column-gap: 56px;
+  --article: calc(var(--measure) + var(--column-gap) + var(--margin-column)); /* 956px */
+
+  /* Figure palette strokes used by the screenshot frame (F4 adds the rest). */
+  --fig-rose-stroke: light-dark(#9a3d49, #d08a92);
+  --fig-amber-stroke: light-dark(#a87a22, #d4a64e);
+  --fig-green-stroke: light-dark(#4a7a3a, #86b373);
+
+  /* Code theme: one dark theme in both page themes. The token colours are
+     also in src/plugins/code-theme.ts (Shiki's theme); a test keeps the two
+     in step. */
+  --code-bg: #1b1916;
+  --code-border: #2e2b26;
+  --code-head: #211f1b;
+  --code-highlight: #2a2620;
+  --code-chip-border: #3a3630;
+  --code-text: #e6e1d6;
+  --code-line-number: #8f897f;
+  --code-keyword: #c4a7e7;
+  --code-string: #a9c77d;
+  --code-number: #e8a06a;
+  --code-function: #8fb4e8;
+  --code-type: #7fc4b5;
+  --code-builtin: #e58c8a;
+  --code-comment: #9a948a;
+  --code-punctuation: #c9c2b5;
 }
 
 /* The toggle's choice, applied by the inline script in BaseLayout.astro before
@@ -76,5 +111,9 @@
     --gutter: 20px;
     --text-hero: 2.5rem; /* 40px */
     --leading-hero: 2.75rem; /* 44px */
+    --text-display: 2.375rem; /* 38px */
+    --leading-display: 2.625rem; /* 42px */
+    --text-dek: 1.1875rem; /* 19px */
+    --leading-dek: 1.875rem; /* 30px */
   }
 }

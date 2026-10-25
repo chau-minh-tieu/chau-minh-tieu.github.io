@@ -1,0 +1,56 @@
+---
+// Topic chips: plain links to the static tag pages (no client-side filter).
+// The chip of the current page is filled and marked aria-current.
+import { TAGS, type Tag } from '../lib/schema.ts';
+import { TAG_LABELS } from '../lib/posts.ts';
+
+interface Props {
+  current: Tag | 'all';
+}
+
+const { current } = Astro.props;
+const chips = [
+  { href: '/', label: 'All', key: 'all' },
+  ...TAGS.map((tag) => ({ href: `/tags/${tag}/`, label: TAG_LABELS[tag], key: tag })),
+];
+---
+
+<nav class="chips" aria-label="Topics">
+  {
+    chips.map((chip) => (
+      <a class="chip" href={chip.href} aria-current={chip.key === current ? 'page' : undefined}>
+        {chip.label}
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    font-size: var(--text-small);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .chip:hover {
+    border-color: var(--ink);
+  }
+
+  .chip[aria-current='page'] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+</style>

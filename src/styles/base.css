@@ -70,6 +70,8 @@ pre,
 samp {
   font-family: var(--font-mono);
   font-size: var(--text-mono);
+  /* JetBrains Mono would draw -> and <= as single arrows; code shows what is typed. */
+  font-variant-ligatures: none;
 }
 
 /* Centred column with side padding: 1120px wide, 40px gutters (20px on phones). */
@@ -87,6 +89,19 @@ samp {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* A post or a list row takes the accent of its primary tag. */
+[data-tag='engineering'] {
+  --accent: var(--engineering);
+}
+
+[data-tag='ai'] {
+  --accent: var(--ai);
+}
+
+[data-tag='leadership'] {
+  --accent: var(--leadership);
 }
 
 /* Hidden on screen, still read by screen readers. */
