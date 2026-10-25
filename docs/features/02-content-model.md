@@ -227,6 +227,7 @@ Alt text is required (the build fails without it), and so is a known fence langu
     E --> D["dist/"]
     O --> D
   ```
+- **What does `pnpm dev` do, and should I test with it or with the built files?** Both, for different jobs. `pnpm dev` starts Vite's dev server: it never writes `dist/`, renders each page when it is requested, watches files and reloads, shows errors as an overlay, and takes shortcuts production does not: drafts are shown, no CSP is written, CSS and JS are unbundled, images are generated on request. Use it while writing or changing things. To check what ships, run `pnpm build && pnpm preview` (rebuild first: preview only serves the last `dist/`). Do not open `dist/` through `file://`: absolute paths such as `/_astro/…css` point at the disk root, folder URLs do not resolve to `index.html`, and browsers block module scripts there. `pnpm preview` serves `dist/` over HTTP the way Pages will; Pages-specific behaviour (trailing-slash redirects, its 404, caching) is checked against the live site in F3. Docs: [CLI reference](https://docs.astro.build/en/reference/cli-reference/).
 
 ### 9. Next
 
