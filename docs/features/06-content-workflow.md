@@ -87,6 +87,8 @@ gh label create post --repo chau-minh-tieu/chau-minh-tieu.github.io --color 1F3A
 
 Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.github.io/labels/brief --jq '{name, color, description}'`, and the same for `post`.
 
+**C1 verified at 20:48 on 2026-10-25, read-only.** `GET /labels/brief`: colour `7A2632`, description "Post brief: AI input, locked on creation". `GET /labels/post`: colour `1F3A5F`, description "Post PR drafted from a brief".
+
 *C2. `content` as a required check.* After the test post PR (post-merge demonstration) shows `content` green:
 
 1. Repository → **Settings** → **Rules** → **Rulesets** → **main**.
@@ -223,7 +225,7 @@ Read-only check afterwards: `gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.g
 - **`gh issue view --json` has no `locked` field**, so `STYLE.md` reads briefs with `gh api -X GET …/issues/<N>`, which is also allowed by `.claude/settings.json`.
 - **`STYLE.md` choices not in HANDOFF.md:** British spelling, as in the rest of the repository; at most one pull quote per post; PR titles and commits `post(<slug>): …`; a short list of banned phrases beyond the four HANDOFF.md names. Vale (F8) can enforce them later.
 - **HTTP/2 answers carry no status text**, so link results read `200`, not `200 OK`.
-- **Labels do not exist yet** (Guide C1). Until then the form files issues without `brief`, and nothing locks them.
+- **The labels came first** (Guide C1, done during the review): without `brief`, the form would have filed issues unlabelled, and nothing would have locked them.
 - **The lockfile is unchanged:** no dependency was added, and the `@pnpm/exe` entry did not reappear.
 
 ### 7. Time used
