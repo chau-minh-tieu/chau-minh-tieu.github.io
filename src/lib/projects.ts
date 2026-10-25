@@ -35,6 +35,7 @@ export const PROJECTS: readonly Project[] = [
     facts: ['≈730 tests', '53-question graded eval', 'Runs on localhost'],
     stack: ['Python', 'Postgres 17', 'pgvector', 'Streamlit', 'Docker Compose'],
     links: [{ label: 'Source', href: 'https://github.com/chau-minh-tieu/delivery-metrics' }],
+    writeUp: 'model-picks-postgres-computes',
   },
   {
     name: 'chau-minh-tieu.github.io',
