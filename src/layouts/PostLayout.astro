@@ -3,6 +3,7 @@
 // rendered Markdown in the reading column with sidenotes in the margin; and
 // the footer with the disclosure, sources, discussion link and neighbours.
 import type { MarkdownHeading } from 'astro';
+import Monogram from '../components/Monogram.astro';
 import type { Post } from '../lib/collection.ts';
 import {
   TAG_LABELS,
@@ -33,7 +34,12 @@ const sections = headings.filter((heading) => heading.depth === 2);
 const disclosure = disclosureOf(data);
 ---
 
-<BaseLayout title={data.title} description={data.description} noindex={data.status !== 'published'}>
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  noindex={data.status !== 'published'}
+  article={{ published: data.pubDate, modified: data.updatedDate, tags: data.tags.map((t) => TAG_LABELS[t]) }}
+>
   <div class="wrap">
     <article class="post" data-tag={tag}>
       <header class="post-head">
@@ -58,7 +64,7 @@ const disclosure = disclosureOf(data);
           <h1 class="post-title">{data.title}</h1>
           <p class="post-dek">{data.description}</p>
           <p class="byline">
-            <img src="/brand/monogram-oxblood.svg" width="28" height="28" alt="" />
+            <Monogram size={28} />
             <span class="byline-name">Chau Tieu</span>
             {data.aiAssisted && <span class="byline-note">· Drafted with AI, edited by me</span>}
           </p>

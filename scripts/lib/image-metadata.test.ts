@@ -21,6 +21,17 @@ const png = (...chunks: Uint8Array[]) =>
 const webpChunk = (type: string, data: string) => bytes(type, u32le(data.length), data, data.length % 2 ? [0] : []);
 const webp = (...chunks: Uint8Array[]) => bytes('RIFF', [0, 0, 0, 0], 'WEBP', ...chunks.map((c) => [...c]));
 
+/** An ICO container around PNGs: header, one 16-byte entry per image, then the images. */
+const icoOf = (...images: Uint8Array[]) => {
+  let offset = 6 + 16 * images.length;
+  const entries = images.map((image) => {
+    const entry = [32, 32, 0, 0, 1, 0, 32, 0, ...u32le(image.length), ...u32le(offset)];
+    offset += image.length;
+    return entry;
+  });
+  return bytes([0, 0, 1, 0, images.length, 0], ...entries, ...images.map((i) => [...i]));
+};
+
 describe('findImageMetadata', () => {
   it('finds EXIF, XMP, IPTC and C2PA blocks in a JPEG', () => {
     const file = jpeg(
@@ -55,6 +66,12 @@ describe('findImageMetadata', () => {
       'XMP',
     ]);
     expect(findImageMetadata(webp(webpChunk('VP8 ', 'EXIF')))).toEqual([]);
+  });
+
+  it('opens ICO files and walks each PNG inside', () => {
+    const clean = png(pngChunk('IHDR', '0123456789abc'));
+    expect(findImageMetadata(icoOf(clean))).toEqual([]);
+    expect(findImageMetadata(icoOf(clean, png(pngChunk('tEXt', 'Software\0x'))))).toEqual(['text']);
   });
 
   it('detects the fake metadata in the kitchen-sink fixture', () => {

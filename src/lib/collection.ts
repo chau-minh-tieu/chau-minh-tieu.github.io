@@ -1,8 +1,8 @@
 /**
- * The posts collection as pages see it. Drafts are left out of production
+ * The collections as pages see them. Drafts are left out of production
  * builds here, in one place, so no page can forget the rule.
  */
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { isBuilt, isListed, newestFirst } from './posts.ts';
 
 export type Post = CollectionEntry<'posts'>;
@@ -16,4 +16,11 @@ export async function builtPosts(): Promise<Post[]> {
 /** Published posts, newest first: home, tag pages, RSS, sitemap, next/previous. */
 export async function listedPosts(): Promise<Post[]> {
   return (await builtPosts()).filter(({ data }) => isListed(data.status));
+}
+
+/** The "Now" list on About (src/data/now.yaml). */
+export async function nowEntry(): Promise<CollectionEntry<'now'>['data']> {
+  const entry = await getEntry('now', 'now');
+  if (!entry) throw new Error('src/data/now.yaml needs a top-level `now:` entry');
+  return entry.data;
 }

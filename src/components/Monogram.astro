@@ -1,0 +1,19 @@
+---
+// The CT monogram (HANDOFF.md 5.4) at one of its three sizes: 28 (post
+// byline), 32 (nav) and 96 (About). The oxblood SVG as an image, made round by
+// CSS. Decorative: the name next to it carries the meaning, so alt is empty.
+interface Props {
+  size: 28 | 32 | 96;
+}
+
+const { size } = Astro.props;
+---
+
+<img class="monogram" src="/brand/monogram-oxblood.svg" width={size} height={size} alt="" />
+
+<style>
+  .monogram {
+    flex: none;
+    border-radius: 50%;
+  }
+</style>

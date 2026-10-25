@@ -35,6 +35,7 @@ Checked on 2026-10-25 against the npm registry and official release pages. Pinne
 | `unist-util-visit` · `hast-util-to-string` | 5.1.0 · 3.0.1 | Not 5.2.0: younger than pnpm 12's one-day [`minimumReleaseAge`](https://pnpm.io/settings/dependency-resolution#minimumreleaseage) on 2026-10-25 |
 | `beautiful-mermaid` | 1.1.3 | F4: diagrams to SVG at build time ([repository](https://github.com/lukilabs/beautiful-mermaid)); brings `elkjs` 0.11.1 and `entities` 7.0.1 |
 | `hast-util-from-html` · `hast-util-sanitize` · `hast-util-to-html` (dev) | 2.0.3 · 5.0.2 · 9.0.5 | F4: parse and sanitise the rendered SVG; already in the tree through `rehype-raw`, `rehype-sanitize` and Astro |
+| `sharp` | 0.35.5 | F5: favicons and the default Open Graph image rendered from the monogram at build time; the version Astro already installs (optional dependency until now) |
 | GitHub actions | `checkout` v7.0.1 · `setup-node` v7.1.0 · `cache` v6.1.0 · `upload-pages-artifact` v5.0.0 · `deploy-pages` v5.0.1 | Pinned by commit SHA (Q5), rechecked 2026-10-25 in F3. `configure-pages` is not used: it adapts other generators' configs, and Astro's `site` is fixed. GitHub's Pages guide still shows older majors |
 
 ## Fixed decisions (HANDOFF.md 4.2): implementation notes

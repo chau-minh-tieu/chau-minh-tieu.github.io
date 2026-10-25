@@ -1,0 +1,287 @@
+---
+// /about/: the About copy of HANDOFF.md 5.3 verbatim, what I write about,
+// "Now" (src/data/now.yaml) and how posts are written; a sidebar with links
+// and the colophon, which the footer links to as /about/#colophon.
+import Monogram from '../components/Monogram.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { nowEntry } from '../lib/collection.ts';
+import { TAG_DESCRIPTIONS, TAG_LABELS, formatMonth } from '../lib/posts.ts';
+import { TAGS } from '../lib/schema.ts';
+
+const now = await nowEntry();
+const elsewhere = [
+  { label: 'GitHub', href: 'https://github.com/chau-minh-tieu' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/tieuminhchau' },
+  { label: 'RSS', href: '/rss.xml' },
+];
+---
+
+<BaseLayout
+  title="About"
+  description="I’m Chau Tieu, an engineering manager. I’ve been building software since 2010, and this is where I write down what I learn."
+>
+  <div class="wrap">
+    <header class="head">
+      <Monogram size={96} />
+      <h1>About</h1>
+    </header>
+
+    <div class="grid">
+      <div class="main">
+        <section class="bio">
+          <p class="first">
+            I’ve been building software since 2010, starting with data and reporting, then moving into
+            software engineering and leadership across Vietnam and Singapore. Today I’m an engineering
+            manager, responsible for people and technical direction.
+          </p>
+          <p>
+            I came to machine learning through quantitative research, building models and data pipelines for
+            financial markets, a field that punishes anything that only works on paper. I currently focus on
+            engineering leadership, system design, cloud, machine learning and AI.
+          </p>
+          <p>
+            I’m also interested in startups and solo founding, especially how far one engineer can go with AI.
+            I’m building <a href="https://www.reignedge.com">Reign Edge</a>, an AI-native trading platform, as
+            a side project.
+          </p>
+          <p>When I’m away from the keyboard, I travel, usually toward the sea or up a mountain trail.</p>
+          <p class="quiet">This site is where I write down what I learn, so I understand it properly.</p>
+        </section>
+
+        <section class="topics" aria-labelledby="topics-title">
+          <h2 id="topics-title">What I write about</h2>
+          {
+            TAGS.map((tag) => (
+              <div class="topic" data-tag={tag}>
+                <span class="label topic-label">{TAG_LABELS[tag]}</span>
+                <p>{TAG_DESCRIPTIONS[tag]}</p>
+              </div>
+            ))
+          }
+        </section>
+
+        <section class="now" aria-labelledby="now-title">
+          <div class="now-head">
+            <h2 id="now-title">Now</h2>
+            <p class="updated">Updated {formatMonth(now.updated)}</p>
+          </div>
+          <ul>
+            {now.items.map((item) => <li>{item}</li>)}
+          </ul>
+        </section>
+
+        <section class="process" aria-labelledby="process-title">
+          <h2 id="process-title">How posts are written</h2>
+          <p>
+            Every post starts as a brief I write myself: the argument, the reader, and what I actually learned.
+            A model drafts from that brief. I review every line in a pull request, check the sources, and cut
+            what I would not say. If a post gets something wrong, that is my mistake, not the model’s.
+          </p>
+        </section>
+      </div>
+
+      <aside class="side">
+        <section aria-labelledby="elsewhere-title">
+          <h2 class="label side-title" id="elsewhere-title">Elsewhere</h2>
+          <ul class="elsewhere">
+            {
+              elsewhere.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                  <span class="arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+        <section id="colophon" aria-labelledby="colophon-title">
+          <h2 class="label side-title" id="colophon-title">Colophon</h2>
+          <p class="colophon">
+            Built with Astro and hosted on GitHub Pages. Set in Inter and JetBrains Mono. No analytics, no
+            cookies, no third-party scripts.
+          </p>
+        </section>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 96px 0 64px;
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: -0.03em;
+  }
+
+  /* Text column and sidebar; the sidebar moves under the text below 960px. */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, var(--measure)) 280px;
+    column-gap: 80px;
+    row-gap: 56px;
+    align-items: start;
+    padding-bottom: 112px;
+  }
+
+  .main {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .bio {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .first {
+    font-size: var(--text-dek);
+    line-height: var(--leading-dek);
+  }
+
+  .quiet {
+    color: var(--muted);
+  }
+
+  .main h2 {
+    font-size: var(--text-section);
+    line-height: var(--leading-section);
+    letter-spacing: -0.015em;
+  }
+
+  .topics {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topics h2 {
+    padding-bottom: 20px;
+  }
+
+  .topic {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    column-gap: 24px;
+    row-gap: 6px;
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+    font-size: 1.0625rem;
+    line-height: 1.75rem;
+  }
+
+  .topic:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .topic-label {
+    line-height: 1.625rem;
+    color: var(--accent);
+  }
+
+  .now,
+  .process {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .now-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .updated {
+    font-size: 0.8125rem;
+    line-height: var(--leading-small);
+    color: var(--muted);
+  }
+
+  .now ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding-left: 20px;
+    font-size: 1.0625rem;
+    line-height: 1.75rem;
+    color: var(--muted);
+  }
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .side section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .side-title {
+    color: var(--muted);
+  }
+
+  .elsewhere {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .elsewhere li {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .elsewhere li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .elsewhere a {
+    text-decoration: none;
+  }
+
+  .elsewhere a:hover {
+    text-decoration: underline;
+  }
+
+  .arrow {
+    color: var(--muted);
+  }
+
+  .colophon {
+    font-size: var(--text-nav);
+    line-height: 1.5rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .topic {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

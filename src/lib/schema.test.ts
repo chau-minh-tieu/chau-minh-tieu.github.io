@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { postSchema } from './schema.ts';
+import { nowSchema, postSchema } from './schema.ts';
 
 const valid = {
   title: 'A post',
@@ -72,5 +72,23 @@ describe('postSchema', () => {
   it('takes the brief as a positive issue number', () => {
     expect(failures({ ...valid, brief: 12 })).toEqual([]);
     expect(failures({ ...valid, brief: 0 })).toEqual(['brief']);
+  });
+});
+
+describe('nowSchema', () => {
+  const now = { updated: '2026-10', items: ['Building', 'Learning', 'Reading'] };
+  const fails = (input: unknown) => !nowSchema.safeParse(input).success;
+
+  it('accepts a month and exactly three items', () => {
+    expect(fails(now)).toBe(false);
+    expect(fails({ ...now, items: now.items.slice(0, 2) })).toBe(true);
+    expect(fails({ ...now, items: [...now.items, 'Four'] })).toBe(true);
+    expect(fails({ ...now, items: ['Building', ' ', 'Reading'] })).toBe(true);
+  });
+
+  it('takes the month as YYYY-MM', () => {
+    expect(fails({ ...now, updated: '2026-13' })).toBe(true);
+    expect(fails({ ...now, updated: 'October 2026' })).toBe(true);
+    expect(fails({ ...now, updated: 202610 })).toBe(true);
   });
 });

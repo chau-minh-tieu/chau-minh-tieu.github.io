@@ -1,11 +1,13 @@
 ---
-// Home: hero and the Writing list. F5 adds selected projects.
+// Home: hero, the Writing list and the first projects of src/lib/projects.ts.
 import PostList from '../components/PostList.astro';
 import TopicChips from '../components/TopicChips.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { listedPosts } from '../lib/collection.ts';
+import { PROJECTS, SELECTED } from '../lib/projects.ts';
 
 const posts = await listedPosts();
+const selected = PROJECTS.slice(0, SELECTED);
 ---
 
 <BaseLayout>
@@ -31,6 +33,24 @@ const posts = await listedPosts();
         <TopicChips current="all" />
       </div>
       <PostList posts={posts} />
+    </section>
+
+    <section class="projects" aria-labelledby="projects-title">
+      <div class="projects-head">
+        <h2 id="projects-title">Selected projects</h2>
+        <a class="all" href="/projects/">All projects<span aria-hidden="true"> →</span></a>
+      </div>
+      <div class="project-grid">
+        {
+          selected.map((project) => (
+            <article class="project">
+              <h3 class:list={['project-name', { mono: project.mono }]}>{project.name}</h3>
+              <p class="project-description">{project.description}</p>
+              {project.stack.length > 0 && <p class="label project-stack">{project.stack.join(' · ')}</p>}
+            </article>
+          ))
+        }
+      </div>
     </section>
   </div>
 </BaseLayout>
@@ -96,5 +116,73 @@ const posts = await listedPosts();
     font-size: var(--text-title);
     line-height: var(--leading-title);
     letter-spacing: -0.02em;
+  }
+
+  .projects {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding-bottom: 112px;
+  }
+
+  /* The one full-strength rule on the page: it closes the Writing list. */
+  .projects-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 28px;
+    border-top: 1px solid var(--ink);
+  }
+
+  .all {
+    font-size: var(--text-nav);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .all:hover {
+    text-decoration: underline;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px;
+  }
+
+  .project {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .project-name {
+    font-size: 1.125rem;
+    line-height: 1.625rem;
+    letter-spacing: -0.01em;
+  }
+
+  .project-name.mono {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .project-description {
+    font-size: 1.0625rem;
+    line-height: 1.75rem;
+    color: var(--muted);
+  }
+
+  .project-stack {
+    color: var(--muted);
+  }
+
+  @media (max-width: 640px) {
+    .project-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>

@@ -16,6 +16,16 @@ export interface Check {
 /** The unlisted regression post and the draft that must never be built (F2). */
 const UNLISTED = 'posts/kitchen-sink/';
 const DRAFT = 'posts/draft-fixture/';
+/** The site's own pages besides home (F5). */
+const PAGES = ['projects/', 'about/'];
+/** A path no build will ever have: Pages must answer it with our 404 page. */
+const MISSING = 'smoke-check-missing-page/';
+/** Icons the pages link to (F5), with the content type each must have. */
+const ICONS: readonly [string, RegExp][] = [
+  ['favicon.ico', /^image\/(x-icon|vnd\.microsoft\.icon)/],
+  ['favicon.svg', /^image\/svg\+xml/],
+  ['apple-touch-icon.png', /^image\/png/],
+];
 
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
@@ -110,6 +120,12 @@ export function hasNoindex(html: string): boolean {
   return /<meta name="robots" content="[^"]*\bnoindex\b/i.test(html);
 }
 
+/** The page's Open Graph image URL, as written: absolute, on the live site's host. */
+export function ogImageOf(html: string): string | undefined {
+  const value = html.match(/<meta property="og:image" content="([^"]*)"/i)?.[1];
+  return value === undefined ? undefined : decode(value);
+}
+
 interface Page {
   status: number;
   type: string;
@@ -137,6 +153,11 @@ async function expectStatus(fetch: Fetch, url: URL, status: number): Promise<Pag
   const page = await get(fetch, url);
   if (page.status !== status) throw new Error(`GET ${url.pathname}: ${page.status}, expected ${status}`);
   return page;
+}
+
+async function expectImage(fetch: Fetch, url: URL, type: RegExp): Promise<void> {
+  const file = await expectStatus(fetch, url, 200);
+  if (!type.test(file.type)) throw new Error(`GET ${url.pathname}: content type ${file.type || 'missing'}`);
 }
 
 async function expectRedirect(fetch: Fetch, from: URL, to: URL): Promise<string> {
@@ -177,6 +198,16 @@ export function smokeChecks(root: URL, version?: string): Check[] {
       },
     },
     {
+      name: 'pages',
+      run: async (fetch) => {
+        for (const path of PAGES) {
+          const page = await expectStatus(fetch, at(path), 200);
+          if (!cspOf(page.text)?.startsWith("default-src 'self';")) throw new Error(`GET /${path}: no CSP`);
+        }
+        return PAGES.map((path) => `/${path}`).join(', ');
+      },
+    },
+    {
       name: 'assets',
       run: async (fetch) => {
         const queue: URL[] = [];
@@ -197,6 +228,17 @@ export function smokeChecks(root: URL, version?: string): Check[] {
           if (file.type.startsWith('text/css')) add(cssUrls(file.text, url), url.pathname);
         }
         return `${seen.size} file(s), all same-origin`;
+      },
+    },
+    {
+      name: 'brand',
+      run: async (fetch) => {
+        for (const [path, type] of ICONS) await expectImage(fetch, at(path), type);
+        const image = ogImageOf((await expectStatus(fetch, root, 200)).text);
+        if (!image || !/^https:\/\//.test(image)) throw new Error(`GET /: og:image is ${image ?? 'missing'}, expected an https URL`);
+        // The tag names the live host; a local run fetches the same path from itself.
+        await expectImage(fetch, at(new URL(image).pathname.slice(1)), /^image\/png/);
+        return `${ICONS.length} icons and og:image ${new URL(image).pathname}`;
       },
     },
     {
@@ -227,6 +269,16 @@ export function smokeChecks(root: URL, version?: string): Check[] {
       run: async (fetch) => {
         await expectStatus(fetch, at(DRAFT), 404);
         return `/${DRAFT} is 404`;
+      },
+    },
+    {
+      name: 'not found',
+      run: async (fetch) => {
+        const page = await expectStatus(fetch, at(MISSING), 404);
+        if (!/Page not found/.test(page.text) || !hasNoindex(page.text)) {
+          throw new Error(`GET /${MISSING}: 404 without the site's own 404 page`);
+        }
+        return `/${MISSING} is 404 with the site's page`;
       },
     },
   ];
