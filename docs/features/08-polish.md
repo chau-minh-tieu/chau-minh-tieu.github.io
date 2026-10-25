@@ -91,6 +91,8 @@ Screenshots: [`img/`](img/) (`08-home-*`, `08-about-*`, `08-mobile.png`, `08-tab
 3. **Discuss link (F2).** Signed in to GitHub, click "Discuss this post on GitHub →" at the end of the post: a new discussion form in "Posts", title filled in. Close it without posting.
 4. **Copy button (F2).** Click "Copy" on a code block of the post and paste it anywhere: the code, without line numbers.
 
+**Your checks, reported at 00:11 on 2026-10-26:** the favicon shows in Chrome and in Safari; LinkedIn's Post Inspector shows the title, description and the monogram card; "Discuss this post on GitHub →" opens a pre-filled form; "Copy" copies the code. This closes the open items of F5 (favicon in a real tab, link previews on the live site) and F2 (the Discuss pre-fill, real copying).
+
 **Revert rehearsal, dry run (done 2026-10-26, before this PR merges).** While #13 was still the last merge, its revert could not conflict. At your request I ran `gh pr revert 13 --repo chau-minh-tieu/chau-minh-tieu.github.io --draft` at 23:59; it opened draft PR #15. Checked read-only:
 
 | Claim in the runbook | Observed on #15 |
@@ -231,4 +233,4 @@ Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-t
 
 ### 9. Next
 
-Within F8: your four checks, closing #15, Guide D, then the review. After the merge I verify `main`, the Deploy run, `pnpm smoke --version <squash sha>`, Lighthouse on the live Home and post, the README on the repository page and the detected licence. F8 ends when you call it done. Deferred, not deleted (HANDOFF.md 8): Vale rules in CI, per-post Open Graph images, the Claude Code GitHub Action, search.
+Within F8: your review. After the merge I verify `main`, the Deploy run, `pnpm smoke --version <squash sha>`, Lighthouse on the live Home and post, the README on the repository page and the detected licence. F8 ends when you call it done. Deferred, not deleted (HANDOFF.md 8): Vale rules in CI, per-post Open Graph images, the Claude Code GitHub Action, search.
