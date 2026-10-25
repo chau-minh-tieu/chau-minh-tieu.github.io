@@ -170,6 +170,7 @@ Alt text is required (the build fails without it), and so is a known fence langu
 | Open `/rss.xml`, `/sitemap.xml`, `/` and `/tags/ai/` | No kitchen-sink entry anywhere |
 | `pnpm dev`, open http://localhost:4321/posts/draft-fixture/ | The draft renders on the dev server only |
 | Signed in to GitHub, click "Discuss this post on GitHub →" | A new discussion form in "Posts" with the title filled in |
+| `gh pr checks 3` | `verify pass`, `privacy pass` (CI ran the same 82 tests and scanned 9 images) |
 | Add `pubdate: 2026-10-25` to the kitchen-sink frontmatter and run `pnpm build` | `posts → kitchen-sink data does not match collection schema`, `Unrecognized key: "pubdate"`; undo the change |
 
 ### 5. Check your understanding
@@ -205,9 +206,9 @@ Alt text is required (the build fails without it), and so is a known fence langu
 | | Time |
 |---|---|
 | F2, brief | 15:23 to 15:35 by the clock: reading, docs and source checks, the revised brief |
-| F2, build | 15:38 to 16:02: build, checks, screenshots, PR #3, this debrief |
-| F2 so far | about 40 minutes of the 50-minute timebox, before review and merge |
-| Cumulative | about 2 h 40 min of the planned 4–6 hours |
+| F2, build | 15:38 to 16:05: build, checks, screenshots, PR #3 with both checks green, this debrief |
+| F2 so far | about 42 minutes of the 50-minute timebox, before review and merge |
+| Cumulative | about 2 h 42 min of the planned 4–6 hours |
 
 ### 8. Q&A log
 
