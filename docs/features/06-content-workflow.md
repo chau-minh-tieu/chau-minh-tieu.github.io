@@ -133,6 +133,8 @@ Read-only check afterwards: `gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.g
 
 *After the merge* (I ask before creating anything): a test brief with fictitious content shows the label, the lock and a green `brief-privacy` run; a test post PR on `post/<test-slug>` shows `verify`, `privacy` and `content` green, then one out-of-scope commit turns `content` red. I close both and remove the test branch once you agree.
 
+**Post-merge demonstration, 2026-10-25** (recorded in F7). You added `content` to the ruleset's required checks before the test PR, not after it as C2 said; with no `post/*` PR open, nothing could wait on it. Test brief #8 was labelled 2 seconds and locked 8 seconds after creation, with `lock` and `brief-privacy` green. Test post PR #9 (`post/f6-gate-test`) showed `verify`, `privacy` and `content` green; one out-of-scope commit turned `content` red, and the ruleset blocked the merge (BLOCKED). #9 was closed unmerged and its branch deleted; #8 was closed as not planned and stays locked. Neither number is reused.
+
 ### 2. File tour
 
 | File | Single responsibility | Depends on |
@@ -237,6 +239,8 @@ Read-only check afterwards: `gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.g
 | F6, build | 20:22 to 20:32, then 20:35 to 20:40 after a pause: form, workflows, scripts, tests, `STYLE.md`, PR #7, this debrief |
 | F6 so far | about 24 minutes of work against the 40-minute timebox, before review, merge and the demonstration |
 | Cumulative | about 5 h 30 min of active time (about 7 h by the clock) of the planned 4–6 hours |
+| F6 total (recorded in F7) | 20:03 to 21:10 by the clock, about 55 minutes active, including review, merge and the demonstration |
+| Cumulative after F6 | about 6 h 01 min of active time (about 7 h 37 min by the clock) |
 
 ### 8. Q&A log
 
