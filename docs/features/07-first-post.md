@@ -176,7 +176,7 @@ Screenshots of the live site in [`img/`](img/): `07-post-light.png`, `07-post-da
 
 ### 8. Q&A log
 
-No questions yet.
+No questions were asked during the reviews of #11, #12 and #13 (2026-10-25). F7's final time (review, merge, live check of the Write-up link) is recorded in F8's chat, as F6's was here.
 
 ### 9. Next
 
