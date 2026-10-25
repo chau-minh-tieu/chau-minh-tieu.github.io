@@ -88,3 +88,7 @@ Asked as open questions in F0; the owner accepted all ten defaults on 2026-10-25
 8. **Keep the `Co-Authored-By: Claude` trailer on commits Claude makes.** The trailer carries Anthropic's non-personal no-reply address, the same kind of address as the owner's own commit identity, and matches the site's AI disclosure. This page does not spell it out, because committed files contain no email addresses.
 9. **Commit the mockup monograms as they are, strip their metadata when F5 copies them to `public/brand/`.** They carry a C2PA content-credentials block naming the generating tool; it holds no personal data and the privacy scan is clean.
 10. **Pre-commit hook without a dependency** (`.githooks/` and `core.hooksPath`). Nothing extra to trust or update, compared with husky or lefthook.
+
+## Later decisions
+
+- **2026-10-25, after F1: the time budget may run over.** Nothing is scoped down at the checkpoints of HANDOFF.md 2.4, and features run in the order of section 8. Elapsed time is still reported in every debrief.

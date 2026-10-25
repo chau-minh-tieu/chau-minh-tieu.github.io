@@ -219,11 +219,11 @@ JSON
 | F1 total | about 57 minutes (14:05 to 15:02) against the 50-minute timebox, before the merge |
 | Cumulative | about 1 h 47 min of 4–6 hours (F0 about 50 minutes) |
 
-Checkpoint: the site should be live (F3) by 2 h 30 min cumulative. In the planned order, F2 (50 minutes) then F3 (30 minutes) put it live at about 3 h 07 min. F3 does not depend on F2: deploying the shell first would put the site live at about 2 h 17 min. See the F2 brief's timebox note.
+Checkpoint: in the planned order the site goes live (F3) at about 3 h 07 min cumulative, after the 2 h 30 min checkpoint. The owner accepted that: the budget may run over, nothing is cut, and features continue in order (Q&A log).
 
 ### 8. Q&A log
 
-No questions this feature.
+- **Time checkpoint.** The debrief noted that F2 then F3 would put the site live after the 2 h 30 min checkpoint, and offered running F3 first. Owner: it is fine to extend the time; do not scope anything down; build feature by feature in order. Recorded in HANDOFF.md 2.4, CLAUDE.md rule 9 and `docs/00-plan.md` ("Later decisions"); the F2 brief's fallback was removed.
 
 ### 9. Next
 

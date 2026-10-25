@@ -6,7 +6,7 @@ Standing rules for Claude Code in this repository. `HANDOFF.md` is the source of
 
 - Portfolio and technical blog for Chau Tieu at https://chau-minh-tieu.github.io. Static: Astro builds it, GitHub Actions deploys it, GitHub Pages serves it. No server, database, analytics or third-party runtime service.
 - The owner writes no code. The owner is a senior backend engineer and engineering manager, newer to frontend, Astro and CSS: explain frontend decisions properly, keep backend basics brief.
-- Budget: the whole build fits in 4–6 hours of the owner's time. Report elapsed time in every debrief.
+- Budget: planned at 4–6 hours of the owner's time; the owner accepts running over (2026-10-25). Report elapsed time in every debrief.
 - Plan, versions and open questions: `docs/00-plan.md`. Feature briefs and debriefs: `docs/features/NN-slug.md`.
 
 ## Working agreement
@@ -19,7 +19,7 @@ Standing rules for Claude Code in this repository. `HANDOFF.md` is the source of
 6. Debrief appended to the feature doc in the nine parts of `HANDOFF.md` section 7, ending with the next brief.
 7. Questions are batched: one message, numbered, each with a default and a one-line reason. "defaults" accepts all.
 8. Work in GitHub's UI goes into a numbered setup guide: click path, expected end state, equivalent `gh` command. Verify afterwards with read-only `gh api -X GET` calls. The owner enters every secret value; never ask for one in chat.
-9. Checkpoints: if the site is not live by 2 h 30 min, or F5 is not done by 4 h 15 min, propose cuts from the stretch list before the next feature.
+9. Checkpoints: report time against them, but do not propose cuts, scope reductions or a different feature order. Features run in the order of `HANDOFF.md` section 8, F8 included (owner decision, 2026-10-25).
 10. Check official docs before any version- or feature-dependent brief, cite links, pin the latest stable versions.
 11. Reply in the language the owner writes in. Everything committed is English.
 12. Teaching style: mental model before mechanics, anchored to backend concepts the owner knows; direct, concise, tables for comparisons. Deep dives that would blow a timebox go to `docs/deep-dives.md`.

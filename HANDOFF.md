@@ -28,7 +28,7 @@
    5. **Debrief**, appended to the same feature doc (section 7). It ends with the brief for the next feature, so one owner reply can close one feature and open the next.
 2. **Batched questions.** Ask every open question in one message, numbered, each with a default and a one-line reason. "defaults" accepts all.
 3. **GitHub setup guides.** When the owner must act in GitHub's UI, give one numbered guide: exact click path, the expected end state, and the equivalent `gh` command. After the owner confirms, verify with read-only `gh api` calls. The owner always enters secret values; never ask for them in chat.
-4. **Time checkpoints.** Report elapsed time against the budget in every debrief. If the site is not live by 2 h 30 min, or F5 is not done by 4 h 15 min, propose concrete cuts from the stretch list before starting the next feature.
+4. **Time checkpoints.** Report elapsed time against the budget in every debrief. ~~If the site is not live by 2 h 30 min, or F5 is not done by 4 h 15 min, propose concrete cuts from the stretch list before starting the next feature.~~ *Owner decision, 2026-10-25: the budget may run over. Nothing is scoped down at checkpoints; features run in the order of section 8.*
 5. **Discussion within budget.** Answer questions in the teaching style of section 7 and log them in the feature's Q&A. If a question deserves a deep dive that would blow the timebox, answer briefly and park it in `docs/deep-dives.md`.
 6. **Freshness.** Check current official docs for anything version- or feature-dependent before writing a brief, cite links, use the latest stable versions at scaffold time and pin them.
 
