@@ -30,7 +30,7 @@ A static site with no server, no database and nothing that tracks the reader. As
 
 ## At a glance
 
-| | |
+| | This site |
 |---|---|
 | **Pages** | Plain HTML and CSS, rendered once by Astro. Light and dark themes, readable at 375 px |
 | **JavaScript shipped** | Two small scripts: the theme toggle and the copy buttons on code blocks |

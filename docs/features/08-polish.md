@@ -62,3 +62,170 @@
 **Versions** (checked 2026-10-25): no new dependency. Astro 7.4.2 and Lighthouse 13.5.0 are still the latest releases. `gh` 2.103.2 has `gh pr revert`.
 
 **Docs.** [About READMEs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes) · [Licensing a repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository) · [MIT licence](https://choosealicense.com/licenses/mit/) · [CC FAQ: revocation](https://creativecommons.org/faq/) · [MDN: `text-wrap`](https://developer.mozilla.org/en-US/docs/Web/CSS/text-wrap) · [Can I use: `text-wrap: balance`](https://caniuse.com/css-text-wrap-balance) · [MDN: `font-variant-numeric`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-numeric) · [MDN: container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries) · [Reverting a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/reverting-a-pull-request) · [`gh pr revert`](https://cli.github.com/manual/gh_pr_revert) · [`gh repo edit`](https://cli.github.com/manual/gh_repo_edit) · [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
+
+---
+
+## Debrief
+
+### 1. What was built
+
+The repository now explains itself to a reader, and the site got the last typographic fixes the live review found. Everything is in PR #14.
+
+| Area | Result |
+|---|---|
+| README | `README.md`: round monogram and links, a Deploy badge, screenshots of Home, the post, a diagram and three phones that follow GitHub's light or dark mode, an "at a glance" table, three Mermaid diagrams (publishing, Markdown pipeline, CI/CD), guardrails, stack, commands, layout, docs, how it was built, licence |
+| Licence | `LICENSE`: MIT for the code. The posts, page copy, monogram and mockups are all rights reserved (README, "Licence") |
+| Docs | `docs/deep-dives.md` with an entry format; runbook: `gh pr revert` and `feat/revert-<PR>` as the fallback branch; F7's final time; plan deviation 11 (the real layout); the F8 scope change in HANDOFF.md 5.3 and 8, CLAUDE.md rule 9 and the plan |
+| Typography | Tabular figures only on the contents numbers and numeric table cells; `text-wrap: balance` on headings, titles, ledes and pull quotes, `pretty` on paragraphs and list items; `<wbr>` after each slash of a code file name |
+| Diagrams | A "Scroll sideways to see the whole figure." line under a diagram, shown only while the figure is narrower than its size floor |
+| Pages | Home selects Reign Edge and delivery-metrics by name; About hides "Now" until it has three items; a new footer and colophon |
+| Tests | 232 (7 new): numeric cells, file-name breaks, the scroll hint and its CSS, docs links, README commands, lockfile; three mutation checks |
+| Other | PR #2's screenshots point at `e85d96d` on `main` instead of the deleted branch |
+
+Screenshots: [`img/`](img/) (`08-home-*`, `08-about-*`, `08-mobile.png`, `08-table-code-light.png`) and [`../readme/`](../readme/), all from this branch's build.
+
+**Your checks** (about 5 minutes; tell me what you see and I record it). The live tags and files are already verified: the post carries `og:type article`, title, description, canonical `og:url`, a 1200 × 630 `og:image` with alt text and `twitter:card summary_large_image`, and `/favicon.ico`, `/favicon.svg`, `/apple-touch-icon.png` and `/og.png` answer 200 with the right content types.
+
+1. **Favicon (F5).** Open https://chau-minh-tieu.github.io in Chrome and in Safari: the tab shows the round oxblood CT.
+2. **Link preview (F5).** Signed in, paste `https://chau-minh-tieu.github.io/posts/model-picks-postgres-computes/` into [LinkedIn's Post Inspector](https://www.linkedin.com/post-inspector/): title, description and the monogram card.
+3. **Discuss link (F2).** Signed in to GitHub, click "Discuss this post on GitHub →" at the end of the post: a new discussion form in "Posts", title filled in. Close it without posting.
+4. **Copy button (F2).** Click "Copy" on a code block of the post and paste it anywhere: the code, without line numbers.
+
+**Revert rehearsal, dry run (you, before this PR merges).** While #13 is still the last merge, its revert cannot conflict:
+
+```bash
+gh pr revert 13 --repo chau-minh-tieu/chau-minh-tieu.github.io --draft
+```
+
+I then check, read-only: the branch name starts with `revert-`, `verify` and `privacy` pass, `content` is skipped, the PR is mergeable. Then you close it without merging and delete its branch (I may not delete a branch I did not create):
+
+```bash
+gh pr close <revert PR> --repo chau-minh-tieu/chau-minh-tieu.github.io --delete-branch
+```
+
+**Setup Guide D: the About box (you).**
+
+1. Repository → **Code** tab → the gear icon next to **About** (right sidebar).
+2. **Website**: `https://chau-minh-tieu.github.io`. **Topics**: `astro`, `github-pages`, `blog`, `typescript`. **Save changes**.
+3. **Settings** → **General** → **Features**: untick **Wikis** and **Projects**. Both save at once.
+
+Expected end state: the About box shows the site link and four topics; the Wiki and Projects tabs are gone. Equivalent command:
+
+```bash
+gh repo edit chau-minh-tieu/chau-minh-tieu.github.io --homepage https://chau-minh-tieu.github.io --add-topic astro,github-pages,blog,typescript --enable-wiki=false --enable-projects=false
+```
+
+Read-only check, which I run after you confirm: `gh api -X GET repos/chau-minh-tieu/chau-minh-tieu.github.io --jq '{homepage, topics, has_wiki, has_projects}'`.
+
+### 2. File tour
+
+| File | Single responsibility | Depends on |
+|---|---|---|
+| `README.md` | The repository's front page for readers | `docs/readme/`, the live `/favicon.svg` |
+| `docs/readme/*.png` | README screenshots, light and dark, palette PNGs without metadata | the branch build |
+| `LICENSE` | MIT for the code | — |
+| `docs/deep-dives.md` | Parked long answers and their format | HANDOFF.md 2.5 |
+| `tests/repository.test.ts` | Docs link only to existing files; README commands exist; no `@pnpm/exe` in the lockfile | `git ls-files`, `package.json`, `pnpm-lock.yaml` |
+| `src/styles/base.css` | `text-wrap` rules for headings, ledes, pull quotes, paragraphs and list items | — |
+| `src/styles/prose.css` | Tabular figures moved to `.toc-num` and `.prose .num` | `rehype-tables.ts` |
+| `src/plugins/rehype-tables.ts` | Also marks numeric cells `num` (`isNumeric`) | — |
+| `src/plugins/rehype-code.ts` | `fileName()`: a `<wbr>` after each slash of the title | — |
+| `src/plugins/rehype-diagrams.ts` | Adds the scroll hint to figures with a floor | `figures.css` |
+| `src/styles/figures.css` | Diagram figures are size containers; 17 container queries show the hint below each floor | — |
+| `src/lib/projects.ts` | `SELECTED` names and `selectedProjects()` | — |
+| `src/pages/index.astro` | Uses `selectedProjects()`; a project without a stack shows its status | `projects.ts` |
+| `src/pages/about.astro` | "Now" only with items; the new colophon | `now.yaml` |
+| `src/lib/schema.ts` · `src/data/now.yaml` | "Now" takes three items or none | — |
+| `src/components/SiteFooter.astro` | The new footer line | — |
+| `src/components/ProjectRow.astro` | Facts lose tabular figures | — |
+| `docs/runbook.md` | `gh pr revert`, the fallback branch | — |
+| `HANDOFF.md` · `CLAUDE.md` · `docs/00-plan.md` | The F8 decisions | — |
+
+### 3. Concepts
+
+**A README is a rendered page with its own rules** `[GitHub]`
+- Mental model: GitHub's Markdown renderer is a small static-site generator with a sanitiser in front. It resolves relative links and images against the branch you are viewing, renders Mermaid fences in a sandboxed frame, builds an outline from the headings, and passes a short allowlist of HTML: `<p align>`, `<img width>`, `<picture>` with `<source media="(prefers-color-scheme: dark)">`, so an image can follow the reader's colour mode. No CSS, no scripts.
+- Here: `README.md` uses `<picture>` for four screenshots, Mermaid `classDef`s with the HANDOFF.md 5.1 figure palette, and the live `/favicon.svg` as its logo, because the committed monogram is square and only the site's CSS rounds it. The About box (website, topics) is repository metadata, set in Guide D.
+- Mistakes: a wide Mermaid `LR` chain that GitHub shrinks until it is unreadable (the first draft; subgraphs with `direction TB` fixed it); absolute links to `blob/main/...` that break on branches (relative links do not); images with metadata (the privacy check catches committed ones).
+- Docs: [About READMEs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes), [Theme-specific images](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#specifying-the-theme-an-image-is-shown-to)
+
+**Licences: code and content are different works** `[GitHub]`
+- Mental model: copyright is the default, like a private API: without a licence nobody may copy, change or redistribute. A licence is a published grant, like making an endpoint public. Code and prose can carry different grants, and a Creative Commons grant can never be withdrawn, so the safe order is to start closed and open later.
+- Here: `LICENSE` (MIT) covers the code; GitHub's Licensee detects one root `LICENSE`, so the content's terms live in the README, where GitHub's docs suggest noting "complexity". The footer's "©" is the matching notice.
+- Mistakes: two licence files at the root (detection may report "Other"); assuming "public repository" means "free to reuse"; licensing someone else's work (the fonts keep their own OFL).
+- Docs: [Licensing a repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository), [CC FAQ](https://creativecommons.org/faq/)
+
+**OpenType features are per glyph, CSS switches them per element** `[CSS]`
+- Mental model: a font is a lookup table from characters to glyphs, and features such as `tnum` swap in alternate glyphs. `font-variant-numeric: tabular-nums` turns `tnum` on for every character of the element, and the font decides which glyphs change. Inter's tabular set includes the hyphen, so "read-only" in a `tnum` block gets a 9.08 px hyphen instead of 6.45 px.
+- Here: `prose.css` used to set `tabular-nums` on the whole contents list and every table; now only `.toc-num` and cells that `rehype-tables.ts` marks `num` get it. Dates, reading times, line numbers and the 404 code keep it: they hold no hyphenated words.
+- Mistakes: enabling a feature on a container "for the numbers in it"; judging by eye at one size (measure: a hidden span and `getBoundingClientRect`); `font-feature-settings` when a `font-variant-*` property exists (it overrides everything else).
+- Docs: [MDN: `font-variant-numeric`](https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-numeric)
+
+**Progressive enhancement in CSS: `text-wrap` and container queries** `[CSS]`
+- Mental model: both are layout decisions handed to the browser, like a query planner choosing a join. `text-wrap: balance` evens out line lengths (Chromium up to 6 lines, Firefox up to 10); `pretty` avoids a lone word on the last line. A container query is a media query on an element's own width instead of the viewport's. Browsers without either ignore the rule and render as before, so nothing breaks.
+- Here: `base.css` balances headings, ledes and pull quotes, so the post title wraps as three even lines. In `figures.css`, `.figure-diagram` is `container-type: inline-size`, and `@container (width < 480px)` shows the hint of a `diagram-min-480` figure: the figure is narrower than the diagram's floor exactly when the diagram scrolls.
+- Mistakes: `balance` on long paragraphs (ignored past the line limit, and slow); a container query on the element that is itself the container (it queries the nearest ancestor container); forgetting that `container-type: inline-size` stops the element from sizing to its content.
+- Docs: [MDN: `text-wrap`](https://developer.mozilla.org/en-US/docs/Web/CSS/text-wrap), [MDN: container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries), [Can I use: `text-wrap: balance`](https://caniuse.com/css-text-wrap-balance)
+
+**A revert is a pull request, not a rewind** `[CI/CD]`
+- Mental model: `main` is append-only, like an event log. A revert adds a commit that undoes another, through the same PR and checks as any change; nothing is erased. `gh pr revert` and the **Revert** button create a `revert-…` branch and its PR in one step; a draft PR lets you look before anything can merge.
+- Here: the runbook now gives `gh pr revert <PR>`, and the AI's fallback branch for a conflicting revert is `feat/revert-<PR>`, because `.claude/settings.json` lets Claude Code push only `feat/*` and `post/*`. The dry run proves the branch name, the checks and that `content` is skipped, without adding commits to `main`.
+- Mistakes: reverting an older PR after later ones touched the same files (conflicts); merging anything else before the revert lands; reverting a revert to "redo" a change without reading what it brings back.
+- Docs: [Reverting a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/reverting-a-pull-request), [`gh pr revert`](https://cli.github.com/manual/gh_pr_revert)
+
+### 4. Verify it yourself
+
+| Do this | Correct result |
+|---|---|
+| `pnpm check` | `0 errors`, `0 warnings` |
+| `pnpm build && pnpm test` | `9 page(s) built`; `Tests 232 passed` |
+| `pnpm privacy` | `privacy: clean (123 file(s), 45 image(s), …)` |
+| `pnpm preview`, open http://localhost:4321/posts/model-picks-postgres-computes/ | The title in three even lines; "A read-only role…" in the contents with a normal hyphen |
+| DevTools → device toolbar at 375 px, scroll to Fig. 2 | "Scroll sideways to see the whole figure." under it; at 1280 px no hint |
+| Same page, section 4 at 375 px | The file name breaks as `migrations/versions/` then `0003_roles_grants.py` |
+| http://localhost:4321/ and `/about/` | Reign Edge and delivery-metrics under "Selected projects"; no "Now" section; the new footer and colophon |
+| Change `(docs/runbook.md)` to `(docs/runbok.md)` in the README, `pnpm test` | `docs > links only to files that exist` fails, naming the file; undo |
+| PR #14 → **Files changed** → `README.md` → rich diff | The README with images and diagrams; after the merge, on the repository's front page |
+
+### 5. Check your understanding
+
+1. Why did "read-only" look spaced out in the contents list but not in the post's body text?
+   <details><summary>Answer</summary>The contents list had <code>font-variant-numeric: tabular-nums</code> on the whole list, so Inter's <code>tnum</code> feature applied to every character, and Inter's tabular set includes a wider hyphen (9.08 px instead of 6.45 px at 14 px). The body text has no tabular figures. The fix moves the feature to the number spans only.</details>
+2. The scroll hint is plain CSS. How does the page know a diagram scrolls, without JavaScript?
+   <details><summary>Answer</summary>The build knows each diagram's floor and writes it as a class (<code>diagram-min-480</code>). The figure is a size container, so <code>@container (width &lt; 480px)</code> matches exactly when the figure is narrower than the diagram's minimum width, which is when its scroll box overflows. One rule per 40 px step covers every floor.</details>
+3. You change a remark or rehype plugin and the local build still shows the old HTML. Why, and what do you do?
+   <details><summary>Answer</summary>Astro caches each post's rendered HTML in <code>node_modules/.astro/data-store.json</code> and reuses it while the post file is unchanged. It does not notice that the plugin code changed. Delete that file and build again. CI starts from a clean checkout, so it never sees a stale cache.</details>
+
+### 6. Deviations and gotchas
+
+- **Astro's content cache hides plugin changes.** The first branch build reused every post's cached HTML (no `<wbr>`, no hint, no `num` cells). `node_modules/.astro/data-store.json` is the file; deleting `.astro/data-store.json` alone changed nothing (tested). The README says so; CI is unaffected.
+- **`pnpm exec` and `pnpm run` reinstall when the lockfile changes.** pnpm 12 checks the lockfile before it runs anything, and it quietly rewrote a mutated lockfile before the test could see it. The lockfile mutation check runs `./node_modules/.bin/vitest` directly. The `@pnpm/exe` entry also came back once mid-chat, at about 23:29, without any pnpm call of mine (the nvm pnpm, tested, leaves the file alone); restored, never committed. Whatever writes it, the new test turns `verify` red before it can merge.
+- **The first lockfile regex missed the entry.** `/'@pnpm\/exe'[:@]/` wanted a quote straight after `exe`; the mutation check caught it, and `/'@pnpm\/exe(?:'|@)/` matches both forms while leaving the legitimate `@pnpm/exe.<platform>` entries alone.
+- **One `astro preview` per project.** Astro 7 refuses a second preview server; the F7 chat's server (since 22:11) was still running and served this branch's `dist/` after each rebuild, so screenshots and checks used it. A second launch configuration was added and removed again.
+- **"Now" is hidden, a deviation from HANDOFF.md 5.3**, which lists the section with placeholder items. The schema now accepts zero or three items; HANDOFF.md 5.3 notes it. Sending three items brings it back with no code change.
+- **Reign Edge's home card shows "Side venture"** in the stack line: HANDOFF.md 5.3 gives it no stack, and an empty line made the two cards uneven.
+- **The README logo depends on the live site.** The committed monogram is a square tile; only the site's CSS makes it round. The README uses `https://chau-minh-tieu.github.io/favicon.svg`, the round mark the build already draws, instead of committing a generated copy.
+- **`text-wrap: pretty` moves some breaks** in body text (About now ends a line before "side project"), and the colophon may break at the hyphen of "third-party", which is an ordinary place to break. A non-breaking hyphen (U+2011, inside the served Inter subset's U+2000–206F range) would prevent it if you mind.
+- **Screenshots are palette PNGs**, re-encoded with `sharp` (about 70% smaller, 672 KB for 14 files); `pnpm privacy` found no metadata in them.
+- **The mockup keeps the old footer and colophon.** HANDOFF.md wins on conflict, and it now records the new copy.
+- **PR #2's body was edited** (one line): its two screenshots now point at `e85d96d`, the F1 squash commit, which holds the same files.
+- **Lighthouse ran locally** on this branch (Home and post: 100 and 100, CLS 0). The live run follows the merge; the README quotes the live F7 figures until then.
+- **The kitchen sink needed no change:** its tables gain `num` cells and its wide diagrams the hint, and the build-output tests still pass on it.
+
+### 7. Time used
+
+| | Time |
+|---|---|
+| F8, brief | 23:20 to 23:30 by the clock: reading, the live review, docs, the brief |
+| Waiting for your answers | 23:30 to about 23:34 |
+| F8, build | 23:34 to 23:55: records, CSS and plugins, tests, screenshots, README, licence, docs, PR #14, this debrief |
+| F8 so far | about 35 minutes of work, before your checks, the revert dry run, Guide D, review and merge |
+| Cumulative | about 8 h 14 min of active time (about 10 h 16 min by the clock) of the planned 4–6 hours |
+
+### 8. Q&A log
+
+No questions yet.
+
+### 9. Next
+
+Within F8: your four checks, the revert dry run (before the merge), Guide D, then the review. After the merge I verify `main`, the Deploy run, `pnpm smoke --version <squash sha>`, Lighthouse on the live Home and post, the README on the repository page and the detected licence. F8 ends when you call it done. Deferred, not deleted (HANDOFF.md 8): Vale rules in CI, per-post Open Graph images, the Claude Code GitHub Action, search.
