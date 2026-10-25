@@ -1,0 +1,41 @@
+# Shared setup for the jobs that build the site: `verify` (pr.yml) and `build`
+# (deploy.yml). Node from .nvmrc, pnpm through corepack, the pnpm store cache
+# and a frozen install, so both jobs bump Node or an action SHA in one place.
+# Run it after actions/checkout: a local action is read from the checked-out
+# commit, which is also why it needs no SHA pin. The actions it uses are pinned.
+# https://docs.github.com/en/actions/tutorials/create-actions/create-a-composite-action
+name: Setup
+description: Node, pnpm and the project's dependencies
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version-file: .nvmrc
+        # The pnpm store is cached below; setup-node would look for pnpm before it exists.
+        package-manager-cache: false
+
+    # Node 25 and later no longer bundle corepack. Corepack then provides the
+    # pnpm version pinned in package.json's packageManager field.
+    - name: Install corepack and pnpm
+      shell: bash
+      run: |
+        npm install --global corepack@0.36.0
+        corepack enable
+        pnpm --version
+
+    - name: Locate the pnpm store
+      id: pnpm-store
+      shell: bash
+      run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: pnpm-store-${{ runner.os }}-
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
