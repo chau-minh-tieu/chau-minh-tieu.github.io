@@ -172,7 +172,7 @@ Not allowed: `classDef`, `style` and `linkStyle` (colours come only from the pal
 - **Fig. 1 on phones** scrolls; the mockup's HTML version wraps its boxes onto two rows, which an SVG cannot do.
 - **New dependencies:** `beautiful-mermaid` (with `elkjs` and `entities`, both new to the tree); `hast-util-from-html` and `hast-util-sanitize` were already installed through `rehype-raw` and `rehype-sanitize`, `hast-util-to-html` (dev, for one test) through Astro.
 - **Screenshots and checks.** The in-app browser pane was hidden for most of the build and returned blank screenshots, so the PR screenshots come from headless Chrome against `pnpm preview`; the CSP check (no console messages), the 375px layout (no page-level sideways scroll; figures at 76–78%) and GitHub's rendering were checked in the in-app browser. Headless Chrome cannot run GitHub's Mermaid frame at all: even the plan's existing diagram shows "Unable to render rich display" there.
-- **Lockfile.** At the start of this chat `pnpm-lock.yaml` had the `@pnpm/exe` entry again; it was restored before branching, and the committed lockfile has none.
+- **Lockfile: the `@pnpm/exe` entry has a clear cause now.** The standalone pnpm in `~/Library/pnpm/bin` (the `@pnpm/exe` build of 12.15.0) writes it whenever it runs inside the repository, even for `pnpm -v`; the nvm pnpm does not. One `pnpm privacy` in this build ran before the nvm path was set, and the entry reached the debrief commit; the next commit removes it, so the branch, and the squash commit, change the lockfile only for the new packages. On the machine side, putting `~/.nvm/versions/node/v26.12.1/bin` ahead of `~/Library/pnpm/bin` in `~/.zshrc`, or removing the standalone install, would stop it; that is your call.
 
 ### 7. Time used
 
