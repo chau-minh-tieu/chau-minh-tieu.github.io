@@ -186,7 +186,7 @@ Not allowed: `classDef`, `style` and `linkStyle` (colours come only from the pal
 
 ### 8. Q&A log
 
-(Questions from the review go here.)
+No questions were asked during the review (PR #5, 2026-10-25).
 
 ### 9. Next
 
