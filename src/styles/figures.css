@@ -1,0 +1,208 @@
+/*
+ * Figures: images and diagrams with numbered captions (rehype-figures.ts,
+ * rehype-diagrams.ts). Screenshots sit in a quiet window frame; wide figures
+ * span both columns of the post grid (956px); diagrams are inline SVG
+ * coloured by classes, never by inline styles, so the CSP stays strict.
+ */
+
+.figure {
+  margin: 0 0 44px;
+}
+
+.prose > .figure-wide {
+  grid-column: 1 / -1;
+}
+
+.figure > img {
+  border-radius: 12px;
+}
+
+.frame {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.frame-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.frame-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--fig-rose-stroke);
+}
+
+.frame-dot:nth-child(2) {
+  background: var(--fig-amber-stroke);
+}
+
+.frame-dot:nth-child(3) {
+  background: var(--fig-green-stroke);
+}
+
+.figure figcaption {
+  max-width: var(--measure);
+  padding-top: 12px;
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+  color: var(--muted);
+}
+
+/*
+ * Diagram size. The SVG's width and height attributes hold its natural size
+ * (the viewBox scaled to 15px labels); like an image it shrinks to fit, and
+ * height: auto keeps the proportions. A diagram-min-N class on the figure
+ * stops the shrinking at 75% of the natural size, rounded up to a 40px step;
+ * below that the figure scrolls sideways. Per-figure values cannot be inline styles under the
+ * CSP, hence one class per 40px step.
+ */
+
+.diagram-scroll {
+  overflow-x: auto;
+}
+
+.diagram-scroll:focus-visible {
+  outline-offset: -2px;
+}
+
+.diagram {
+  max-width: 100%;
+  height: auto;
+}
+
+.diagram-min-280 .diagram { min-width: 280px; }
+.diagram-min-320 .diagram { min-width: 320px; }
+.diagram-min-360 .diagram { min-width: 360px; }
+.diagram-min-400 .diagram { min-width: 400px; }
+.diagram-min-440 .diagram { min-width: 440px; }
+.diagram-min-480 .diagram { min-width: 480px; }
+.diagram-min-520 .diagram { min-width: 520px; }
+.diagram-min-560 .diagram { min-width: 560px; }
+.diagram-min-600 .diagram { min-width: 600px; }
+.diagram-min-640 .diagram { min-width: 640px; }
+.diagram-min-680 .diagram { min-width: 680px; }
+.diagram-min-720 .diagram { min-width: 720px; }
+.diagram-min-760 .diagram { min-width: 760px; }
+.diagram-min-800 .diagram { min-width: 800px; }
+.diagram-min-840 .diagram { min-width: 840px; }
+.diagram-min-880 .diagram { min-width: 880px; }
+.diagram-min-920 .diagram { min-width: 920px; }
+
+/*
+ * Diagram colours. The theme pass turns each paint the renderer wrote into a
+ * fig-fill-<role> or fig-stroke-<role> class; CSS rules beat SVG
+ * presentation attributes, and the tokens switch with the theme.
+ */
+
+.diagram .fig-fill-slate { fill: var(--fig-slate-fill); }
+.diagram .fig-stroke-slate { stroke: var(--fig-slate-stroke); }
+.diagram .fig-fill-slate-text { fill: var(--fig-slate-text); }
+.diagram .fig-fill-teal { fill: var(--fig-teal-fill); }
+.diagram .fig-stroke-teal { stroke: var(--fig-teal-stroke); }
+.diagram .fig-fill-teal-text { fill: var(--fig-teal-text); }
+.diagram .fig-fill-violet { fill: var(--fig-violet-fill); }
+.diagram .fig-stroke-violet { stroke: var(--fig-violet-stroke); }
+.diagram .fig-fill-violet-text { fill: var(--fig-violet-text); }
+.diagram .fig-fill-blue { fill: var(--fig-blue-fill); }
+.diagram .fig-stroke-blue { stroke: var(--fig-blue-stroke); }
+.diagram .fig-fill-blue-text { fill: var(--fig-blue-text); }
+.diagram .fig-fill-amber { fill: var(--fig-amber-fill); }
+.diagram .fig-stroke-amber { stroke: var(--fig-amber-stroke); }
+.diagram .fig-fill-amber-text { fill: var(--fig-amber-text); }
+.diagram .fig-fill-green { fill: var(--fig-green-fill); }
+.diagram .fig-stroke-green { stroke: var(--fig-green-stroke); }
+.diagram .fig-fill-green-text { fill: var(--fig-green-text); }
+.diagram .fig-fill-rose { fill: var(--fig-rose-fill); }
+.diagram .fig-stroke-rose { stroke: var(--fig-rose-stroke); }
+.diagram .fig-fill-rose-text { fill: var(--fig-rose-text); }
+
+/* External systems: a dashed slate border on the page background. */
+.diagram .fig-fill-external { fill: var(--bg); }
+.diagram .fig-stroke-external { stroke: var(--fig-slate-stroke); stroke-dasharray: 5 4; }
+.diagram .fig-fill-external-text { fill: var(--fig-slate-text); }
+
+/* Neutral roles: connectors, text, page background, hairlines. */
+.diagram .fig-fill-line { fill: var(--fig-line); }
+.diagram .fig-stroke-line { stroke: var(--fig-line); }
+.diagram .fig-fill-ink { fill: var(--ink); }
+.diagram .fig-fill-muted { fill: var(--muted); }
+.diagram .fig-fill-bg { fill: var(--bg); }
+.diagram .fig-fill-rule { fill: var(--line); }
+.diagram .fig-stroke-rule { stroke: var(--line); }
+
+/* Strokes in user units, which the SVG scales by 15/13: 1.3 draws about 1.5px. */
+.diagram .fig-node > * {
+  stroke-width: 1.3;
+}
+
+.diagram .fig-edge,
+.diagram .fig-message > line {
+  stroke-width: 1.3;
+}
+
+/* Edge labels: text on a patch of page background, no box. */
+.diagram .fig-edge-label > rect {
+  stroke: none;
+}
+
+/* A system boundary: dashed, unfilled, with a label in the style of .label. */
+.diagram .fig-group > rect {
+  fill: none;
+  stroke: var(--fig-line);
+  stroke-width: 1.3;
+  stroke-dasharray: 6 4;
+}
+
+.diagram .fig-group > text {
+  font-size: 10.5px; /* 12px once scaled */
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--muted);
+}
+
+/* Legend: the categories a diagram uses, as swatches. */
+
+.prose .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 16px 0 0;
+  list-style: none;
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.125rem; /* 18px */
+  color: var(--muted);
+}
+
+.prose .legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.legend-swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
+  border: 1.5px solid;
+  border-radius: 3px;
+}
+
+.fig-swatch-slate { background: var(--fig-slate-fill); border-color: var(--fig-slate-stroke); }
+.fig-swatch-teal { background: var(--fig-teal-fill); border-color: var(--fig-teal-stroke); }
+.fig-swatch-violet { background: var(--fig-violet-fill); border-color: var(--fig-violet-stroke); }
+.fig-swatch-blue { background: var(--fig-blue-fill); border-color: var(--fig-blue-stroke); }
+.fig-swatch-amber { background: var(--fig-amber-fill); border-color: var(--fig-amber-stroke); }
+.fig-swatch-green { background: var(--fig-green-fill); border-color: var(--fig-green-stroke); }
+.fig-swatch-rose { background: var(--fig-rose-fill); border-color: var(--fig-rose-stroke); }
+.fig-swatch-external { background: transparent; border-color: var(--fig-slate-stroke); border-style: dashed; }

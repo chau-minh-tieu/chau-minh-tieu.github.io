@@ -4,16 +4,21 @@
  *
  *   ![The dashboard with the assistant panel open](./screenshot-dashboard.png "The assistant shows the SQL it ran.")
  *
- * The title becomes the caption, "Fig. N" (HANDOFF.md 6.1). An image whose
- * file name starts with `screenshot-` gets the quiet window frame of the
- * mockup. A missing alt text fails the build and names the image.
+ * The title becomes the caption (HANDOFF.md 6.1). An image whose file name
+ * starts with `screenshot-` gets the quiet window frame of the mockup; one
+ * starting with `wide-` breaks out of the reading column to the full 956px.
+ * A missing alt text fails the build and names the image.
+ *
+ * rehypeFigureNumbers runs after the diagrams (rehype-diagrams.ts) and
+ * numbers every captioned figure, image or diagram, "Fig. N" in page order.
  */
 import type { Element, Root } from 'hast';
 import type { Plugin } from 'unified';
 import { visit } from 'unist-util-visit';
-import { el, isBlank, isElement, text } from './hast.ts';
+import { classes, el, isBlank, isElement, text } from './hast.ts';
 
 const SCREENSHOT = /(?:^|\/)screenshot-[^/]*$/;
+const WIDE = /(?:^|\/)wide-[^/]*$/;
 
 function frameBar(): Element {
   const dot = () => el('span', { className: ['frame-dot'] });
@@ -29,7 +34,6 @@ export const rehypeFigures: Plugin<[], Root> = () => (tree, file) => {
     }
   });
 
-  let number = 0;
   visit(tree, 'element', (node, index, parent) => {
     if (node.tagName !== 'p' || !parent || index === undefined) return;
     const content = node.children.filter((child) => !isBlank(child));
@@ -39,11 +43,26 @@ export const rehypeFigures: Plugin<[], Root> = () => (tree, file) => {
     if (typeof caption !== 'string' || caption.trim() === '') return;
 
     delete image.properties.title;
-    number++;
-    const screenshot = SCREENSHOT.test(String(image.properties.src));
-    parent.children[index] = el('figure', { className: screenshot ? ['figure', 'figure-frame'] : ['figure'] }, [
+    const src = String(image.properties.src);
+    const screenshot = SCREENSHOT.test(src);
+    const className = ['figure'];
+    if (screenshot) className.push('figure-frame');
+    if (WIDE.test(src)) className.push('figure-wide');
+    parent.children[index] = el('figure', { className }, [
       screenshot ? el('div', { className: ['frame'] }, [frameBar(), image]) : image,
-      el('figcaption', {}, [el('span', { className: ['figure-num'] }, [text(`Fig. ${number}`)]), text(` ${caption}`)]),
+      el('figcaption', {}, [text(caption)]),
     ]);
+  });
+};
+
+/** Numbers every figure with a caption, images and diagrams alike, in page order. */
+export const rehypeFigureNumbers: Plugin<[], Root> = () => (tree) => {
+  let number = 0;
+  visit(tree, 'element', (node) => {
+    if (node.tagName !== 'figure' || !classes(node).includes('figure')) return;
+    const caption = node.children.find((child) => isElement(child, 'figcaption'));
+    if (!isElement(caption, 'figcaption')) return;
+    number++;
+    caption.children.unshift(el('span', { className: ['figure-num'] }, [text(`Fig. ${number}`)]), text(' '));
   });
 };

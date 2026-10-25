@@ -3,7 +3,8 @@
  * every page carries a CSP that allows each of its inline scripts and styles
  * by hash, nothing is loaded from another origin, no email address is
  * published, served images carry no metadata, drafts are never built,
- * unlisted posts stay out of every list, and the sitemap matches the pages.
+ * unlisted posts stay out of every list, the sitemap matches the pages, and
+ * diagrams are inert SVG with unique ids.
  *
  * Locally the suite is skipped when dist/ is missing; in CI it is required.
  */
@@ -173,6 +174,33 @@ describe.skipIf(!built)('post content', () => {
 
   it('renders hostile HTML from the post body inert', () => {
     expect(post).not.toMatch(/alert\(|javascript:|<iframe/);
+  });
+
+  it('renders the diagrams as numbered figures with accessible SVG', () => {
+    const diagrams = Array.from(post.matchAll(/<figure class="figure figure-diagram[^"]*">[\s\S]*?<\/figure>/g), (m) => m[0]);
+    expect(diagrams).toHaveLength(3);
+    for (const figure of diagrams) {
+      expect(figure).toMatch(/<svg viewBox="[^"]+" width="\d+" height="\d+" role="img" aria-label="[^"]{20,}" class="diagram">/);
+      expect(figure).toContain('<span class="figure-num">Fig. ');
+    }
+    expect(diagrams[0]).toContain('figure-wide');
+    expect(diagrams[1]).toContain('<ul class="legend" aria-label="Legend">');
+    const numbers = Array.from(post.matchAll(/<span class="figure-num">Fig\. (\d+)<\/span>/g), (m) => Number(m[1]));
+    expect(numbers).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(post).toContain('<figure class="figure figure-wide"><img ');
+  });
+});
+
+describe.skipIf(!built)('diagrams on every page', () => {
+  it.each(pages.map(name))('%s has unique ids', (page) => {
+    const ids = Array.from(read(join(DIST, page)).matchAll(/\sid="([^"]+)"/g), (m) => m[1]);
+    expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+  });
+
+  it.each(pages.map(name))('%s keeps inline SVG inert', (page) => {
+    for (const [svg] of read(join(DIST, page)).matchAll(/<svg[\s\S]*?<\/svg>/g)) {
+      expect(svg).not.toMatch(/<(script|style|foreignObject|a|image)\b|\son[a-z]+=|\s(href|style)=|url\((?!#)/i);
+    }
   });
 
   it('serves images without metadata', () => {

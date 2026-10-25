@@ -104,10 +104,11 @@ describe('figures', () => {
     expect(html).not.toContain('title=');
   });
 
-  it('frames screenshots and leaves untitled or inline images alone', async () => {
+  it('frames screenshots, widens wide- images, and leaves untitled or inline images alone', async () => {
     expect(await render('![The app](./screenshot-app.png "The app.")')).toMatch(
       /<figure class="figure figure-frame"><div class="frame"><div class="frame-bar" aria-hidden="true">/,
     );
+    expect(await render('![A chart](./wide-chart.png "Wide.")')).toMatch(/^<figure class="figure figure-wide"><img /);
     expect(await render('![A chart](./chart.png)')).toBe('<p><img src="./chart.png" alt="A chart"></p>');
     expect(await render('Inline ![icon](./i.png "t") here.')).not.toContain('<figure');
   });
@@ -174,12 +175,6 @@ describe('code blocks', () => {
 
   it('fails the build on an unknown language', async () => {
     await expect(render(md('```pyhton', 'print(1)', '```'))).rejects.toThrow('Unknown code block language "pyhton"');
-  });
-
-  it('leaves mermaid fences for the diagram step', async () => {
-    expect(await render(md('```mermaid', 'flowchart LR', '```'))).toBe(
-      '<pre><code class="language-mermaid">flowchart LR\n</code></pre>',
-    );
   });
 
   it('uses the same colours as tokens.css', () => {

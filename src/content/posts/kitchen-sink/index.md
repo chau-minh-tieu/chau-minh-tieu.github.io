@@ -88,7 +88,67 @@ Table: The example project at a glance
 
 ![A bar chart with five bars in the figure palette](./figure-sample.png "A column-width figure. The title of the image becomes this caption.")
 
+![The same bar chart, at full width](./wide-figure-sample.png "A wide figure: an image whose file name starts with wide- spans the text and the margin.")
+
 ![An abstract app window with a chart, a list and a code panel](./screenshot-fixture.jpg "A screenshot gets a quiet window frame. Its source file carries fake metadata that the build must strip.")
+
+## Diagrams
+
+Diagrams are Mermaid fences, rendered to SVG when the site is built. A flowchart, with the figure palette by category. It is wider than the reading column, so it uses the full width of the page:
+
+Figure: The model writes queries; the database does the arithmetic. Every answer carries its query.
+
+```mermaid
+flowchart LR
+  accDescr: A question from an engineer goes to the model, which writes SQL. The database runs it under a read-only role and returns rows with exact numbers. The model explains the result and cites the query.
+  Q["<b>Question</b><br>from an engineer"]:::slate --> M1["<b>Model</b><br>writes SQL"]:::violet --> D["<b>Database</b><br>read-only role"]:::blue --> R["<b>Rows</b><br>exact numbers"]:::green --> M2["<b>Model</b><br>explains, cites query"]:::violet
+```
+
+A container view in the C4 style, with a system boundary, external systems and a legend. The edge to the model API is written from the API's side with a start arrow (`API <--- AST`), so the layout puts the API on top:
+
+Figure: Simplified container view (C4, level 2). Only the assistant talks to the model, and it holds the narrowest database grant.
+
+```mermaid
+flowchart TB
+  accDescr: Container diagram. An engineer uses the dashboard. The dashboard sends questions to the assistant and reads the metrics database for charts. The assistant sends the schema and the question to the model API and runs read-only SQL on the metrics database. The sync worker fetches from the code host API and writes to the metrics database.
+  U(["<b>Engineer</b><br>Person"]):::slate
+  API["<b>Model API</b><br>External system"]:::external
+  subgraph SYS ["Example system"]
+    DASH["<b>Dashboard</b><br>Container · web UI"]:::teal
+    AST["<b>Assistant</b><br>Container · Python"]:::violet
+    DB[("<b>Metrics DB</b><br>Database")]:::blue
+    W["<b>Sync worker</b><br>Container · Python"]:::amber
+  end
+  GH["<b>Code host API</b><br>External system"]:::external
+  U -->|asks in plain English| DASH
+  DASH -->|question| AST
+  API <---|schema + question| AST
+  AST -->|read-only SQL| DB
+  DASH -->|reads for charts| DB
+  W -->|writes| DB
+  W -->|fetches over REST| GH
+%% legend
+```
+
+A sequence diagram:
+
+Figure: One question, end to end. Only the assistant talks to the model.
+
+```mermaid
+sequenceDiagram
+  accDescr: The engineer asks the assistant a question. The assistant sends the schema and the question to the model API, which returns SQL. The assistant runs the SQL on the database under a read-only role, gets rows back, and answers the engineer with the query attached.
+  participant E as Engineer
+  participant A as Assistant
+  participant M as Model API
+  participant D as Database
+  E->>A: Question
+  A->>M: Schema and question
+  M-->>A: SQL
+  A->>D: SQL, read-only role
+  D-->>A: Rows
+  A-->>E: Answer with the query
+  Note right of D: Every number comes from here
+```
 
 ## Notes and quotes
 
