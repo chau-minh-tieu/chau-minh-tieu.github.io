@@ -108,6 +108,8 @@ JSON
 
 `integration_id` 15368 is the GitHub Actions app: only a check reported by Actions satisfies the rule, not one with the same name posted by anything else.
 
+**Verified on 2026-10-25, read-only.** `GET /rulesets`: one ruleset, `main`, `active`, target `~DEFAULT_BRANCH`, no bypass actors, `current_user_can_bypass: never`. `GET /rules/branches/main`: `deletion`, `non_fast_forward`, `pull_request` (0 approvals) and `required_status_checks` (`verify` and `privacy`, integration 15368, not strict). PR #2 stayed `CLEAN` and mergeable with both checks green. The refused direct push was not tried: pushing to `main` is itself against the guardrails, and the rules API shows the push rules that apply to `main`.
+
 ### 2. File tour
 
 | File | Single responsibility | Depends on |
@@ -205,16 +207,19 @@ JSON
 - **The footer year is the build year.** Every deploy rebuilds, so it rolls over with the first deploy of a new year.
 - **pnpm 12 settings live in `pnpm-workspace.yaml`**, not `.npmrc`, even in a single-package repository.
 - **Screenshots are committed** under `docs/features/img/` so the PR and this debrief can show them. Headless Chrome PNGs, checked: no metadata chunks.
+- **The ruleset carries one parameter Guide B1 did not set:** `require_extra_approval_for_unattributed_changes: true`, which GitHub filled in by default. It did not block PR #2, whose commits are all attributed to `chau-minh-tieu`. If a future PR is blocked for an approval that 0 required approvals should not need, check this setting first.
+- **No direct push to `main` was attempted** to prove the ruleset; the rules API shows what applies to `main` (part 1).
 
 ### 7. Time used
 
 | | Time |
 |---|---|
-| F1, Claude's build | 14:05 to 14:25 by the clock: 20 minutes for scaffold, styles, privacy check, CI, PR and these docs |
-| F1, owner | Reading this debrief and the PR, applying Guide B1, merging: estimate 25 minutes, so about 45 minutes against the 50-minute timebox |
-| Cumulative | about 1 h 35 min of 4–6 hours (F0 about 50 minutes) |
+| F1, build | 14:05 to 14:25 by the clock: scaffold, styles, privacy check, CI, PR and these docs |
+| F1, review and Guide B1 | 14:25 to 15:00: reading, applying the ruleset, verification |
+| F1 total | about 57 minutes (14:05 to 15:02) against the 50-minute timebox, before the merge |
+| Cumulative | about 1 h 47 min of 4–6 hours (F0 about 50 minutes) |
 
-Checkpoint: the site should be live (F3) by 2 h 30 min cumulative. In the planned order, F2 (50 minutes) then F3 (30 minutes) put it live at about 3 h 05 min. F3 does not depend on F2: deploying the shell first would put the site live at about 2 h 05 min. See the F2 brief's timebox note.
+Checkpoint: the site should be live (F3) by 2 h 30 min cumulative. In the planned order, F2 (50 minutes) then F3 (30 minutes) put it live at about 3 h 07 min. F3 does not depend on F2: deploying the shell first would put the site live at about 2 h 17 min. See the F2 brief's timebox note.
 
 ### 8. Q&A log
 

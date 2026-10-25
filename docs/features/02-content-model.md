@@ -36,6 +36,6 @@
 
 **Timebox.** 50 minutes of the owner's time. Highest risk: the Shiki class transformer and the sanitiser schema. If time runs out, sidenotes and the Verdict row move to F5.
 
-**Checkpoint.** In this order the site goes live (F3) at about 3 h 05 min, past the 2 h 30 min checkpoint. F3 does not depend on F2: running it first would put the shell live at about 2 h 05 min.
+**Checkpoint.** In this order the site goes live (F3) at about 3 h 07 min, past the 2 h 30 min checkpoint. F3 does not depend on F2: running it first would put the shell live at about 2 h 17 min.
 
 **Docs.** [Content collections](https://docs.astro.build/en/guides/content-collections/) · [Markdown processors](https://docs.astro.build/en/guides/markdown-content/) · [Syntax highlighting](https://docs.astro.build/en/guides/syntax-highlighting/) · [Shiki transformers](https://shiki.style/packages/transformers) · [`rehype-sanitize`](https://github.com/rehypejs/rehype-sanitize) · [RSS recipe](https://docs.astro.build/en/recipes/rss/) · [Sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
