@@ -101,11 +101,7 @@ Screenshots: [`img/`](img/) (`08-home-*`, `08-about-*`, `08-mobile.png`, `08-tab
 | `content` is skipped | Skipped: the branch does not start with `post/` |
 | It can be merged like any PR | `mergeable: MERGEABLE`, `mergeStateStatus: CLEAN`; as a draft it needs **Ready for review** first |
 
-You close it without merging and delete its branch (GitHub created the branch, so the deletion is yours):
-
-```bash
-gh pr close 15 --repo chau-minh-tieu/chau-minh-tieu.github.io --delete-branch
-```
+You closed it without merging and deleted its branch at 00:01 (GitHub created the branch, so the deletion was yours): `gh pr close 15 --repo chau-minh-tieu/chau-minh-tieu.github.io --delete-branch`. Verified read-only: #15 `CLOSED` with no merge, and no `revert-` branch left. Number #15 is not reused.
 
 **Setup Guide D: the About box (you).**
 
