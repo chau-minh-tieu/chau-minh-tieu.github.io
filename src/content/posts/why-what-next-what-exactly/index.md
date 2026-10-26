@@ -3,7 +3,7 @@ title: 'Why, what next, what exactly: how an engineering manager works with PMs,
 description: PM, PO and BA mean different jobs in every company. What helped me was writing down who decides why we build, what we build next and what exactly it must do.
 pubDate: 2026-10-26
 tags: [leadership, ai]
-status: unlisted
+status: published
 brief: 17
 disclosure: Drafted with AI from my notes. Reviewed and edited by me.
 sources:
