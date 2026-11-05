@@ -37,7 +37,6 @@ const disclosure = disclosureOf(data);
 <BaseLayout
   title={data.title}
   description={data.description}
-  noindex={data.status !== 'published'}
   article={{ published: data.pubDate, modified: data.updatedDate, tags: data.tags.map((t) => TAG_LABELS[t]) }}
 >
   <div class="wrap">

@@ -37,7 +37,8 @@ A static site with no server, no database and nothing that tracks the reader. As
 | **Third-party requests** | None. Fonts are self-hosted; no analytics, no cookies, no CDN |
 | **Lighthouse** (desktop, live) | Performance 100, accessibility 100 on Home and on the post |
 | **Content Security Policy** | `default-src 'self'`; inline scripts and styles only by SHA-256 hash |
-| **Tests** | 232 Vitest tests, plus 11 smoke checks against the live site after every deploy |
+| **Search engines** | Not indexed: every page says `noindex, nofollow`. `robots.txt` lets search engines crawl so they can read that, and refuses image search and AI-training crawlers. No sitemap |
+| **Tests** | 260 Vitest tests, plus 12 smoke checks against the live site after every deploy |
 
 ## How a post gets published
 
@@ -55,7 +56,7 @@ flowchart LR
   end
   subgraph S3["3 · Review and publish"]
     direction TB
-    U["Live but unlisted<br/>I review every line"]:::teal --> P["Publish PR<br/>status: published"]:::blue --> L["Listed<br/>home · tags · RSS · sitemap"]:::green
+    U["Live but unlisted<br/>I review every line"]:::teal --> P["Publish PR<br/>status: published"]:::blue --> L["Listed<br/>home · tags · RSS"]:::green
   end
   S1 --> S2 --> S3
   classDef slate fill:#ECE9E2,stroke:#6B665D,color:#2E2B26
@@ -199,13 +200,13 @@ Two things to know:
 │   ├── content/posts/<slug>/    one folder per post: index.md and its images
 │   ├── content.config.ts        the posts and "Now" collections
 │   ├── data/now.yaml            "Now" on About
-│   ├── pages/                   routes: pages, tag pages, RSS, sitemap, icons, version.txt
+│   ├── pages/                   routes: pages, tag pages, RSS, icons, version.txt
 │   ├── layouts/  components/    the base layout, the post layout, small components
 │   ├── lib/                     schema, post rules, projects, brand drawing
 │   ├── plugins/                 remark and rehype passes: notes, tables, figures, diagrams, code
 │   ├── scripts/                 the two browser scripts: theme and copy
 │   └── styles/                  tokens, base, prose, code and figure styles
-├── public/brand/                the CT monogram in three colours
+├── public/                      robots.txt; brand/: the CT monogram in three colours
 ├── scripts/                     privacy check, post gates, link check, smoke checks
 ├── tests/                       tests over dist/ and over the repository itself
 ├── .github/                     workflows, the shared setup action, the brief form, the post PR template

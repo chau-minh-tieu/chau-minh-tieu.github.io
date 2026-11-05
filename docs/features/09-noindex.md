@@ -41,6 +41,8 @@
 1. **AI search crawlers. Default: block only the six tokens you named.** Reason: your list is explicit, and adding a token later is one line. Alternative: also block `OAI-SearchBot` and `Claude-SearchBot`, which build the search indexes behind ChatGPT and Claude search. Their vendors' pages describe robots.txt as the way to opt out.
 2. **Non-HTML files** (`/rss.xml`, `/version.txt`, the SVG icons). **Default: accept and record the gap in the plan.** Reason: Pages cannot send `X-Robots-Tag`. A `Disallow` for these files would contradict "allow all" and would not stop a bare-URL listing. Images are covered by `Googlebot-Image`.
 
+**Your answers** (2026-11-05): "Go, defaults". Both defaults stand.
+
 **Acceptance criteria**
 
 - Every HTML file in `dist/` carries `<meta name="robots" content="noindex, nofollow">` exactly once, and the mutation check proves the test bites.

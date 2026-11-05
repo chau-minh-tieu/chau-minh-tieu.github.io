@@ -56,6 +56,7 @@ Standing rules for Claude Code in this repository. `HANDOFF.md` is the source of
 - Only the theme toggle and copy buttons ship JavaScript. Astro islands only when a feature truly needs one.
 - Render content as text. Sanitise rendered Markdown, because post bodies may contain raw HTML. `src/plugins/markdown.ts` runs rehype-raw, then rehype-sanitize, then our plugins; nothing after the sanitiser may parse author text as HTML.
 - CSP through `<meta http-equiv>`, starting from `default-src 'self'`. Document and justify every relaxation.
+- Not indexed by search engines (owner decision, 2026-11-05): `BaseLayout.astro` writes `<meta name="robots" content="noindex, nofollow">` on every page. `public/robots.txt` lets search engines crawl, so they can read the tag (never `Disallow: /` for `*`), and refuses image search and AI-training crawlers. No sitemap. `scripts/lib/robots.ts` holds the policy; build-output tests and smoke checks enforce it.
 - Design tokens, typography, pages and copy: `HANDOFF.md` section 5. Reference markup: `docs/design/mockup/` (the handoff wins on conflict). No gradients, glassmorphism, drop shadows on content, stock images, emoji or decorative animation.
 
 ## Content

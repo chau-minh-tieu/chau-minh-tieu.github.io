@@ -5,6 +5,7 @@
  * promise for dist/. Requests never follow redirects: a 200 must be a real 200.
  */
 import { attributes, decode } from './html.ts';
+import { ROBOTS_META, robotsMetaOf, robotsProblems } from './robots.ts';
 
 export type Fetch = (url: string, init?: RequestInit) => Promise<Response>;
 
@@ -105,10 +106,6 @@ export function cspOf(html: string): string | undefined {
   return value === undefined ? undefined : decode(value);
 }
 
-export function hasNoindex(html: string): boolean {
-  return /<meta name="robots" content="[^"]*\bnoindex\b/i.test(html);
-}
-
 /** The page's Open Graph image URL, as written: absolute, on the live site's host. */
 export function ogImageOf(html: string): string | undefined {
   const value = html.match(/<meta property="og:image" content="([^"]*)"/i)?.[1];
@@ -142,6 +139,14 @@ async function expectStatus(fetch: Fetch, url: URL, status: number): Promise<Pag
   const page = await get(fetch, url);
   if (page.status !== status) throw new Error(`GET ${url.pathname}: ${page.status}, expected ${status}`);
   return page;
+}
+
+/** Every page asks not to be indexed or its links followed (F9). */
+function expectNoindex(page: Page, url: URL): void {
+  const content = robotsMetaOf(page.text);
+  if (content !== ROBOTS_META) {
+    throw new Error(`GET ${url.pathname}: robots meta is ${content === undefined ? 'missing' : `"${content}"`}, expected "${ROBOTS_META}"`);
+  }
 }
 
 async function expectImage(fetch: Fetch, url: URL, type: RegExp): Promise<void> {
@@ -183,7 +188,8 @@ export function smokeChecks(root: URL, version?: string): Check[] {
         if (!home.type.startsWith('text/html')) throw new Error(`GET /: content type ${home.type}`);
         const csp = cspOf(home.text);
         if (!csp?.startsWith("default-src 'self';")) throw new Error("GET /: no CSP starting with default-src 'self'");
-        return 'HTML with the CSP meta tag';
+        expectNoindex(home, root);
+        return 'HTML with the CSP and noindex meta tags';
       },
     },
     {
@@ -192,6 +198,7 @@ export function smokeChecks(root: URL, version?: string): Check[] {
         for (const path of PAGES) {
           const page = await expectStatus(fetch, at(path), 200);
           if (!cspOf(page.text)?.startsWith("default-src 'self';")) throw new Error(`GET /${path}: no CSP`);
+          expectNoindex(page, at(path));
         }
         return PAGES.map((path) => `/${path}`).join(', ');
       },
@@ -234,22 +241,26 @@ export function smokeChecks(root: URL, version?: string): Check[] {
       name: 'feeds',
       run: async (fetch) => {
         const rss = await expectStatus(fetch, at('rss.xml'), 200);
-        const sitemap = await expectStatus(fetch, at('sitemap.xml'), 200);
-        const robots = await expectStatus(fetch, at('robots.txt'), 200);
         if (!rss.text.includes('<rss')) throw new Error('/rss.xml is not an RSS feed');
-        if (!sitemap.text.includes('<urlset')) throw new Error('/sitemap.xml is not a sitemap');
-        if (!/^Sitemap: /m.test(robots.text)) throw new Error('/robots.txt does not point to the sitemap');
-        for (const [path, page] of [['/rss.xml', rss], ['/sitemap.xml', sitemap]] as const) {
-          if (page.text.includes(`/${UNLISTED}`)) throw new Error(`${path} lists the unlisted post`);
-        }
-        return 'RSS, sitemap and robots.txt; no unlisted post';
+        if (rss.text.includes(`/${UNLISTED}`)) throw new Error('/rss.xml lists the unlisted post');
+        return 'RSS without the unlisted post';
+      },
+    },
+    {
+      name: 'robots',
+      run: async (fetch) => {
+        const robots = await expectStatus(fetch, at('robots.txt'), 200);
+        const problems = robotsProblems(robots.text);
+        if (problems.length > 0) throw new Error(`/robots.txt: ${problems.join('; ')}`);
+        await expectStatus(fetch, at('sitemap.xml'), 404);
+        return 'robots.txt lets search engines crawl and refuses the blocked agents; no sitemap';
       },
     },
     {
       name: 'unlisted',
       run: async (fetch) => {
         const post = await expectStatus(fetch, at(UNLISTED), 200);
-        if (!hasNoindex(post.text)) throw new Error(`/${UNLISTED} has no noindex`);
+        expectNoindex(post, at(UNLISTED));
         return `/${UNLISTED} with noindex`;
       },
     },
@@ -264,9 +275,8 @@ export function smokeChecks(root: URL, version?: string): Check[] {
       name: 'not found',
       run: async (fetch) => {
         const page = await expectStatus(fetch, at(MISSING), 404);
-        if (!/Page not found/.test(page.text) || !hasNoindex(page.text)) {
-          throw new Error(`GET /${MISSING}: 404 without the site's own 404 page`);
-        }
+        if (!/Page not found/.test(page.text)) throw new Error(`GET /${MISSING}: 404 without the site's own 404 page`);
+        expectNoindex(page, at(MISSING));
         return `/${MISSING} is 404 with the site's page`;
       },
     },

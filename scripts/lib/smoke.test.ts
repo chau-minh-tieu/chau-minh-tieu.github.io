@@ -1,9 +1,9 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   cspOf,
   cssUrls,
   type Fetch,
-  hasNoindex,
   isLocal,
   ogImageOf,
   resourceUrls,
@@ -90,17 +90,15 @@ describe('cssUrls', () => {
   });
 });
 
-describe('cspOf, hasNoindex and ogImageOf', () => {
+describe('cspOf and ogImageOf', () => {
   it('read the meta tags Astro writes', () => {
     expect(ogImageOf('<meta property="og:image" content="https://example.github.io/og.png?v=1&amp;x=2">')).toBe(
       'https://example.github.io/og.png?v=1&x=2',
     );
     expect(ogImageOf('<p>none</p>')).toBeUndefined();
-    const html = `<meta http-equiv="content-security-policy" content="default-src 'self'; object-src 'none'"><meta name="robots" content="noindex">`;
+    const html = `<meta http-equiv="content-security-policy" content="default-src 'self'; object-src 'none'">`;
     expect(cspOf(html)).toBe("default-src 'self'; object-src 'none'");
-    expect(hasNoindex(html)).toBe(true);
     expect(cspOf('<p>none</p>')).toBeUndefined();
-    expect(hasNoindex('<meta name="robots" content="index">')).toBe(false);
   });
 });
 
@@ -108,34 +106,36 @@ describe('cspOf, hasNoindex and ogImageOf', () => {
 type Site = Record<string, { status?: number; type?: string; location?: string; body?: string }>;
 
 const CSP = `<meta http-equiv="content-security-policy" content="default-src 'self'; object-src 'none'">`;
+const NOINDEX = '<meta name="robots" content="noindex, nofollow">';
+/** The fake site serves the real robots.txt. */
+const ROBOTS = readFileSync(new URL('../../public/robots.txt', import.meta.url), 'utf8');
 
 function goodSite(): Site {
   return {
     'https://example.github.io/': {
       type: 'text/html',
-      body: `${CSP}<link rel="stylesheet" href="/_astro/a.css"><meta property="og:image" content="https://chau-minh-tieu.github.io/og.png">`,
+      body: `${CSP}${NOINDEX}<link rel="stylesheet" href="/_astro/a.css"><meta property="og:image" content="https://chau-minh-tieu.github.io/og.png">`,
     },
-    'https://example.github.io/projects/': { type: 'text/html', body: CSP },
-    'https://example.github.io/about/': { type: 'text/html', body: CSP },
+    'https://example.github.io/projects/': { type: 'text/html', body: CSP + NOINDEX },
+    'https://example.github.io/about/': { type: 'text/html', body: CSP + NOINDEX },
     'https://example.github.io/favicon.ico': { type: 'image/vnd.microsoft.icon', body: 'x' },
     'https://example.github.io/favicon.svg': { type: 'image/svg+xml', body: '<svg/>' },
     'https://example.github.io/apple-touch-icon.png': { type: 'image/png', body: 'x' },
     'https://example.github.io/og.png': { type: 'image/png', body: 'x' },
     'https://example.github.io/smoke-check-missing-page/': {
       status: 404,
-      body: '<meta name="robots" content="noindex"><h1>Page not found</h1>',
+      body: `${NOINDEX}<h1>Page not found</h1>`,
     },
     'https://example.github.io/_astro/a.css': { type: 'text/css', body: 'b{src:url(/_astro/fonts/f.woff2)}' },
     'https://example.github.io/_astro/fonts/f.woff2': { type: 'font/woff2', body: 'x' },
     'https://example.github.io/posts/kitchen-sink/': {
       type: 'text/html',
-      body: `${CSP}<meta name="robots" content="noindex"><script type="module" src="/_astro/p.js"></script>`,
+      body: `${CSP}${NOINDEX}<script type="module" src="/_astro/p.js"></script>`,
     },
     'https://example.github.io/_astro/p.js': { type: 'text/javascript', body: '' },
     'https://example.github.io/version.txt': { type: 'text/plain', body: 'abc123\n' },
     'https://example.github.io/rss.xml': { type: 'application/xml', body: '<rss version="2.0"></rss>' },
-    'https://example.github.io/sitemap.xml': { type: 'application/xml', body: '<urlset></urlset>' },
-    'https://example.github.io/robots.txt': { type: 'text/plain', body: 'User-agent: *\nSitemap: https://example.github.io/sitemap.xml\n' },
+    'https://example.github.io/robots.txt': { type: 'text/plain', body: ROBOTS },
     'http://example.github.io/': { status: 301, location: 'https://example.github.io/' },
     'https://example.github.io/posts/kitchen-sink': { status: 301, location: 'https://example.github.io/posts/kitchen-sink/' },
   };
@@ -171,7 +171,7 @@ describe('smokeChecks', () => {
 
   it('runs Pages redirect checks only against a non-local host', () => {
     const names = (root: URL) => smokeChecks(root).map((check) => check.name);
-    const everywhere = ['version', 'home', 'pages', 'assets', 'brand', 'feeds', 'unlisted', 'draft', 'not found'];
+    const everywhere = ['version', 'home', 'pages', 'assets', 'brand', 'feeds', 'robots', 'unlisted', 'draft', 'not found'];
     expect(names(ROOT)).toEqual([...everywhere, 'https redirect', 'trailing slash']);
     expect(names(new URL('http://localhost:4321/'))).toEqual(everywhere);
   });
@@ -202,10 +202,30 @@ describe('smokeChecks', () => {
   it('fails when the unlisted post is indexable or listed', async () => {
     const site = goodSite();
     site['https://example.github.io/posts/kitchen-sink/']!.body = CSP;
-    site['https://example.github.io/sitemap.xml']!.body = '<urlset><loc>https://example.github.io/posts/kitchen-sink/</loc></urlset>';
+    site['https://example.github.io/rss.xml']!.body = '<rss><link>https://example.github.io/posts/kitchen-sink/</link></rss>';
     const failed = await failures(site);
-    expect(failed.unlisted).toBe('/posts/kitchen-sink/ has no noindex');
-    expect(failed.feeds).toBe('/sitemap.xml lists the unlisted post');
+    expect(failed.unlisted).toBe('GET /posts/kitchen-sink/: robots meta is missing, expected "noindex, nofollow"');
+    expect(failed.feeds).toBe('/rss.xml lists the unlisted post');
+  });
+
+  it('fails when any checked page may be indexed', async () => {
+    const site = goodSite();
+    site['https://example.github.io/']!.body = site['https://example.github.io/']!.body!.replace(NOINDEX, '<meta name="robots" content="noindex">');
+    site['https://example.github.io/about/']!.body = CSP;
+    site['https://example.github.io/smoke-check-missing-page/']!.body = '<h1>Page not found</h1>';
+    const failed = await failures(site);
+    expect(failed.home).toBe('GET /: robots meta is "noindex", expected "noindex, nofollow"');
+    expect(failed.pages).toBe('GET /about/: robots meta is missing, expected "noindex, nofollow"');
+    expect(failed['not found']).toBe('GET /smoke-check-missing-page/: robots meta is missing, expected "noindex, nofollow"');
+  });
+
+  it('fails when robots.txt hides the tag, or a sitemap is still served', async () => {
+    const site = goodSite();
+    site['https://example.github.io/robots.txt']!.body = ROBOTS.replace('Allow: /', 'Disallow: /');
+    expect((await failures(site)).robots).toMatch(/^\/robots\.txt: \* may not crawl \/, so it cannot read the noindex tag; /);
+    const stale = goodSite();
+    stale['https://example.github.io/sitemap.xml'] = { type: 'application/xml', body: '<urlset></urlset>' };
+    expect((await failures(stale)).robots).toBe('GET /sitemap.xml: 200, expected 404');
   });
 
   it('fails when the draft is served', async () => {

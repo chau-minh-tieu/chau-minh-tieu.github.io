@@ -109,7 +109,7 @@ Change any of these only after asking.
 | Interactivity | None by default. Only the theme toggle and copy buttons ship JavaScript; Astro islands only if a feature truly needs one |
 | Styling | Plain CSS with custom properties for every token (section 5.1); no CSS framework unless you make a strong case in F1 |
 | Fonts | Inter (variable, with optical sizes) and JetBrains Mono from `@fontsource`, self-hosted, OFL |
-| Feeds and SEO | RSS, sitemap, canonical URLs, Open Graph and Twitter meta, `noindex` on unlisted posts |
+| Feeds and SEO | ~~RSS, sitemap, canonical URLs, Open Graph and Twitter meta, `noindex` on unlisted posts~~ *Owner decision, 2026-11-05 (F9): the site is not indexed by search engines. RSS, canonical URLs, Open Graph and Twitter meta; `<meta name="robots" content="noindex, nofollow">` on every page; `robots.txt` allows all crawlers, so search engines can read that tag, and disallows `/` for Googlebot-Image, GPTBot, ClaudeBot, CCBot, Google-Extended and Applebot-Extended; no sitemap.* |
 | Testing | Vitest for utilities and remark/rehype plugins; a build-output test asserting privacy and metadata rules |
 
 ### 4.3 Proposed defaults (confirm at kickoff)
@@ -275,7 +275,7 @@ Tag label · filter chip (link) · theme toggle · code block (header with file 
 | `description` | required, ≤ 160 chars (dek, meta description, RSS) |
 | `pubDate`, `updatedDate` | dates |
 | `tags` | 1–2 of `engineering`, `ai`, `leadership`; the first is primary and sets the accent |
-| `status` | `draft` (never built in production) · `unlisted` (built, `noindex`, excluded from lists, tags, RSS and sitemap; for previewing on the live site) · `published` |
+| `status` | `draft` (never built in production) · `unlisted` (~~built, `noindex`, excluded from lists, tags, RSS and sitemap~~ *owner decision, 2026-11-05 (F9): built and excluded from lists and RSS, meaning home, tag pages and next/previous; every page is `noindex`*; for previewing on the live site) · `published` |
 | `brief` | the issue number of the post brief |
 | `sources` | list of `{ title, url }`; required when `tags` includes `engineering` or `ai` |
 | `aiAssisted` | boolean, default `true`; drives the disclosure line |
