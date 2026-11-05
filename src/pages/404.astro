@@ -1,7 +1,7 @@
 ---
 // /404.html: GitHub Pages serves it, with status 404, for every path that has
-// no file. It answers at any address, so it has no canonical URL, and it is
-// never indexed. Asset paths are absolute (Astro's default), so it renders
+// no file. It answers at any address, so it has no canonical URL; like every
+// page, it is never indexed. Asset paths are absolute (Astro's default), so it renders
 // the same at /missing and at /posts/missing/deeper/.
 import BaseLayout from '../layouts/BaseLayout.astro';
 
@@ -12,7 +12,7 @@ const links = [
 ];
 ---
 
-<BaseLayout title="Page not found" noindex canonical={false}>
+<BaseLayout title="Page not found" canonical={false}>
   <div class="wrap">
     <header class="head">
       <p class="label code">404</p>

@@ -13,7 +13,7 @@ export async function builtPosts(): Promise<Post[]> {
   return newestFirst(posts);
 }
 
-/** Published posts, newest first: home, tag pages, RSS, sitemap, next/previous. */
+/** Published posts, newest first: home, tag pages, RSS, next/previous. */
 export async function listedPosts(): Promise<Post[]> {
   return (await builtPosts()).filter(({ data }) => isListed(data.status));
 }

@@ -1,6 +1,6 @@
 ---
 title: Kitchen sink, every post component on one page
-description: A regression page for the post layout. Unlisted, so it never appears in lists, feeds or the sitemap.
+description: A regression page for the post layout. Unlisted, so it never appears in lists or feeds.
 pubDate: 2026-10-25
 tags: [ai, engineering]
 status: unlisted

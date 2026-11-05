@@ -1,4 +1,11 @@
+# Crawling stays allowed so search engines can read each page's noindex tag.
 User-agent: *
 Allow: /
 
-Sitemap: https://chau-minh-tieu.github.io/sitemap.xml
+User-agent: Googlebot-Image
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+Disallow: /

@@ -17,8 +17,6 @@ interface Props {
   /** Page title; the site name is appended. Omit on the home page. */
   title?: string;
   description?: string;
-  /** Asks search engines not to index the page (unlisted posts, 404). */
-  noindex?: boolean;
   /** False for a page served at many addresses (404): no canonical URL, no og:url. */
   canonical?: boolean;
   /** Posts: Open Graph type `article` with these details. */
@@ -28,7 +26,6 @@ interface Props {
 const {
   title,
   description = 'Notes on software, data & AI, and engineering leadership.',
-  noindex = false,
   canonical = true,
   article,
 } = Astro.props;
@@ -50,7 +47,10 @@ const image = new URL('/og.png', Astro.site);
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={url} />}
-    {noindex && <meta name="robots" content="noindex" />}
+    {/* No page is indexed or its links followed (F9). public/robots.txt lets
+        search engines crawl, so they can read this tag. */}
+    <meta name="robots" content="noindex, nofollow" />
+
     <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

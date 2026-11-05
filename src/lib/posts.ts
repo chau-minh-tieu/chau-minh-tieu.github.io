@@ -35,7 +35,7 @@ export function isBuilt(status: Status, dev: boolean): boolean {
   return status !== 'draft' || dev;
 }
 
-/** Only published posts appear on home, tag pages, RSS, the sitemap and next/previous. */
+/** Only published posts appear on home, tag pages, RSS and next/previous. */
 export function isListed(status: Status): boolean {
   return status === 'published';
 }

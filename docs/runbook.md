@@ -29,9 +29,11 @@ stateDiagram-v2
 |---|---|---|
 | Brief | An issue labelled `brief`, locked | Nothing |
 | Draft | An open PR from `post/<slug>` with `status: unlisted` | Nothing |
-| Unlisted | `src/content/posts/<slug>/index.md` on `main`, `status: unlisted` | `/posts/<slug>/` with `noindex`; absent from home, tag pages, RSS and sitemap |
-| Published | The same file, `status: published` | Everywhere: home, `/tags/<tag>/`, `/rss.xml`, `/sitemap.xml`; the project's "Write-up" link if `src/lib/projects.ts` names the slug |
+| Unlisted | `src/content/posts/<slug>/index.md` on `main`, `status: unlisted` | `/posts/<slug>/`; absent from home, tag pages and RSS |
+| Published | The same file, `status: published` | Everywhere: home, `/tags/<tag>/`, `/rss.xml`; the project's "Write-up" link if `src/lib/projects.ts` names the slug |
 | Gone | `status: draft`, or no folder | `/posts/<slug>/` returns 404 |
+
+Every page carries `noindex, nofollow`, whatever its state (F9): no state is meant for search engines, so only the lists and RSS tell unlisted and published apart.
 
 ## 1. Publish a post end to end
 
@@ -69,8 +71,8 @@ stateDiagram-v2
    ```sh
    gh run list --repo $REPO --workflow deploy.yml --branch main --limit 1
    pnpm smoke --version <squash SHA>
-   curl -s $SITE/posts/<slug>/ | grep -c 'name="robots" content="noindex"'   # 1
-   curl -s $SITE/rss.xml $SITE/sitemap.xml $SITE/ | grep -c '/posts/<slug>/'   # 0
+   curl -s $SITE/posts/<slug>/ | grep -c 'name="robots" content="noindex, nofollow"'   # 1
+   curl -s $SITE/rss.xml $SITE/ | grep -c '/posts/<slug>/'   # 0
    ```
 
    Read the page in a browser, both themes and on a phone: this is the full-fidelity review GitHub's preview cannot give.
@@ -80,8 +82,8 @@ stateDiagram-v2
 7. **Merge (you)** with the same `gh pr merge` command. Check (the AI): Deploy green, `pnpm smoke --version <squash SHA>`, and the post listed:
 
    ```sh
-   for path in / /tags/<tag>/ /rss.xml /sitemap.xml; do printf '%s ' "$path"; curl -s "$SITE$path" | grep -c '/posts/<slug>/'; done   # each ≥ 1
-   curl -s $SITE/posts/<slug>/ | grep -c 'name="robots" content="noindex"'   # 0
+   for path in / /tags/<tag>/ /rss.xml; do printf '%s ' "$path"; curl -s "$SITE$path" | grep -c '/posts/<slug>/'; done   # each ≥ 1
+   curl -s $SITE/posts/<slug>/ | grep -c 'name="robots" content="noindex, nofollow"'   # 1: every page, published or not
    ```
 
    A project write-up: `writeUp: '<slug>'` in `src/lib/projects.ts`, in a `feat/*` PR (a post PR may change only `src/content/posts/**`). The link appears once the post is published, whichever PR merges first.
@@ -92,7 +94,7 @@ Choose the depth. Each is a post PR on `post/<slug>-unpublish` with `Closes #<N>
 
 | Goal | Change | Result after the deploy |
 |---|---|---|
-| Take it off the lists, keep the URL | `status: unlisted` | Page answers with `noindex`; gone from home, tags, RSS, sitemap and the Projects link |
+| Take it off the lists, keep the URL | `status: unlisted` | Page stays at its URL; gone from home, tags, RSS and the Projects link |
 | Take the page down, keep the file | `status: draft` | `/posts/<slug>/` returns 404; the file stays for later |
 | Remove it | Delete the folder (`git rm -r src/content/posts/<slug>`) | 404; the text lives on in git history |
 

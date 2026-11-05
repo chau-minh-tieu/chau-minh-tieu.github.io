@@ -3,7 +3,8 @@
  * every page carries a CSP that allows each of its inline scripts and styles
  * by hash, nothing is loaded from another origin, no email address is
  * published, served images carry no metadata, drafts are never built,
- * unlisted posts stay out of every list, the sitemap matches the pages,
+ * unlisted posts stay out of every list, every page asks not to be indexed
+ * while robots.txt lets search engines read that, there is no sitemap,
  * diagrams are inert SVG with unique ids, every internal link resolves, and
  * every page carries the Open Graph defaults and the icons.
  *
@@ -15,6 +16,7 @@ import { extname, join, relative, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { findImageMetadata, IMAGE_EXTENSIONS } from '../scripts/lib/image-metadata.ts';
 import { findEmails } from '../scripts/lib/privacy.ts';
+import { ROBOTS_META, robotsMetaOf, robotsProblems } from '../scripts/lib/robots.ts';
 
 const DIST = join(import.meta.dirname, '..', 'dist');
 const SITE = 'https://chau-minh-tieu.github.io';
@@ -124,30 +126,33 @@ describe.skipIf(!built)('statuses and feeds', () => {
     }
   });
 
-  it('builds unlisted posts with noindex', () => {
-    const html = read(join(DIST, 'posts', 'kitchen-sink', 'index.html'));
-    expect(html).toContain('<meta name="robots" content="noindex">');
-  });
-
-  it('keeps unlisted posts out of home, tag pages, RSS and the sitemap', () => {
+  it('keeps unlisted posts out of home, tag pages and RSS', () => {
     const lists = [
       join(DIST, 'index.html'),
       ...pages.filter((page) => name(page).startsWith(`tags${sep}`)),
       join(DIST, 'rss.xml'),
-      join(DIST, 'sitemap.xml'),
     ];
     expect(lists.length).toBeGreaterThan(4);
     for (const file of lists) expect(read(file), name(file)).not.toContain(UNLISTED);
   });
+});
 
-  it('lists exactly the indexable pages in the sitemap', () => {
-    const sitemap = read(join(DIST, 'sitemap.xml'));
-    const listed = Array.from(sitemap.matchAll(/<loc>([^<]+)<\/loc>/g), (m) => m[1]).sort();
-    const indexable = pages
-      .filter((page) => !page.endsWith(`${sep}404.html`) && !read(page).includes('name="robots" content="noindex"'))
-      .map(urlOf)
-      .sort();
-    expect(listed).toEqual(indexable);
+describe.skipIf(!built)('indexing (F9)', () => {
+  it.each(pages.map(name))('%s asks not to be indexed or followed, once', (page) => {
+    const html = read(join(DIST, page));
+    expect(html.match(/<meta name="robots"/gi) ?? []).toHaveLength(1);
+    expect(robotsMetaOf(html)).toBe(ROBOTS_META);
+  });
+
+  it('serves a robots.txt that lets search engines read the tag and refuses the blocked agents', () => {
+    expect(robotsProblems(read(join(DIST, 'robots.txt')))).toEqual([]);
+  });
+
+  it('has no sitemap, and nothing mentions one', () => {
+    expect(files.filter((file) => /sitemap/i.test(name(file))).map(name)).toEqual([]);
+    for (const file of files.filter((f) => TEXT_EXTENSIONS.has(extname(f)))) {
+      expect(read(file), name(file)).not.toMatch(/sitemap/i);
+    }
   });
 });
 
@@ -286,7 +291,7 @@ describe.skipIf(!built)('pages and brand', () => {
   it('serves the 404 page without a canonical URL and with noindex', () => {
     const html = read(join(DIST, '404.html'));
     expect(html).toContain('Page not found');
-    expect(html).toContain('<meta name="robots" content="noindex">');
+    expect(robotsMetaOf(html)).toBe(ROBOTS_META);
     expect(html).not.toContain('rel="canonical"');
     expect(metaOf(html, 'og:url')).toEqual([]);
   });
