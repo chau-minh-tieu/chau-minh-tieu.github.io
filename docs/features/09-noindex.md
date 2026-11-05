@@ -82,7 +82,7 @@ flowchart LR
 | robots.txt | `*` may crawl everything; the six named agents are refused `/`; no `Sitemap:` line |
 | Sitemap | `src/pages/sitemap.xml.ts` deleted; `dist/` has no sitemap and no text mentions one; `/sitemap.xml` answers 404 under `pnpm preview` |
 | Unchanged | RSS, canonical URLs, Open Graph and Twitter tags; unlisted posts still stay off home, tag pages, next/previous and RSS |
-| Tests | 260 (17 new): the tag on each page, robots.txt policy, no sitemap; robots.txt parser; smoke `robots` check and failure cases. Three mutation checks |
+| Tests | 260: 23 new (12 build-output, 9 parser, 2 smoke) and 2 removed (the sitemap list and the old unlisted `noindex` test). Three mutation checks |
 | Smoke | `home`, `pages`, `unlisted` and `not found` require the tag; new `robots` check (policy, `/sitemap.xml` is 404); `feeds` is RSS only. 10 checks locally, 12 live |
 | Docs | HANDOFF.md 4.2 and 6.2, CLAUDE.md (Frontend), the plan (later decisions, deviation 8 superseded, versions), runbook (states and checks), README (at a glance, publishing diagram, layout) |
 
