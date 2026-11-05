@@ -163,6 +163,8 @@ flowchart LR
 - **README numbers.** "232 Vitest tests, plus 11 smoke checks" had already drifted, because each new post adds per-page tests. It now says 260 and 12 (10 everywhere, plus the two redirect checks that run only against the live site).
 - **Astro template comments** (`{/* … */}`) are not written to the HTML; the built pages carry the tag and no comment.
 - **Not measured:** Lighthouse. Its SEO category will now report "Page is blocked from indexing". That is expected, and HANDOFF.md 9 asks only for performance and accessibility, which this change does not touch.
+- **Post-merge checks of #20** (2026-11-05). Local `main` equals `origin/main` at `c09d1ba`, and the working tree is clean. The `main` ruleset still requires a pull request and `verify`, `privacy` and `content`, and still blocks force pushes and deletion. Still open: the merge did not delete `feat/09-noindex` (`.claude/settings.json` stops me from deleting branches), and the live checks wait for a successful deploy.
+- **The deploy of #20 stalled twice.** In run 42064811934, `build` was green both times, and `deploy` cancelled itself at the 10-minute timeout of `deploy-pages`. In attempt 1 (23:29 to 23:39) Pages sat at `updating_pages`. In attempt 2, your re-run (23:42 to 23:52), Pages reported an empty status throughout. GitHub's status page showed no incident, and no other deployment was running. The log shows that a Pages deployment's ID is the commit SHA, so the re-run asked again for the ID that had just been cancelled. This close-out commit gives Pages a new ID. The live site kept serving `fb6bbbf`, so readers saw the old pages, not a broken site. If this commit's deploy stalls too, the next step is GitHub Support, with both attempts' run and job IDs. [One community report](https://github.com/orgs/community/discussions/200884) describes a stuck Pages environment that Support cleared. The re-run itself needs admin rights: as the active `gh` account it failed with "Must have admin rights to Repository".
 
 ### 7. Time used
 
@@ -171,8 +173,11 @@ flowchart LR
 | F9, brief | 22:20 to 22:30 by the clock: reading, finding every sitemap and robots reference, the docs check, the brief |
 | Waiting for your answer | 22:30 to about 23:16 |
 | F9, build | 23:16 to about 23:30: layout, robots.txt, parser, tests, smoke checks, docs, mutation checks, local smoke, PR #20, this debrief |
-| F9 so far | about 24 minutes of work, before your review and the merge |
-| Cumulative | about 9 h 00 min of active time: 8 h 36 min after F8 plus F9 so far. The second post's chat (#17 to #19) recorded no time here and is not counted |
+| Review and merge | to 23:28: no questions; #20 merged as `c09d1ba` |
+| Post-merge verification | 23:29 to 23:55: `main` and the ruleset checked; the deploy stalled twice, including your re-run; diagnosis |
+| Close-out PR | 23:55 to about 00:00: this record, whose merge deploys the site afresh |
+| F9 so far | about 55 minutes of work: brief 10, build 14, post-merge and close-out about 31. The close-out's deploy and the live checks are still to come |
+| Cumulative | about 9 h 31 min of active time: 8 h 36 min after F8 plus F9 so far. The second post's chat (#17 to #19) recorded no time here and is not counted |
 
 ### 8. Q&A log
 
